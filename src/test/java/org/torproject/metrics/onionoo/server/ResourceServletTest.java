@@ -640,6 +640,13 @@ public class ResourceServletTest {
   }
 
   @Test(timeout = 100)
+  public void testSearchBase64FingerprintPlusEncoded() {
+    this.assertSummaryDocument(
+        "/summary?search=ACXBNsHzqe7%2BKuP5GPA7+iG1Bws", 1,
+        new String[] { "TimMayTribute" }, 0, null);
+  }
+
+  @Test(timeout = 100)
   public void testSearchBase64FingerprintBridge() {
     this.assertSummaryDocument(
         "/summary?search=AACDGyNt/3PUCa0XtA4qcopTmU8", 0, null, 0, null);
@@ -675,6 +682,12 @@ public class ResourceServletTest {
     this.assertSummaryDocument(
         "/summary?search=F1A3 B33C", 1, new String[] { "TorkaZ" }, 0,
         null);
+  }
+
+  @Test(timeout = 100)
+  public void testSearchPlusSeparatedFingerprintLastEight() {
+    this.assertSummaryDocument(
+        "/summary?search=F1A3+B33C", 0, null, 0, null);
   }
 
   @Test(timeout = 100)
@@ -949,9 +962,23 @@ public class ResourceServletTest {
   }
 
   @Test(timeout = 100)
+  public void testSearchEmailAddressEncodedPlus() {
+    this.assertSummaryDocument(
+        "/summary?search=contact:<tor%2Bsteven.murdoch@cl.cam.ac.uk>", 1,
+        new String[] { "TimMayTribute" }, 0, null);
+  }
+
+  @Test(timeout = 100)
   public void testSearchDoubleQuotedEmailAddress() {
     this.assertSummaryDocument(
         "/summary?search=contact:\"klaus dot zufall at gmx dot de\"", 1,
+        new String[] { "TorkaZ" }, 0, null);
+  }
+
+  @Test(timeout = 100)
+  public void testSearchDoubleQuotedEmailAddressReversed() {
+    this.assertSummaryDocument(
+        "/summary?search=contact:\"de dot gmx at zufall dot klaus\"", 1,
         new String[] { "TorkaZ" }, 0, null);
   }
 

@@ -9,6 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,7 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletConfig;
@@ -134,13 +135,15 @@ public class ResourceServlet extends HttpServlet {
     RequestHandler rh = new RequestHandler(nodeIndex);
     rh.setResourceType(resourceType);
 
-    /* Extract parameters either from the old-style URI or from request
-     * parameters. */
-    Map<String, String> parameterMap = new HashMap<>();
-    for (String parameterKey : request.getParameterMap().keySet()) {
-      String[] parameterValues =
-          request.getParameterValues(parameterKey);
-      parameterMap.put(parameterKey, parameterValues[0]);
+    /* Parse request parameters from the query string using our own code rather
+     * than relying on HttpServletRequest#getParameterMap(), because we want
+     * percent-encoded characters to be decoded in all parameters and don't want
+     * the + sign to be decoded to the space sign in any of our parameters. */
+    Map<String, String> parameterMap
+        = this.parseQueryString(request.getQueryString());
+    if (null == parameterMap) {
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+      return;
     }
 
     /* Make sure that the request doesn't contain any unknown
@@ -154,8 +157,7 @@ public class ResourceServlet extends HttpServlet {
 
     /* Filter relays and bridges matching the request. */
     if (parameterMap.containsKey("search")) {
-      String[] searchTerms = parseSearchParameters(
-          request.getQueryString());
+      String[] searchTerms = parseSearchParameters(parameterMap.get("search"));
       if (searchTerms == null) {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         return;
@@ -426,11 +428,6 @@ public class ResourceServlet extends HttpServlet {
         bridgeDocumentsWritten, charsWritten, writtenResponseMillis);
   }
 
-  private static Pattern searchQueryStringPattern =
-      Pattern.compile("(?:.*[?&])*?" // lazily skip other parameters
-          + "search=([\\p{Graph} &&[^&]]+)" // capture parameter
-          + "(?:&.*)*"); // skip remaining parameters
-
   private static Pattern searchParameterPattern =
       Pattern.compile("^\\$?[0-9a-fA-F]{1,40}$|" /* Hex fingerprint. */
       + "^[0-9a-zA-Z+/]{1,27}$|" /* Base64 fingerprint. */
@@ -438,16 +435,44 @@ public class ResourceServlet extends HttpServlet {
       + ipv6AddressPatternString + "|" /* IPv6 address. */
       + "^[a-zA-Z_]+:\"?[\\p{Graph} ]+\"?$"); /* Qualified search term. */
 
-  protected static String[] parseSearchParameters(String queryString) {
-    Matcher searchQueryStringMatcher = searchQueryStringPattern.matcher(
-        queryString);
-    if (!searchQueryStringMatcher.matches()) {
-      /* Search query contains illegal character(s). */
-      return null;
+  /**
+   * Parse the given query string and return a map with parameter keys and first
+   * encountered parameter values.
+   *
+   * @param queryString Query string obtained from the request.
+   * @return Map with parameter keys and values.
+   */
+  protected Map<String, String> parseQueryString(String queryString) {
+    Map<String, String> parameterMap = new HashMap<>();
+    if (null != queryString) {
+      for (String parameter : queryString.split("&")) {
+        String[] parameterParts = parameter.split("=", 2);
+        if (parameterParts.length < 2) {
+          /* We don't support parameter keys without values. */
+          return null;
+        }
+        String parameterKey = parameterParts[0];
+        if (parameterMap.containsKey(parameterKey)) {
+          /* Only keep the first parameter value for any given parameter key. */
+          continue;
+        }
+        String parameterValue = parameterParts[1];
+        try {
+          /* Percent-encode the plus sign before decoding it to avoid it being
+           * decoded to the space sign. */
+          String percentDecodedParameterValue = URLDecoder.decode(
+              parameterValue.replaceAll("\\+", "%2B"), "UTF-8");
+          parameterMap.put(parameterKey, percentDecodedParameterValue);
+        } catch (UnsupportedEncodingException e) {
+          return null;
+        }
+      }
     }
-    String parameter = searchQueryStringMatcher.group(1);
-    String[] spaceSeparatedParts =
-        parameter.replaceAll("%20", " ").split(" ");
+    return parameterMap;
+  }
+
+  protected static String[] parseSearchParameters(String parameter) {
+    String[] spaceSeparatedParts = parameter.split(" ");
     List<String> searchParameters = new ArrayList<>();
     StringBuilder doubleQuotedSearchTerm = null;
     for (String spaceSeparatedPart : spaceSeparatedParts) {
