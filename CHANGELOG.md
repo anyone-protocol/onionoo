@@ -4,6 +4,7 @@
    - Simplify logging configuration.
    - Set default locale `US` and default time zone `UTC` at the
      beginning of the execution.
+   - Update to metrics-lib 2.16.0.
 
 
 # Changes in version 8.0-1.25.0 - 2020-02-20

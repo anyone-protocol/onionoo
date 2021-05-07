@@ -98,5 +98,8 @@ public class DummyBridgeStatus implements BridgeNetworkStatus {
   public long getStableUptime() {
     return 0;
   }
+
+  @Override
+  public String getFingerprint() { return null; }
 }
 
