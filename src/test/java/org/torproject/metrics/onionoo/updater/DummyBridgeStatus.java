@@ -100,6 +100,8 @@ public class DummyBridgeStatus implements BridgeNetworkStatus {
   }
 
   @Override
-  public String getFingerprint() { return null; }
+  public String getFingerprint() {
+    return null;
+  }
 }
 
