@@ -1,5 +1,4 @@
 /generated/
-/lib/
 /geoip/
 /in/
 /out/
@@ -8,4 +7,4 @@
 .classpath
 .project
 /build.properties
-
+/.idea/
