@@ -3,29 +3,31 @@
 
 package org.torproject.metrics.onionoo.updater;
 
-import org.torproject.descriptor.*;
+import org.torproject.descriptor.Descriptor;
+import org.torproject.descriptor.GeoipFile;
+import org.torproject.descriptor.GeoipNamesFile;
 import org.torproject.descriptor.impl.DescriptorReaderImpl;
-import org.torproject.descriptor.impl.GeoipFileImpl;
-import org.torproject.descriptor.impl.GeoipNamesFileImpl;
 import org.torproject.metrics.onionoo.util.FormattingUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.management.DescriptorRead;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 public class LookupService {
@@ -52,36 +54,36 @@ public class LookupService {
 
   /* Make sure we have all required .csv files. */
   private void findRequiredCsvFiles() {
-    DescriptorReader dr = new DescriptorReaderImpl();
     File geoip = new File(this.geoipDir,
         "geoip");
-    for (Descriptor g : dr.readDescriptors(geoip)) {
+    for (Descriptor g : new DescriptorReaderImpl().readDescriptors(geoip)) {
       if (g instanceof GeoipFile) {
         this.geoip = (GeoipFile) g;
       }
     }
     File geoip6 = new File(this.geoipDir,
         "geoip6");
-    for (Descriptor g : dr.readDescriptors(geoip6)) {
+    for (Descriptor g : new DescriptorReaderImpl().readDescriptors(geoip6)) {
       if (g instanceof GeoipFile) {
         this.geoip6 = (GeoipFile) g;
       }
     }
     File countries = new File(this.geoipDir,
             "countries.txt");
-    for (Descriptor g : dr.readDescriptors(countries)) {
+    for (Descriptor g : new DescriptorReaderImpl().readDescriptors(countries)) {
       if (g instanceof GeoipNamesFile) {
         this.countries = (GeoipNamesFile) g;
       }
     }
     File asns = new File(this.geoipDir,
             "asn.txt");
-    for (Descriptor g : dr.readDescriptors(asns)) {
+    for (Descriptor g : new DescriptorReaderImpl().readDescriptors(asns)) {
       if (g instanceof GeoipNamesFile) {
         this.asns = (GeoipNamesFile) g;
       }
     }
-    this.hasAllFiles = true;
+    this.hasAllFiles = (null != this.geoip && null != this.geoip6
+                        && null != this.countries && null != this.asns);
   }
 
   private final Pattern ipv4Pattern = Pattern.compile("^[0-9.]{7,15}$");
@@ -108,32 +110,38 @@ public class LookupService {
         geoipFile = this.geoip6;
       }
       try {
-        Optional<GeoipFile.GeoipEntry> entry = geoipFile.getEntry(InetAddress.getByName(addressString));
+        Optional<GeoipFile.GeoipEntry> entry =
+            geoipFile.getEntry(InetAddress.getByName(addressString));
         if (entry.isPresent()) {
           String countryCode = entry.get().getCountryCode();
-          if (countryCode.length() > 1) {
+          if (null != countryCode) {
             addressCountries.put(addressString, countryCode);
           }
           String asn = entry.get().getAutonomousSystemNumber();
-          if (asn.length() > 1) {
+          if (null != asn) {
             addressAsn.put(addressString, asn);
           }
         }
       } catch (UnknownHostException e) {
-        logger.error("Tried to look up " + addressString + " which is not an IP address.");
+        logger.error("Tried to look up " + addressString
+                + " which is not an IP address.");
       }
     }
 
     /* Finally, put together lookup results. */
     for (String addressString : addressStrings) {
       LookupResult lookupResult = new LookupResult();
-      if (addressCountries.containsKey(addressString)) {
-        String countryCode = addressCountries.get(addressString).toLowerCase();
-        lookupResult.setCountryCode(countryCode);
-        lookupResult.setCountryName(this.countries.get(countryCode));
+      String countryCode = addressCountries.getOrDefault(addressString, null);
+      String asn = addressAsn.getOrDefault(addressString, null);
+      if (null == countryCode && null == asn) {
+        continue;
       }
-      if (addressAsn.containsKey(addressString)) {
-        String asn = addressAsn.get(addressString);
+      if (null != countryCode) {
+        lookupResult.setCountryCode(countryCode.toLowerCase());
+        lookupResult.setCountryName(this.countries.get(
+                countryCode.toUpperCase()));
+      }
+      if (null != asn) {
         lookupResult.setAsNumber(asn);
         lookupResult.setAsName(this.asns.get(asn));
       }
@@ -142,6 +150,8 @@ public class LookupService {
 
     /* Keep statistics. */
     this.addressesLookedUp += addressStrings.size();
+    this.addressesCountryResolved += addressCountries.size();
+    this.addressesAsnResolved += addressAsn.size();
     this.addressesResolved += lookupResults.size();
 
     return lookupResults;
@@ -165,14 +175,22 @@ public class LookupService {
 
   private int addressesResolved = 0;
 
+  private int addressesCountryResolved = 0;
+
+  private int addressesAsnResolved = 0;
+
   /** Returns a string with the number of addresses looked up and
    * resolved. */
   public String getStatsString() {
     return String.format(
         "    %s addresses looked up\n"
-        + "    %s addresses resolved\n",
+        + "    %s addresses resolved (any)\n"
+        + "    %s addresses resolved (country)\n"
+        + "    %s addresses resolved (ASN)\n",
         FormattingUtils.formatDecimalNumber(addressesLookedUp),
-        FormattingUtils.formatDecimalNumber(addressesResolved));
+        FormattingUtils.formatDecimalNumber(addressesResolved),
+        FormattingUtils.formatDecimalNumber(addressesCountryResolved),
+        FormattingUtils.formatDecimalNumber(addressesAsnResolved));
   }
 }
 
