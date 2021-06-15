@@ -1,10 +1,13 @@
 # Changes in version 8.0-1.2?.? - 2020-0?-??
 
+ * Medium changes
+   - Use IPFire geolocation database instead of MaxMind.
+
  * Minor changes
    - Simplify logging configuration.
    - Set default locale `US` and default time zone `UTC` at the
      beginning of the execution.
-   - Update to metrics-lib 2.16.0.
+   - Update to metrics-lib 2.17.0.
 
 
 # Changes in version 8.0-1.25.0 - 2020-02-20
