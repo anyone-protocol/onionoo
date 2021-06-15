@@ -2,6 +2,8 @@
 
  * Medium changes
    - Use IPFire geolocation database instead of MaxMind.
+   - Fix inconsistencies between ASN/GeoIP/rDNS lookups in
+     summary and details documents.
 
  * Minor changes
    - Simplify logging configuration.

@@ -474,10 +474,18 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
         updatedNodeStatus = this.knownNodes.get(fingerprint);
         String address = nodeStatus.getAddress();
         if (address.equals(updatedNodeStatus.getAddress())) {
-          /* Only remember the last lookup time if the address has not
-           * changed.  Otherwise we'll want to do a fresh lookup. */
+          /* Only remember rDNS/GeoIP lookup results if the address has not
+           * changed. Otherwise we'll want to do a fresh lookup anyway. */
+          updatedNodeStatus.setVerifiedHostNames(
+              nodeStatus.getVerifiedHostNames());
+          updatedNodeStatus.setUnverifiedHostNames(
+              nodeStatus.getUnverifiedHostNames());
           updatedNodeStatus.setLastRdnsLookup(
               nodeStatus.getLastRdnsLookup());
+          updatedNodeStatus.setCountryCode(
+              nodeStatus.getCountryCode());
+          updatedNodeStatus.setAsNumber(nodeStatus.getAsNumber());
+          updatedNodeStatus.setAsName(nodeStatus.getAsName());
         }
         int orPort = nodeStatus.getOrPort();
         int dirPort = nodeStatus.getDirPort();
@@ -488,6 +496,11 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
             dirPort, orAddressesAndPorts);
         if (nodeStatus.getLastSeenMillis()
             > updatedNodeStatus.getLastSeenMillis()) {
+          /* Remember everything we learned from more recent consensuses or
+           * bridge network statuses during the last execution. Be sure to only
+           * include attributes here that have been set while processing these
+           * two descriptor types above and nothing else.
+           */
           updatedNodeStatus.setNickname(nodeStatus.getNickname());
           updatedNodeStatus.setAddress(address);
           updatedNodeStatus.setOrAddressesAndPorts(orAddressesAndPorts);
@@ -498,14 +511,9 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
           updatedNodeStatus.setRelayFlags(nodeStatus.getRelayFlags());
           updatedNodeStatus.setConsensusWeight(
               nodeStatus.getConsensusWeight());
-          updatedNodeStatus.setCountryCode(nodeStatus.getCountryCode());
           updatedNodeStatus.setDefaultPolicy(
               nodeStatus.getDefaultPolicy());
           updatedNodeStatus.setPortList(nodeStatus.getPortList());
-          updatedNodeStatus.setAsNumber(nodeStatus.getAsNumber());
-          updatedNodeStatus.setAsName(nodeStatus.getAsName());
-          updatedNodeStatus.setRecommendedVersion(
-              nodeStatus.isRecommendedVersion());
           updatedNodeStatus.setVersion(nodeStatus.getVersion());
         }
         if (nodeStatus.getFirstSeenMillis()
@@ -520,6 +528,8 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
             nodeStatus.getEffectiveFamily());
         updatedNodeStatus.setExtendedFamily(
             nodeStatus.getExtendedFamily());
+        updatedNodeStatus.setRecommendedVersion(
+            nodeStatus.isRecommendedVersion());
       } else {
         updatedNodeStatus = nodeStatus;
         this.knownNodes.put(fingerprint, nodeStatus);
