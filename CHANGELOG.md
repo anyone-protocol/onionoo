@@ -4,6 +4,10 @@
    - Use IPFire geolocation database instead of MaxMind.
    - Fix inconsistencies between ASN/GeoIP/rDNS lookups in
      summary and details documents.
+   - Decode percent-encoded characters in the search parameter in the
+     same way as in the other parameters.
+   - Stop decoding a + sign to a space character in any of the
+     parameters.
 
  * Minor changes
    - Simplify logging configuration.
