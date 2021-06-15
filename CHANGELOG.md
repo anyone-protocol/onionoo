@@ -1,4 +1,4 @@
-# Changes in version 8.0-1.2?.? - 2020-0?-??
+# Changes in version 8.0-1.26.0 - 2021-06-15
 
  * Medium changes
    - Use IPFire geolocation database instead of MaxMind.
