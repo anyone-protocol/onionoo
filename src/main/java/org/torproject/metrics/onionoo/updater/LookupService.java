@@ -142,7 +142,7 @@ public class LookupService {
                 countryCode.toUpperCase()));
       }
       if (null != asn) {
-        lookupResult.setAsNumber(asn);
+        lookupResult.setAsNumber("AS" + asn);
         lookupResult.setAsName(this.asns.get(asn));
       }
       lookupResults.put(addressString, lookupResult);
