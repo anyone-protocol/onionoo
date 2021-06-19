@@ -1,4 +1,4 @@
-# Changes in version 8.0-1.xx.x - 2021-xx-xx
+# Changes in version 8.0-1.26.1 - 2021-06-19
 
  * Minor changes
     - Restore the "AS" prefix string to the as field in documents.
