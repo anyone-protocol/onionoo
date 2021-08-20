@@ -61,6 +61,36 @@ public class BandwidthStatusTest {
       return this.intervalLength;
     }
 
+    private long overloadRatelimitsTimestamp;
+
+    public long getOverloadRatelimitsTimestamp() {
+      return this.overloadRatelimitsTimestamp;
+    }
+
+    private long overloadRatelimitsRateLimit;
+
+    public long getOverloadRatelimitsRateLimit() {
+      return this.overloadRatelimitsRateLimit;
+    }
+
+    private long overloadRatelimitsBurstLimit;
+
+    public long getOverloadRatelimitsBurstLimit() {
+      return this.overloadRatelimitsBurstLimit;
+    }
+
+    private int overloadRatelimitsReadCount;
+
+    public int getOverloadRatelimitsReadCount() {
+      return this.overloadRatelimitsReadCount;
+    }
+
+    private int overloadRatelimitsWriteCount;
+
+    public int getOverloadRatelimitsWriteCount() {
+      return this.overloadRatelimitsWriteCount;
+    }
+
     private SortedMap<Long, Long> bandwidthValues = new TreeMap<>();
 
     public SortedMap<Long, Long> getBandwidthValues() {
@@ -109,6 +139,23 @@ public class BandwidthStatusTest {
   }
 
   @Test()
+  public void testExistingStatusWithOverloadRatelimits() {
+    BandwidthStatus bandwidthStatus = new BandwidthStatus();
+    String existingLines =
+        "w 2014-07-31 23:52:22 2014-08-01 00:07:22 4096\n"
+        + "w 2014-08-01 00:07:22 2014-08-01 00:22:22 30720\n";
+    bandwidthStatus.setFromDocumentString(existingLines);
+    bandwidthStatus.setOverloadRatelimitsTimestamp(1628168400000L);
+    bandwidthStatus.setOverloadRatelimitsRateLimit(1310720);
+    bandwidthStatus.setOverloadRatelimitsBurstLimit(1310720);
+    bandwidthStatus.setOverloadRatelimitsReadCount(360);
+    bandwidthStatus.setOverloadRatelimitsWriteCount(531);
+    assertEquals("New interval should be appended.",
+        existingLines + "rl 2021-08-05 13:00:00 1310720 1310720 360 531\n",
+        bandwidthStatus.toDocumentString());
+  }
+
+  @Test()
   public void testCompressRecentIntervals() {
     BandwidthStatus bandwidthStatus = new BandwidthStatus();
     String existingLines =
@@ -144,4 +191,3 @@ public class BandwidthStatusTest {
         statusLines, bandwidthStatus.toDocumentString());
   }
 }
-

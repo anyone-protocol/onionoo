@@ -11,6 +11,22 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+/**
+ * Define details documents files. These are saved in
+ * /out/details and served via the /details endpoint.
+ *
+ * <p>DetailsDocument does not extend the Document methods:
+ * {@see Document#setFromDocumentString(String documentString)} and
+ * {@see Document#toDocumentString()}(String documentString)</p>
+ *
+ * <p>The document is instead writte to file via the
+ * {@code objectMapper.writeValueAsString(document}
+ * methond in {@see DocumentStore}.</p>
+ *
+ * <p>DetailsDocument do not support JSON in order not to break
+ * compatibility with older document formats.</p>
+ */
+
 public class DetailsDocument extends Document {
 
   /* We must ensure that details files only contain ASCII characters
@@ -362,6 +378,16 @@ public class DetailsDocument extends Document {
     return this.advertisedBandwidth;
   }
 
+  private long overloadGeneralTimestamp;
+
+  public void setOverloadGeneralTimestamp(long overloadGeneralTimestamp) {
+    this.overloadGeneralTimestamp = overloadGeneralTimestamp;
+  }
+
+  public long getOverloadGeneralTimestamp() {
+    return this.overloadGeneralTimestamp;
+  }
+
   private List<String> exitPolicy;
 
   public void setExitPolicy(List<String> exitPolicy) {
@@ -582,4 +608,3 @@ public class DetailsDocument extends Document {
     return this.bridgedbDistributor;
   }
 }
-

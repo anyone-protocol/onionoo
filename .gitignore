@@ -8,3 +8,6 @@
 .project
 /build.properties
 /.idea/
+
+src/main/main.iml
+src/test/test.iml
