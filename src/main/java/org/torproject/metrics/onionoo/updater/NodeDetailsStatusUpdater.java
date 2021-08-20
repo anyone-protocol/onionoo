@@ -174,6 +174,10 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
     detailsStatus.setBandwidthBurst(bandwidthBurst);
     detailsStatus.setObservedBandwidth(observedBandwidth);
     detailsStatus.setAdvertisedBandwidth(advertisedBandwidth);
+    long overloadGeneralTimestamp = descriptor.getOverloadGeneralTimestamp();
+    if (overloadGeneralTimestamp != -1L) {
+      detailsStatus.setOverloadGeneralTimestamp(overloadGeneralTimestamp);
+    }
     detailsStatus.setExitPolicy(descriptor.getExitPolicyLines());
     detailsStatus.setContact(descriptor.getContact());
     detailsStatus.setPlatform(descriptor.getPlatform());
@@ -333,6 +337,10 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
     detailsStatus.setDescPublished(descriptor.getPublishedMillis());
     detailsStatus.setLastRestarted(calculateLastRestartedMillis(descriptor));
     detailsStatus.setAdvertisedBandwidth(advertisedBandwidth);
+    long overloadGeneralTimestamp = descriptor.getOverloadGeneralTimestamp();
+    if (overloadGeneralTimestamp != -1L) {
+      detailsStatus.setOverloadGeneralTimestamp(overloadGeneralTimestamp);
+    }
     detailsStatus.setPlatform(descriptor.getPlatform());
     this.documentStore.store(detailsStatus, fingerprint);
   }
@@ -1002,4 +1010,3 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
         FormattingUtils.formatDecimalNumber(bridgeStatusesProcessed));
   }
 }
-

@@ -33,5 +33,27 @@ public class BandwidthDocument extends Document {
   public Map<String, GraphHistory> getReadHistory() {
     return this.readHistory;
   }
-}
 
+  private Map<String, Long> overloadRatelimits;
+
+  public void setOverloadRatelimits(Map<String, Long> overloadRatelimits) {
+    this.overloadRatelimits = overloadRatelimits;
+  }
+
+  public Map<String, Long> getOverloadRatelimits() {
+    return this.overloadRatelimits;
+  }
+
+  private Map<String, Long> overloadFdExhausted;
+
+  public void setOverloadFdExhausted(
+      Map<String, Long> overloadFdExhausted
+  ) {
+    this.overloadFdExhausted = overloadFdExhausted;
+  }
+
+  public Map<String, Long> getOverloadFdExhausted() {
+    return this.overloadFdExhausted;
+  }
+
+}

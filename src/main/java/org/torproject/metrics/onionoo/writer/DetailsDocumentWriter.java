@@ -20,6 +20,14 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+/**
+ * Write DetailsDocument files in {@code /out/details}
+ * from updated status files.
+ *
+ * <p>Status files under {@code /status/details} are updated in
+ * {@link NodeDetailsStatusUpdater}</p>
+ *
+ */
 public class DetailsDocumentWriter implements DocumentWriter {
 
   private static final Logger logger = LoggerFactory.getLogger(
@@ -51,6 +59,12 @@ public class DetailsDocumentWriter implements DocumentWriter {
     logger.info("Wrote details document files");
   }
 
+  /**
+   * Update the relay details document file for a relay.
+   *
+   * @param fingerprint, a String
+   * @param detailsStatus, a DetailsStatus
+   */
   private void updateRelayDetailsFile(String fingerprint,
       DetailsStatus detailsStatus) {
     DetailsDocument detailsDocument = new DetailsDocument();
@@ -115,6 +129,10 @@ public class DetailsDocumentWriter implements DocumentWriter {
         detailsStatus.getObservedBandwidth());
     detailsDocument.setAdvertisedBandwidth(
         detailsStatus.getAdvertisedBandwidth());
+    long overloadGeneralTimestamp = detailsStatus.getOverloadGeneralTimestamp();
+    if (overloadGeneralTimestamp != -1L) {
+      detailsDocument.setOverloadGeneralTimestamp(overloadGeneralTimestamp);
+    }
     detailsDocument.setExitPolicy(detailsStatus.getExitPolicy());
     detailsDocument.setContact(detailsStatus.getContact());
     detailsDocument.setPlatform(detailsStatus.getPlatform());
@@ -157,11 +175,18 @@ public class DetailsDocumentWriter implements DocumentWriter {
     this.documentStore.store(detailsDocument, fingerprint);
   }
 
+  /**
+   * Update the relay details document file for a bridge.
+   *
+   * @param fingerprint, a String
+   * @param detailsStatus, a DetailsStatus
+   */
   private void updateBridgeDetailsFile(String fingerprint,
       DetailsStatus detailsStatus) {
     DetailsDocument detailsDocument = new DetailsDocument();
     detailsDocument.setNickname(detailsStatus.getNickname());
     detailsDocument.setHashedFingerprint(fingerprint);
+
     String address = detailsStatus.getAddress();
     List<String> orAddresses = new ArrayList<>();
     orAddresses.add(address + ":" + detailsStatus.getOrPort());
@@ -182,6 +207,10 @@ public class DetailsDocumentWriter implements DocumentWriter {
     detailsDocument.setLastRestarted(detailsStatus.getLastRestarted());
     detailsDocument.setAdvertisedBandwidth(
         detailsStatus.getAdvertisedBandwidth());
+    long overloadGeneralTimestamp = detailsStatus.getOverloadGeneralTimestamp();
+    if (overloadGeneralTimestamp != -1L) {
+      detailsDocument.setOverloadGeneralTimestamp(overloadGeneralTimestamp);
+    }
     detailsDocument.setPlatform(detailsStatus.getPlatform());
     detailsDocument.setTransports(detailsStatus.getTransports());
     detailsDocument.setVersion(detailsStatus.getVersion());
@@ -197,4 +226,3 @@ public class DetailsDocumentWriter implements DocumentWriter {
     return null;
   }
 }
-

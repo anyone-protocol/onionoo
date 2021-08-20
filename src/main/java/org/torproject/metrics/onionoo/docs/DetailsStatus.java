@@ -94,6 +94,16 @@ public class DetailsStatus extends Document {
     return this.advertisedBandwidth;
   }
 
+  private long overloadGeneralTimestamp;
+
+  public void setOverloadGeneralTimestamp(long overloadGeneralTimestamp) {
+    this.overloadGeneralTimestamp = overloadGeneralTimestamp;
+  }
+
+  public long getOverloadGeneralTimestamp() {
+    return this.overloadGeneralTimestamp;
+  }
+
   private List<String> exitPolicy;
 
   public void setExitPolicy(List<String> exitPolicy) {
@@ -650,4 +660,3 @@ public class DetailsStatus extends Document {
     return this.versionStatus;
   }
 }
-

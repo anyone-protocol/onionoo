@@ -51,11 +51,20 @@ public class BandwidthDocumentWriter implements DocumentWriter {
     logger.info("Wrote bandwidth document files");
   }
 
-
   private BandwidthDocument compileBandwidthDocument(String fingerprint,
       long mostRecentStatusMillis, BandwidthStatus bandwidthStatus) {
     BandwidthDocument bandwidthDocument = new BandwidthDocument();
     bandwidthDocument.setFingerprint(fingerprint);
+    if (bandwidthStatus.getOverloadRatelimitsTimestamp() != -1L) {
+      Map<String, Long> overloadRatelimits =
+          bandwidthStatus.compileOverloadRatelimits();
+      bandwidthDocument.setOverloadRatelimits(overloadRatelimits);
+    }
+    if (bandwidthStatus.getOverloadFdExhaustedTimestamp() != -1L) {
+      Map<String, Long> overloadFdExhausted =
+          bandwidthStatus.compileOverloadFdExhausted();
+      bandwidthDocument.setOverloadFdExhausted(overloadFdExhausted);
+    }
     bandwidthDocument.setWriteHistory(this.compileGraphType(
         mostRecentStatusMillis, bandwidthStatus.getWriteHistory()));
     bandwidthDocument.setReadHistory(this.compileGraphType(
@@ -102,4 +111,3 @@ public class BandwidthDocumentWriter implements DocumentWriter {
     return null;
   }
 }
-
