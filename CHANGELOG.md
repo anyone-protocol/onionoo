@@ -1,14 +1,17 @@
+# Changes in version 8.0-1.xx.x - 2021-xx-xx
+
+ * Medium changes
+
 # Changes in version 8.0-1.27.0 - 2021-08-23
 
  * Medium changes
-   - Add overload-ratelimits and overload-fd-exhausted ExtraInfo
-     descriptor line fields to the bandwidth document.
-   - Add overoload-general server descriptor line fields to the
-     details document.
+     - Add overload-ratelimits and overload-fd-exhausted ExtraInfo
+       descriptor line fields to the bandwidth document.
+     - Add overoload-general server descriptor line fields to the
+       details document.
 
- * Minor changes
-   - Update to metrics-lib 2.19.0
-
+* Minor changes
+     - Update to metrics-lib 2.19.0
 
 # Changes in version 8.0-1.26.1 - 2021-06-19
 
