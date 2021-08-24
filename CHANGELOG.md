@@ -1,6 +1,14 @@
 # Changes in version 8.0-1.xx.x - 2021-xx-xx
 
  * Medium changes
+     - Reads bridgestrap statistics from CollecTor.
+     - If a bridgestrap test has been recently performed, the
+       result of that test will override the presence of the
+       Running flag. If no test has been recently performed, the
+       flags present in the bridge network status continue to be
+       used. Note: the presence of the running flag determines the
+       value of the "running" field in details documents.
+
 
 # Changes in version 8.0-1.27.0 - 2021-08-23
 

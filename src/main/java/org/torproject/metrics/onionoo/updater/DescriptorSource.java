@@ -138,6 +138,10 @@ public class DescriptorSource {
         DescriptorType.BRIDGE_POOL_ASSIGNMENTS);
     this.readDescriptors(DescriptorType.BRIDGE_POOL_ASSIGNMENTS,
         DescriptorHistory.BRIDGE_POOL_ASSIGNMENTS_HISTORY, false);
+    logger.debug("Reading recent {} ...",
+        DescriptorType.BRIDGESTRAP);
+    this.readDescriptors(DescriptorType.BRIDGESTRAP,
+        DescriptorHistory.BRIDGESTRAP_HISTORY, false);
   }
 
   private void readDescriptors(DescriptorType descriptorType,
@@ -202,6 +206,9 @@ public class DescriptorSource {
           relay = false;
         } else if (annotation.startsWith("@type bridge-pool-assignment 1.")) {
           descriptorType = DescriptorType.BRIDGE_POOL_ASSIGNMENTS;
+          relay = false;
+        } else if (annotation.startsWith("@type bridgestrap-stats 1.")) {
+          descriptorType = DescriptorType.BRIDGESTRAP;
           relay = false;
         }
       }

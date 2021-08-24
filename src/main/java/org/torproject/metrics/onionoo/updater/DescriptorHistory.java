@@ -13,6 +13,7 @@ public enum DescriptorHistory {
   BRIDGE_SERVER_HISTORY("bridge-server-history"),
   BRIDGE_EXTRAINFO_HISTORY("bridge-extrainfo-history"),
   BRIDGE_POOL_ASSIGNMENTS_HISTORY("bridge-pool-assignments-history"),
+  BRIDGESTRAP_HISTORY("bridgestrap-history"),
   ARCHIVED_HISTORY("archived-history");
 
   private String fileName;

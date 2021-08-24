@@ -5,6 +5,8 @@ package org.torproject.metrics.onionoo.updater;
 
 import org.torproject.descriptor.BridgeNetworkStatus;
 import org.torproject.descriptor.BridgePoolAssignment;
+import org.torproject.descriptor.BridgestrapStats;
+import org.torproject.descriptor.BridgestrapTestResult;
 import org.torproject.descriptor.Descriptor;
 import org.torproject.descriptor.ExitList;
 import org.torproject.descriptor.ExtraInfoDescriptor;
@@ -21,10 +23,12 @@ import org.torproject.metrics.onionoo.util.FormattingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -86,6 +90,8 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
 
   private long bridgesLastPublishedMillis = -1L;
 
+  private long bridgestrapLastEndMillis = -1L;
+
   private SortedMap<String, Integer> lastBandwidthWeights = null;
 
   private SortedSet<TorVersion> lastRecommendedServerVersions = null;
@@ -93,6 +99,8 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
   private int relayConsensusesProcessed = 0;
 
   private int bridgeStatusesProcessed = 0;
+
+  private int bridgestrapStatsProcessed = 0;
 
   /** Initializes a new status updater, obtains references to all relevant
    * singleton instances, and registers as listener at the (singleton)
@@ -123,6 +131,8 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
         DescriptorType.EXIT_LISTS);
     this.descriptorSource.registerDescriptorListener(this,
         DescriptorType.BRIDGE_POOL_ASSIGNMENTS);
+    this.descriptorSource.registerDescriptorListener(this,
+        DescriptorType.BRIDGESTRAP);
   }
 
   /* Step 1: parse descriptors. */
@@ -145,6 +155,8 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
       this.processBridgeNetworkStatus((BridgeNetworkStatus) descriptor);
     } else if (descriptor instanceof BridgePoolAssignment) {
       this.processBridgePoolAssignment((BridgePoolAssignment) descriptor);
+    } else if (descriptor instanceof BridgestrapStats) {
+      this.processBridgestrapStats((BridgestrapStats) descriptor);
     }
   }
 
@@ -406,6 +418,42 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
         < bridgePoolAssignment.getPublishedMillis()) {
       this.latestBridgePoolAssignments = bridgePoolAssignment;
     }
+  }
+
+  private void processBridgestrapStats(BridgestrapStats bridgestrapStats) {
+    long bridgestrapStatsEndMillis = bridgestrapStats.bridgestrapStatsEnd()
+        .toInstant(ZoneOffset.UTC).toEpochMilli();
+    if (this.bridgestrapLastEndMillis < bridgestrapStatsEndMillis) {
+      this.bridgestrapLastEndMillis = bridgestrapStatsEndMillis;
+      Optional<List<BridgestrapTestResult>> results =
+          bridgestrapStats.bridgestrapTests();
+      if (!results.isPresent()) {
+        return;
+      }
+      for (BridgestrapTestResult r : results.get()) {
+        if (!r.hashedFingerprint().isPresent()) {
+          continue;
+        }
+        String fingerprint = r.hashedFingerprint().get();
+        boolean reachable = r.isReachable();
+        NodeStatus nodeStatus = this.knownNodes.get(fingerprint);
+        if (nodeStatus == null) {
+          nodeStatus = new NodeStatus(fingerprint);
+          this.knownNodes.put(fingerprint, nodeStatus);
+        }
+        SortedSet<String> flags = nodeStatus.getRelayFlags();
+        if (flags == null) {
+          flags = new TreeSet<>();
+        }
+        if (reachable) {
+          flags.add("Running");
+        } else {
+          flags.remove("Running");
+        }
+        nodeStatus.setRelayFlags(flags);
+      }
+    }
+    this.bridgestrapStatsProcessed++;
   }
 
   @Override
@@ -1005,8 +1053,10 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
   @Override
   public String getStatsString() {
     return String.format("    %s relay consensuses processed\n"
-        + "    %s bridge statuses processed\n",
+        + "    %s bridge statuses processed\n"
+        + "    %s bridgestrap stats processed\n",
         FormattingUtils.formatDecimalNumber(relayConsensusesProcessed),
-        FormattingUtils.formatDecimalNumber(bridgeStatusesProcessed));
+        FormattingUtils.formatDecimalNumber(bridgeStatusesProcessed),
+        FormattingUtils.formatDecimalNumber(bridgestrapStatsProcessed));
   }
 }

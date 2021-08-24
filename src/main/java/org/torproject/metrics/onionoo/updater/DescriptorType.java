@@ -11,7 +11,8 @@ public enum DescriptorType {
   BRIDGE_STATUSES("bridge-descriptors/statuses"),
   BRIDGE_SERVER_DESCRIPTORS("bridge-descriptors/server-descriptors"),
   BRIDGE_EXTRA_INFOS("bridge-descriptors/extra-infos"),
-  BRIDGE_POOL_ASSIGNMENTS("bridge-pool-assignments");
+  BRIDGE_POOL_ASSIGNMENTS("bridge-pool-assignments"),
+  BRIDGESTRAP("bridgestrap");
 
   private final String dir;
   DescriptorType(String dir) {
