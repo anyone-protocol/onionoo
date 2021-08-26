@@ -364,6 +364,17 @@ public class SummaryDocument extends Document {
     return this.recommendedVersion;
   }
 
+  @JsonProperty("os")
+  private Boolean overloadStatus;
+
+  public void setOverloadStatus(Boolean overloadStatus) {
+    this.overloadStatus = overloadStatus;
+  }
+
+  public Boolean isOverloadStatus() {
+    return this.overloadStatus;
+  }
+
   /** Instantiate an empty summary document. */
   public SummaryDocument() {
     /* empty */
@@ -379,7 +390,7 @@ public class SummaryDocument extends Document {
       String contact, SortedSet<String> familyFingerprints,
       SortedSet<String> effectiveFamily, String version, String operatingSystem,
       SortedSet<String> verifiedHostNames,
-      SortedSet<String> unverifiedHostNames, Boolean recommendedVersion) {
+      SortedSet<String> unverifiedHostNames, Boolean recommendedVersion, Boolean overloadStatus) {
     this.setRelay(isRelay);
     this.setNickname(nickname);
     this.setFingerprint(fingerprint);
@@ -400,6 +411,6 @@ public class SummaryDocument extends Document {
     this.setVerifiedHostNames(verifiedHostNames);
     this.setUnverifiedHostNames(unverifiedHostNames);
     this.setRecommendedVersion(recommendedVersion);
+    this.setOverloadStatus(overloadStatus);
   }
 }
-

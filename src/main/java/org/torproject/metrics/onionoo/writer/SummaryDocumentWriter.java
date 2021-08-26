@@ -98,12 +98,13 @@ public class SummaryDocumentWriter implements DocumentWriter {
       SortedSet<String> unverifiedHostNames =
           nodeStatus.getUnverifiedHostNames();
       Boolean recommendedVersion = nodeStatus.isRecommendedVersion();
+      Boolean overloadStatus = nodeStatus.isOverloadStatus();
       SummaryDocument summaryDocument = new SummaryDocument(isRelay,
           nickname, fingerprint, addresses, lastSeenMillis, running,
           relayFlags, consensusWeight, countryCode, firstSeenMillis,
           asNumber, asName, contact, declaredFamily, effectiveFamily, version,
           operatingSystem, verifiedHostNames,
-          unverifiedHostNames, recommendedVersion);
+          unverifiedHostNames, recommendedVersion, overloadStatus);
       if (this.documentStore.store(summaryDocument, fingerprint)) {
         this.writtenDocuments++;
       }
@@ -119,4 +120,3 @@ public class SummaryDocumentWriter implements DocumentWriter {
         FormattingUtils.formatDecimalNumber(this.deletedDocuments));
   }
 }
-

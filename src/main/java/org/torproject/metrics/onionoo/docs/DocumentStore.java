@@ -467,12 +467,13 @@ public class DocumentStore {
     SortedSet<String> verifiedHostNames = null;
     SortedSet<String> unverifiedHostNames = null;
     Boolean recommendedVersion = null;
+    Boolean overloadStatus = null;
     return new SummaryDocument(isRelay,
         nickname, fingerprint, addresses, lastSeenMillis, running,
         relayFlags, consensusWeight, countryCode, firstSeenMillis,
         asNumber, asName, contact, family, family, version, operatingSystem,
         verifiedHostNames, unverifiedHostNames,
-        recommendedVersion);
+        recommendedVersion, overloadStatus);
   }
 
   private <T extends Document> T retrieveDocumentFile(
@@ -858,4 +859,3 @@ public class DocumentStore {
         FormattingUtils.formatDecimalNumber(removedFiles));
   }
 }
-

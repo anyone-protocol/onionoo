@@ -167,6 +167,12 @@ public class NodeIndexer implements ServletContextListener, Runnable {
     Map<Boolean, Set<String>> newBridgesByRecommendedVersion = new HashMap<>();
     newBridgesByRecommendedVersion.put(true, new HashSet<>());
     newBridgesByRecommendedVersion.put(false, new HashSet<>());
+    Map<Boolean, Set<String>> newRelaysByOverloadStatus = new HashMap<>();
+    newRelaysByOverloadStatus.put(true, new HashSet<>());
+    newRelaysByOverloadStatus.put(false, new HashSet<>());
+    Map<Boolean, Set<String>> newBridgesByOverloadStatus = new HashMap<>();
+    newBridgesByOverloadStatus.put(true, new HashSet<>());
+    newBridgesByOverloadStatus.put(false, new HashSet<>());
     SortedMap<Integer, Set<String>> newRelaysByFirstSeenDays = new TreeMap<>();
     SortedMap<Integer, Set<String>> newBridgesByFirstSeenDays = new TreeMap<>();
     SortedMap<Integer, Set<String>> newRelaysByLastSeenDays = new TreeMap<>();
@@ -299,6 +305,11 @@ public class NodeIndexer implements ServletContextListener, Runnable {
         newRelaysByRecommendedVersion.get(recommendedVersion).add(
             hashedFingerprint);
       }
+      Boolean overloadStatus = entry.isOverloadStatus();
+      if (null != overloadStatus) {
+        newRelaysByOverloadStatus.get(overloadStatus).add(
+            hashedFingerprint);
+      }
     }
     /* This loop can go away once all Onionoo services had their hourly
      * updater write effective families to summary documents at least
@@ -369,6 +380,13 @@ public class NodeIndexer implements ServletContextListener, Runnable {
         newBridgesByRecommendedVersion.get(recommendedVersion).add(
             hashedHashedFingerprint);
       }
+      Boolean overloadStatus = entry.isOverloadStatus();
+      if (null != overloadStatus) {
+        newBridgesByOverloadStatus.get(overloadStatus).add(
+            hashedFingerprint);
+        newBridgesByOverloadStatus.get(overloadStatus).add(
+            hashedHashedFingerprint);
+      }
     }
     NodeIndex newNodeIndex = new NodeIndex();
     newNodeIndex.setRelayFingerprintSummaryLines(
@@ -395,6 +413,8 @@ public class NodeIndexer implements ServletContextListener, Runnable {
     newNodeIndex.setRelaysByHostName(newRelaysByHostName);
     newNodeIndex.setRelaysByRecommendedVersion(newRelaysByRecommendedVersion);
     newNodeIndex.setBridgesByRecommendedVersion(newBridgesByRecommendedVersion);
+    newNodeIndex.setRelaysByOverloadStatus(newRelaysByOverloadStatus);
+    newNodeIndex.setBridgesByOverloadStatus(newBridgesByOverloadStatus);
     synchronized (this) {
       this.lastIndexed = updateStatusMillis;
       this.latestNodeIndex = newNodeIndex;
@@ -402,4 +422,3 @@ public class NodeIndexer implements ServletContextListener, Runnable {
     }
   }
 }
-

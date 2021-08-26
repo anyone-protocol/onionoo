@@ -104,6 +104,14 @@ public class DetailsStatus extends Document {
     return this.overloadGeneralTimestamp;
   }
 
+  public Boolean isOverloadStatus() {
+    if (this.overloadGeneralTimestamp != -1L) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   private List<String> exitPolicy;
 
   public void setExitPolicy(List<String> exitPolicy) {

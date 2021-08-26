@@ -72,7 +72,7 @@ public class ResourceServlet extends HttpServlet {
       Arrays.asList("type", "running", "search", "lookup",
           "country", "as", "as_name", "flag", "first_seen_days",
           "last_seen_days", "contact", "order", "limit", "offset", "fields",
-          "family", "version", "os", "host_name", "recommended_version"));
+          "family", "version", "os", "host_name", "recommended_version", "overload_status"));
 
   private static Set<String> illegalSearchQualifiers =
       new HashSet<>(Arrays.asList(("search,fingerprint,order,limit,"
@@ -335,6 +335,18 @@ public class ResourceServlet extends HttpServlet {
         return;
       }
       rh.setRecommendedVersion(recommendedVersionRequested);
+    }
+    if (parameterMap.containsKey("overload_status")) {
+      String overloadStatusParameterValue =
+          parameterMap.get("overload_status").toLowerCase();
+      boolean overloadStatusRequested = true;
+      if (overloadStatusParameterValue.equals("false")) {
+        overloadStatusRequested = false;
+      } else if (!overloadStatusParameterValue.equals("true")) {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        return;
+      }
+      rh.setOverloadStatus(overloadStatusRequested);
     }
     if (parameterMap.containsKey("order")) {
       String[] order = this.parseOrderParameter(parameterMap.get("order"));
@@ -710,4 +722,3 @@ public class ResourceServlet extends HttpServlet {
     return parameter;
   }
 }
-

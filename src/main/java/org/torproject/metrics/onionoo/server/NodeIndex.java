@@ -252,5 +252,26 @@ class NodeIndex {
   public Map<Boolean, Set<String>> getBridgesByRecommendedVersion() {
     return this.bridgesByRecommendedVersion;
   }
-}
 
+  private Map<Boolean, Set<String>> relaysByOverloadStatus;
+
+  public void setRelaysByOverloadStatus(
+      Map<Boolean, Set<String>> relaysByOverloadStatus) {
+    this.relaysByOverloadStatus = relaysByOverloadStatus;
+  }
+
+  public Map<Boolean, Set<String>> getRelaysByOverloadStatus() {
+    return this.relaysByOverloadStatus;
+  }
+
+  private Map<Boolean, Set<String>> bridgesByOverloadStatus;
+
+  public void setBridgesByOverloadStatus(
+      Map<Boolean, Set<String>> bridgesByOverloadStatus) {
+    this.bridgesByOverloadStatus = bridgesByOverloadStatus;
+  }
+
+  public Map<Boolean, Set<String>> getBridgesByOverloadStatus() {
+    return this.bridgesByOverloadStatus;
+  }
+}

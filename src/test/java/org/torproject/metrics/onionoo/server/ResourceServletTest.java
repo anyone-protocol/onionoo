@@ -150,7 +150,7 @@ public class ResourceServletTest {
         "0.2.3.25", "linux",
         new TreeSet<>(Arrays.asList(
             "ppp-62-216-201-221.dynamic.mnet-online.de")),
-        null, true);
+        null, true, false);
     this.relays.put("000C5F55BD4814B917CC474BD537F1A3B33CCE2A",
         relayTorkaZ);
     org.torproject.metrics.onionoo.docs.SummaryDocument relayFerrari458 =
@@ -169,7 +169,7 @@ public class ResourceServletTest {
         null, null,
         new TreeSet<>(Arrays.asList(
             "c-68-38-171-200.hsd1.in.comcast.net")),
-        null, null);
+        null, null, false);
     this.relays.put("001C13B3A55A71B977CA65EC85539D79C653A3FC",
         relayFerrari458);
     org.torproject.metrics.onionoo.docs.SummaryDocument relayTimMayTribute =
@@ -184,7 +184,7 @@ public class ResourceServletTest {
         "1024d/51e2a1c7 \"steven j. murdoch\" "
         + "<tor+steven.murdoch@cl.cam.ac.uk> <fb-token:5sr_k_zs2wm=>",
             new TreeSet<>(), new TreeSet<>(), "0.2.3.24-rc-dev",
-        "windows xp", null, null, false);
+        "windows xp", null, null, false, false);
     this.relays.put("0025C136C1F3A9EEFE2AE3F918F03BFA21B5070B",
         relayTimMayTribute);
     this.bridges = new TreeMap<>();
@@ -196,7 +196,7 @@ public class ResourceServletTest {
         DateTimeHelper.parse("2013-04-21 18:07:03"), false,
         new TreeSet<>(Arrays.asList("Valid")), -1L,
         null, DateTimeHelper.parse("2013-04-20 15:37:04"), null, null, null,
-        null, null, "0.2.2.39", null, null, null, true);
+        null, null, "0.2.2.39", null, null, null, true, false);
     this.bridges.put("0000831B236DFF73D409AD17B40E2A728A53994F",
         bridgeec2bridgercc7f31fe);
     org.torproject.metrics.onionoo.docs.SummaryDocument bridgeUnnamed =
@@ -206,7 +206,7 @@ public class ResourceServletTest {
         DateTimeHelper.parse("2013-04-20 17:37:04"), false,
         new TreeSet<>(Arrays.asList("Valid")), -1L,
         null, DateTimeHelper.parse("2013-04-14 07:07:05"), null, null, null,
-        null, null, null, null, null, null, null);
+        null, null, null, null, null, null, null, false);
     this.bridges.put("0002D9BDBBC230BD9C78FF502A16E0033EF87E0C",
         bridgeUnnamed);
     org.torproject.metrics.onionoo.docs.SummaryDocument bridgegummy =
@@ -217,7 +217,7 @@ public class ResourceServletTest {
         new TreeSet<>(Arrays.asList("Running",
             "Valid")), -1L, null,
         DateTimeHelper.parse("2013-01-16 21:07:04"), null, null, null, null,
-        null, "0.2.4.4-alpha-dev", "windows 7", null, null, false);
+        null, "0.2.4.4-alpha-dev", "windows 7", null, null, false, false);
     this.bridges.put("1FEDE50ED8DBA1DD9F9165F78C8131E4A44AB756",
         bridgegummy);
   }
@@ -1942,4 +1942,3 @@ public class ResourceServletTest {
     this.assertErrorStatusCode("/summary?recommended_version=null", 400);
   }
 }
-

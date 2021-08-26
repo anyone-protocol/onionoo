@@ -164,6 +164,12 @@ public class RequestHandler {
     this.family = family;
   }
 
+  private Boolean overloadStatus;
+
+  public void setOverloadStatus(Boolean overloadStatus) {
+    this.overloadStatus = overloadStatus;
+  }
+
   private Map<String, SummaryDocument> filteredRelays = new HashMap<>();
 
   private Map<String, SummaryDocument> filteredBridges = new HashMap<>();
@@ -193,6 +199,7 @@ public class RequestHandler {
     this.filterByOperatingSystem();
     this.filterByHostName();
     this.filterByRecommendedVersion();
+    this.filterByOverloadStatus();
     this.order();
     this.offset();
     this.limit();
@@ -657,6 +664,19 @@ public class RequestHandler {
     this.filteredBridges.keySet().retainAll(keepBridges);
   }
 
+  private void filterByOverloadStatus() {
+    if (null == this.overloadStatus) {
+      /* Not filtering by recommended version. */
+      return;
+    }
+    Set<String> keepRelays = this.nodeIndex.getRelaysByOverloadStatus()
+        .get(this.overloadStatus);
+    this.filteredRelays.keySet().retainAll(keepRelays);
+    Set<String> keepBridges = this.nodeIndex.getBridgesByOverloadStatus()
+        .get(this.overloadStatus);
+    this.filteredBridges.keySet().retainAll(keepBridges);
+  }
+
   private void order() {
     List<SummaryDocument> uniqueRelays = new ArrayList<>();
     List<SummaryDocument> uniqueBridges = new ArrayList<>();
@@ -760,4 +780,3 @@ public class RequestHandler {
     return this.nodeIndex.getBridgesPublishedString();
   }
 }
-
