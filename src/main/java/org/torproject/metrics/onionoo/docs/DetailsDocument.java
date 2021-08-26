@@ -378,13 +378,13 @@ public class DetailsDocument extends Document {
     return this.advertisedBandwidth;
   }
 
-  private long overloadGeneralTimestamp;
+  private Long overloadGeneralTimestamp;
 
-  public void setOverloadGeneralTimestamp(long overloadGeneralTimestamp) {
+  public void setOverloadGeneralTimestamp(Long overloadGeneralTimestamp) {
     this.overloadGeneralTimestamp = overloadGeneralTimestamp;
   }
 
-  public long getOverloadGeneralTimestamp() {
+  public Long getOverloadGeneralTimestamp() {
     return this.overloadGeneralTimestamp;
   }
 

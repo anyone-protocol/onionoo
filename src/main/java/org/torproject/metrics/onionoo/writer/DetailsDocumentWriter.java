@@ -132,6 +132,8 @@ public class DetailsDocumentWriter implements DocumentWriter {
     long overloadGeneralTimestamp = detailsStatus.getOverloadGeneralTimestamp();
     if (overloadGeneralTimestamp != -1L) {
       detailsDocument.setOverloadGeneralTimestamp(overloadGeneralTimestamp);
+    } else {
+      detailsDocument.setOverloadGeneralTimestamp(null);
     }
     detailsDocument.setExitPolicy(detailsStatus.getExitPolicy());
     detailsDocument.setContact(detailsStatus.getContact());
@@ -210,6 +212,8 @@ public class DetailsDocumentWriter implements DocumentWriter {
     long overloadGeneralTimestamp = detailsStatus.getOverloadGeneralTimestamp();
     if (overloadGeneralTimestamp != -1L) {
       detailsDocument.setOverloadGeneralTimestamp(overloadGeneralTimestamp);
+    } else {
+      detailsDocument.setOverloadGeneralTimestamp(null);
     }
     detailsDocument.setPlatform(detailsStatus.getPlatform());
     detailsDocument.setTransports(detailsStatus.getTransports());
