@@ -187,9 +187,7 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
     detailsStatus.setObservedBandwidth(observedBandwidth);
     detailsStatus.setAdvertisedBandwidth(advertisedBandwidth);
     long overloadGeneralTimestamp = descriptor.getOverloadGeneralTimestamp();
-    if (overloadGeneralTimestamp != -1L) {
-      detailsStatus.setOverloadGeneralTimestamp(overloadGeneralTimestamp);
-    }
+    detailsStatus.setOverloadGeneralTimestamp(overloadGeneralTimestamp);
     detailsStatus.setExitPolicy(descriptor.getExitPolicyLines());
     detailsStatus.setContact(descriptor.getContact());
     detailsStatus.setPlatform(descriptor.getPlatform());
@@ -350,9 +348,7 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
     detailsStatus.setLastRestarted(calculateLastRestartedMillis(descriptor));
     detailsStatus.setAdvertisedBandwidth(advertisedBandwidth);
     long overloadGeneralTimestamp = descriptor.getOverloadGeneralTimestamp();
-    if (overloadGeneralTimestamp != -1L) {
-      detailsStatus.setOverloadGeneralTimestamp(overloadGeneralTimestamp);
-    }
+    detailsStatus.setOverloadGeneralTimestamp(overloadGeneralTimestamp);
     detailsStatus.setPlatform(descriptor.getPlatform());
     this.documentStore.store(detailsStatus, fingerprint);
   }
