@@ -72,7 +72,8 @@ public class ResourceServlet extends HttpServlet {
       Arrays.asList("type", "running", "search", "lookup",
           "country", "as", "as_name", "flag", "first_seen_days",
           "last_seen_days", "contact", "order", "limit", "offset", "fields",
-          "family", "version", "os", "host_name", "recommended_version", "overload_status"));
+          "family", "version", "os", "host_name", "recommended_version",
+          "overload_status"));
 
   private static Set<String> illegalSearchQualifiers =
       new HashSet<>(Arrays.asList(("search,fingerprint,order,limit,"
