@@ -1,4 +1,4 @@
-# Changes in version 8.0-1.xx.x - 2021-xx-xx
+# Changes in version 8.0-1.28.0 - 2021-08-30
 
  * Medium changes
      - Reads bridgestrap statistics from CollecTor.
@@ -8,14 +8,18 @@
        flags present in the bridge network status continue to be
        used. Note: the presence of the running flag determines the
        value of the "running" field in details documents.
+     - Allow search by overload status
 
+ * Minor changes
+     - The overload-general server descriptor should be null when
+       not present and not 0
 
 # Changes in version 8.0-1.27.0 - 2021-08-23
 
  * Medium changes
      - Add overload-ratelimits and overload-fd-exhausted ExtraInfo
        descriptor line fields to the bandwidth document.
-     - Add overoload-general server descriptor line fields to the
+     - Add overload-general server descriptor line fields to the
        details document.
 
 * Minor changes
