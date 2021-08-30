@@ -361,6 +361,16 @@ public class NodeStatus extends Document {
     return lastChangedAddressesMillis;
   }
 
+  private Boolean overloadStatus;
+
+  public void setOverloadStatus(Boolean overloadStatus) {
+    this.overloadStatus = overloadStatus;
+  }
+
+  public Boolean isOverloadStatus() {
+    return this.overloadStatus;
+  }
+
   private Boolean recommendedVersion;
 
   public void setRecommendedVersion(Boolean recommendedVersion) {
@@ -765,4 +775,3 @@ public class NodeStatus extends Document {
     return sb.toString();
   }
 }
-
