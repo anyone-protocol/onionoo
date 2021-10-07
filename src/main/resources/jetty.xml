@@ -37,15 +37,34 @@
   </Call>
 
   <Set name="handler">
-    <!-- maybe add more handlers (statistics, logging, etc.) later -->
-    <New class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
-      <Call name="addHandler">
-        <Arg>
-          <Ref id="webAppContext"/>
-        </Arg>
-      </Call>
-    </New>
-  </Set>
+   <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
+     <Set name="handlers">
+      <Array type="org.eclipse.jetty.server.Handler">
+        <Item>
+          <New class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
+            <Call name="addHandler">
+              <Arg>
+                <Ref id="webAppContext"/>
+              </Arg>
+            </Call>
+            <Call name="addHandler">
+              <Arg>
+                <New class="org.eclipse.jetty.server.handler.ContextHandler">
+                  <Set name="contextPath">/metrics</Set>
+                  <Set name="handler">
+                    <New class="org.eclipse.jetty.server.handler.ResourceHandler">
+                      <Set name="resourceBase">/srv/onionoo.torproject.org/onionoo/metrics</Set>
+                      <Set name="directoriesListed">true</Set>
+                    </New>
+                  </Set>
+                </New>
+              </Arg>
+            </Call>
+          </New>
+        </Item>
+      </Array>
+     </Set>
+   </New>
+ </Set>
 
 </Configure>
-
