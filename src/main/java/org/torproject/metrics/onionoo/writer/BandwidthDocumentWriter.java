@@ -60,10 +60,16 @@ public class BandwidthDocumentWriter implements DocumentWriter {
           bandwidthStatus.compileOverloadRatelimits();
       bandwidthDocument.setOverloadRatelimits(overloadRatelimits);
     }
+    else {
+      bandwidthDocument.setOverloadRatelimits(null);
+    }
     if (bandwidthStatus.getOverloadFdExhaustedTimestamp() != -1L) {
       Map<String, Long> overloadFdExhausted =
           bandwidthStatus.compileOverloadFdExhausted();
       bandwidthDocument.setOverloadFdExhausted(overloadFdExhausted);
+    }
+    else {
+      bandwidthDocument.setOverloadFdExhausted(null);
     }
     bandwidthDocument.setWriteHistory(this.compileGraphType(
         mostRecentStatusMillis, bandwidthStatus.getWriteHistory()));
