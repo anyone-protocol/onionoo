@@ -97,9 +97,11 @@ public class BandwidthStatusUpdaterTest {
     assertEquals(1633582800000L, bs.getOverloadRatelimitsTimestamp());
 
     BandwidthStatusUpdater ndsuUpdated = new BandwidthStatusUpdater();
-    DescriptorParser dpUpdated = DescriptorSourceFactory.createDescriptorParser();
+    DescriptorParser dpUpdated =
+        DescriptorSourceFactory.createDescriptorParser();
     String descStringUpdated = RELAY3UPDATED;
-    for (Descriptor descUpdated : dpUpdated.parseDescriptors(descStringUpdated.getBytes(),
+    for (Descriptor descUpdated : dpUpdated.parseDescriptors(
+        descStringUpdated.getBytes(),
         new File("dummy"), "dummy")) {
       assertTrue(descUpdated.getClass().getName(),
           descUpdated instanceof ExtraInfoDescriptor);
@@ -107,7 +109,8 @@ public class BandwidthStatusUpdaterTest {
     }
     assertEquals(3, this.docStore.getPerformedStoreOperations());
     assertEquals(2, this.docStore.storedDocuments.size());
-    BandwidthStatus bsUpdated = this.docStore.getDocument(BandwidthStatus.class, FP3);
+    BandwidthStatus bsUpdated = this.docStore.getDocument(
+        BandwidthStatus.class, FP3);
     assertEquals(-1L, bsUpdated.getOverloadRatelimitsTimestamp());
   }
 
