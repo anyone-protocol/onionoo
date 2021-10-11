@@ -80,6 +80,37 @@ public class BandwidthStatusUpdaterTest {
     assertEquals(-1L, bs.getOverloadRatelimitsTimestamp());
   }
 
+  @Test
+  public void testWithUpdatedOverloadRatelimits() {
+    BandwidthStatusUpdater ndsu = new BandwidthStatusUpdater();
+    DescriptorParser dp = DescriptorSourceFactory.createDescriptorParser();
+    String descString = RELAY1 + RELAY3;
+    for (Descriptor desc : dp.parseDescriptors(descString.getBytes(),
+        new File("dummy"), "dummy")) {
+      assertTrue(desc.getClass().getName(),
+          desc instanceof ExtraInfoDescriptor);
+      ndsu.processDescriptor(desc, true);
+    }
+    assertEquals(2, this.docStore.getPerformedStoreOperations());
+    assertEquals(2, this.docStore.storedDocuments.size());
+    BandwidthStatus bs = this.docStore.getDocument(BandwidthStatus.class, FP3);
+    assertEquals(1633582800000L, bs.getOverloadRatelimitsTimestamp());
+
+    BandwidthStatusUpdater ndsuUpdated = new BandwidthStatusUpdater();
+    DescriptorParser dpUpdated = DescriptorSourceFactory.createDescriptorParser();
+    String descStringUpdated = RELAY3UPDATED;
+    for (Descriptor descUpdated : dpUpdated.parseDescriptors(descStringUpdated.getBytes(),
+        new File("dummy"), "dummy")) {
+      assertTrue(descUpdated.getClass().getName(),
+          descUpdated instanceof ExtraInfoDescriptor);
+      ndsuUpdated.processDescriptor(descUpdated, true);
+    }
+    assertEquals(3, this.docStore.getPerformedStoreOperations());
+    assertEquals(2, this.docStore.storedDocuments.size());
+    BandwidthStatus bsUpdated = this.docStore.getDocument(BandwidthStatus.class, FP3);
+    assertEquals(-1L, bsUpdated.getOverloadRatelimitsTimestamp());
+  }
+
   private static final String FP1 = "01EE53C3542326D2EA98E77658D40DE8C960EE0F";
   private static final String FP3 = "C1FFF27A38DF8DC8B310D078C13E23F080AF2957";
 
@@ -201,4 +232,57 @@ public class BandwidthStatusUpdaterTest {
       + "/LThNLNSHRywpw0ZoBM50lQ46IuuHrL3oetpgZ+++SNpGSx0XphacM3UCgMY4NqD\n"
       + "h1g/V8idCb7CUdW45alifQ+IgHklTbHJEs4ZYDerR0U=\n"
       + "-----END SIGNATURE-----\n";
+
+  private static final String RELAY3UPDATED = "@type extra-info 1.0\n"
+      + "extra-info ylxdzsw C1FFF27A38DF8DC8B310D078C13E23F080AF2957\n"
+      + "identity-ed25519\n"
+      + "-----BEGIN ED25519 CERT-----\n"
+      + "AQQABu6iAWv2WTGXw1SLjnmA97j/rUgNL4DSu+ASR0x7KpTrk6ZLAQAgBACqbSsR\n"
+      + "F3GIjW+bEsQpqh3x5hDjsQHeTWAkUmgeiLZopEnRG0h3YlKROXFYuBPgPg/+qNDg\n"
+      + "Pxo++hxIsvI68Vgj99SNxmBIgYEtDOUaN/37PyhqgWLz/UGlaCRiaJALzQE=\n"
+      + "-----END ED25519 CERT-----\n"
+      + "published 2021-10-09 13:27:27\n"
+      + "write-history 2021-10-09 11:29:19 (86400 s) 4590592,6473728,4418560,"
+      + "4402176,4314112\n"
+      + "read-history 2021-10-09 11:29:19 (86400 s) 20384768,26002432,"
+      + "20875264,19668992,18417664\n"
+      + "ipv6-write-history 2021-07-23 12:39:10 (86400 s) 57667584,45329408,"
+      + "53468160,62139392,50221056\n"
+      + "ipv6-read-history 2021-07-23 12:39:10 (86400 s) 83062784,56497152,"
+      + "76729344,85133312,56424448\n"
+      + "dirreq-write-history 2021-07-23 12:39:10 (86400 s) 2280448,2203648,"
+      + "1436672,1805312,1504256\n"
+      + "dirreq-read-history 2021-07-23 12:39:10 (86400 s) 187392,99328,"
+      + "112640,140288,118784\n"
+      + "geoip-db-digest 900E9BD6C8B8679A1539F7F316974E86618038B2\n"
+      + "geoip6-db-digest 456BCA0796A27F8C80674EE89B1323F8310BED39\n"
+      + "dirreq-stats-end 2021-10-06 17:16:59 (86400 s)\n"
+      + "dirreq-v3-ips\n"
+      + "dirreq-v3-reqs\n"
+      + "dirreq-v3-resp ok=0,not-enough-sigs=0,unavailable=0,not-found=0,"
+      + "not-modified=0,busy=0\n"
+      + "dirreq-v3-direct-dl complete=0,timeout=0,running=0\n"
+      + "dirreq-v3-tunneled-dl complete=0,timeout=0,running=0\n"
+      + "hidserv-stats-end 2021-10-06 17:16:59 (86400 s)\n"
+      + "hidserv-rend-relayed-cells 3112 delta_f=2048 epsilon=0.30 "
+      + "bin_size=1024\n"
+      + "hidserv-dir-onions-seen -9 delta_f=8 epsilon=0.30 bin_size=8\n"
+      + "hidserv-v3-stats-end 2021-10-07 12:00:00 (86400 s)\n"
+      + "hidserv-rend-v3-relayed-cells -839 delta_f=2048 epsilon=0.30 "
+      + "bin_size=1024\n"
+      + "hidserv-dir-v3-onions-seen 6 delta_f=8 epsilon=0.30 bin_size=8\n"
+      + "padding-counts 2021-10-06 17:17:14 (86400 s) bin-size=10000 "
+      + "write-drop=0 write-pad=10000 write-total=10000 read-drop=0 "
+      + "read-pad=10000 read-total=10000 enabled-read-pad=10000 "
+      + "enabled-read-total=10000 enabled-write-pad=10000 "
+      + "enabled-write-total=10000 max-chanpad-timers=0\n"
+      + "router-sig-ed25519 mMnzvnEA3ex7oPiYjEDj3E8D3bsDhNIMtqgEHSAMfk+"
+      + "k1zY5NK0ZsOGLLfNVadBjFc7bGE30PJgnzxPWgDt6Bg\n"
+      + "router-signature\n"
+      + "-----BEGIN SIGNATURE-----\n"
+      + "Hq/0n126zkG7Os2wWLpWTJbWHE8Pk4gC70t0PjXnG+YRKT23J4q9Yb4aOhQVW4aK\n"
+      + "/LThNLNSHRywpw0ZoBM50lQ46IuuHrL3oetpgZ+++SNpGSx0XphacM3UCgMY4NqD\n"
+      + "h1g/V8idCb7CUdW45alifQ+IgHklTbHJEs4ZYDerR0U=\n"
+      + "-----END SIGNATURE-----\n";
+
 }

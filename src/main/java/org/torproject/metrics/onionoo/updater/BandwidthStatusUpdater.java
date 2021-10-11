@@ -58,36 +58,25 @@ public class BandwidthStatusUpdater implements DescriptorListener,
     if (descriptor.getReadHistory() != null) {
       bandwidthStatus.addToReadHistory(descriptor.getReadHistory());
     }
-    if (descriptor.getOverloadRatelimitsTimestamp() != -1L ) {
-      bandwidthStatus.setOverloadRatelimitsTimestamp(
-              descriptor.getOverloadRatelimitsTimestamp()
-      );
-    }
-    if (descriptor.getOverloadRatelimitsRateLimit() != -1L ) {
-      bandwidthStatus.setOverloadRatelimitsRateLimit(
-              descriptor.getOverloadRatelimitsRateLimit()
-      );
-    }
-    if (descriptor.getOverloadRatelimitsBurstLimit() != -1L ) {
-      bandwidthStatus.setOverloadRatelimitsBurstLimit(
-              descriptor.getOverloadRatelimitsBurstLimit()
-      );
-    }
-    if (descriptor.getOverloadRatelimitsReadCount() != -1 ) {
-      bandwidthStatus.setOverloadRatelimitsReadCount(
-              descriptor.getOverloadRatelimitsReadCount()
-      );
-    }
-    if (descriptor.getOverloadRatelimitsWriteCount() != -1 ) {
-      bandwidthStatus.setOverloadRatelimitsWriteCount(
-              descriptor.getOverloadRatelimitsWriteCount()
-      );
-    }
-    if (descriptor.getOverloadFdExhaustedTimestamp() != -1 ) {
-      bandwidthStatus.setOverloadFdExhaustedTimestamp(
-              descriptor.getOverloadFdExhaustedTimestamp()
-      );
-    }
+    bandwidthStatus.setOverloadRatelimitsTimestamp(
+        descriptor.getOverloadRatelimitsTimestamp()
+    );
+    bandwidthStatus.setOverloadRatelimitsRateLimit(
+        descriptor.getOverloadRatelimitsRateLimit()
+    );
+    bandwidthStatus.setOverloadRatelimitsBurstLimit(
+        descriptor.getOverloadRatelimitsBurstLimit()
+    );
+
+    bandwidthStatus.setOverloadRatelimitsReadCount(
+        descriptor.getOverloadRatelimitsReadCount()
+    );
+    bandwidthStatus.setOverloadRatelimitsWriteCount(
+        descriptor.getOverloadRatelimitsWriteCount()
+    );
+    bandwidthStatus.setOverloadFdExhaustedTimestamp(
+        descriptor.getOverloadFdExhaustedTimestamp()
+    );
     if (bandwidthStatus.isDirty()) {
       NodeStatus nodeStatus = this.documentStore.retrieve(NodeStatus.class,
           true, fingerprint);
