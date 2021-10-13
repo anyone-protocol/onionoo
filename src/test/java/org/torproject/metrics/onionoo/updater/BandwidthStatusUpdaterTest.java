@@ -4,6 +4,7 @@
 package org.torproject.metrics.onionoo.updater;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.torproject.descriptor.Descriptor;
@@ -44,6 +45,23 @@ public class BandwidthStatusUpdaterTest {
     assertEquals(2, this.docStore.storedDocuments.size());
     BandwidthStatus bs = this.docStore.getDocument(BandwidthStatus.class, FP1);
     assertEquals(false, bs.isDirty());
+  }
+
+  @Test
+  public void testMalformedDescriptor() {
+    BandwidthStatusUpdater ndsu = new BandwidthStatusUpdater();
+    DescriptorParser dp = DescriptorSourceFactory.createDescriptorParser();
+    String descString = RELAY4;
+    for (Descriptor desc : dp.parseDescriptors(descString.getBytes(),
+        new File("dummy"), "dummy")) {
+      assertFalse(desc.getClass().getName(),
+          desc instanceof ExtraInfoDescriptor);
+      ndsu.processDescriptor(desc, true);
+    }
+    assertEquals(0, this.docStore.getPerformedStoreOperations());
+    assertEquals(0, this.docStore.storedDocuments.size());
+    BandwidthStatus bs = this.docStore.getDocument(BandwidthStatus.class, FP4);
+    assertEquals(null, bs);
   }
 
   @Test
@@ -116,6 +134,7 @@ public class BandwidthStatusUpdaterTest {
 
   private static final String FP1 = "01EE53C3542326D2EA98E77658D40DE8C960EE0F";
   private static final String FP3 = "C1FFF27A38DF8DC8B310D078C13E23F080AF2957";
+  private static final String FP4 = "AA4B41C39A456755D76CE923716AB11428165774";
 
   private static final String RELAY1 = "@type extra-info 1.0\n"
       + "extra-info Unnamed 01EE53C3542326D2EA98E77658D40DE8C960EE0F\n"
@@ -287,5 +306,41 @@ public class BandwidthStatusUpdaterTest {
       + "/LThNLNSHRywpw0ZoBM50lQ46IuuHrL3oetpgZ+++SNpGSx0XphacM3UCgMY4NqD\n"
       + "h1g/V8idCb7CUdW45alifQ+IgHklTbHJEs4ZYDerR0U=\n"
       + "-----END SIGNATURE-----\n";
+
+  private static final String RELAY4 = "@type extra-info 1.0\n"
+      + "extra-info sethsBSDrelay AA4B41C39A456755D76CE923716AB11428165774\n"
+      + "identity-ed25519\n"
+      + "-----BEGIN ED25519 CERT-----\n"
+      + "AQQABu3jAUnIYifEtuUltUpb2QCkwOTUT05Bg7BB7M2tNzTwgFoVAQAgBABinua+\n"
+      + "uWFcIszYpZ8sNT1X8p35oLfkVSWrnCkMkw83MTvITSmG8RUoOu2+I2CfCdfuGEIC\n"
+      + "zF20k0Lcu0SpTLMXF2kGm3gzaeOEEMEluGbFI0LzJH5IhVf8m1LtACyZSAE=\n"
+      + "-----END ED25519 CERT-----\n"
+      + "published 2021-10-12 20:21:00\n"
+      + "geoip-db-digest B3A9770171D3060502B7F13C0618BE109B92DF6C\n"
+      + "geoip6-db-digest 410B70763FC675B3622264FAA0FC67B78FDE30C2\n"
+      + "dirreq-stats-end 2021-10-12 00:05:39 (86417 s)\n"
+      + "dirreq-v3-ips\n"
+      + "dirreq-v3-reqs\n"
+      + "dirreq-v3-resp ok=0,not-enough-sigs=0,unavailable=0,not-found=0,\n"
+      + "not-modified=0,busy=0\n"
+      + "dirreq-v3-direct-dl complete=0,timeout=0,running=0\n"
+      + "dirreq-v3-tunneled-dl complete=0,timeout=0,running=0\n"
+      + "hidserv-stats-end 2021-10-12 00:05:39 (86417 s)\n"
+      + "hidserv-rend-relayed-cells 7808 delta_f=2048 epsilon=0.30 \n"
+      + "bin_size=1024\n"
+      + "hidserv-dir-onions-seen 27 delta_f=8 epsilon=0.30 bin_size=8\n"
+      + "hidserv-v3-stats-end 2021-10-12 12:04:20 (86400 s)\n"
+      + "hidserv-rend-v3-relayed-cells 3775 delta_f=2048 epsilon=0.30 \n"
+      + "bin_size=1024\n"
+      + "hidserv-dir-v3-onions-seen -86 delta_f=8 epsilon=0.30 bin_size=8\n"
+      + "router-sig-ed25519 ZfNXqaLFcCdDY1Xie46dL+rqdyB4074DRY7ga8dn+wdt6E\n"
+      + "uLNO9M8Fue2K3IjbNlJtZXRF4zZiGS2lDgoQ3zDg\n"
+      + "router-signature\n"
+      + "-----BEGIN SIGNATURE-----\n"
+      + "j4ipNATYO25XNVvv4Uy1dKS1ekHXo/Uy8OlIqmvVnMm//lc98aF0LvpnjjTZjFCM\n"
+      + "xT39qPiwIIOFqYQT3iEFk9S+MfY0XiTGMHuMFORHfyOHucO1Rve5rUE9rubrkQ1e\n"
+      + "TBgcDTdggl1sL6C7QtgBcV19jfMStALBOJmY2Molaws=\n"
+      + "-----END SIGNATURE-----\n";
+
 
 }
