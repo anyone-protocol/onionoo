@@ -50,10 +50,23 @@
             <Call name="addHandler">
               <Arg>
                 <New class="org.eclipse.jetty.server.handler.ContextHandler">
-                  <Set name="contextPath">/metrics</Set>
+                  <Set name="contextPath">/network</Set>
                   <Set name="handler">
                     <New class="org.eclipse.jetty.server.handler.ResourceHandler">
-                      <Set name="resourceBase">/srv/onionoo.torproject.org/onionoo/metrics</Set>
+                      <Set name="resourceBase">/srv/onionoo.torproject.org/onionoo/network</Set>
+                      <Set name="directoriesListed">true</Set>
+                    </New>
+                  </Set>
+                </New>
+              </Arg>
+            </Call>
+            <Call name="addHandler">
+              <Arg>
+                <New class="org.eclipse.jetty.server.handler.ContextHandler">
+                  <Set name="contextPath">/service</Set>
+                  <Set name="handler">
+                    <New class="org.eclipse.jetty.server.handler.ResourceHandler">
+                      <Set name="resourceBase">/srv/onionoo.torproject.org/onionoo/service</Set>
                       <Set name="directoriesListed">true</Set>
                     </New>
                   </Set>
