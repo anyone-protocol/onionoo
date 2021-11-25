@@ -3,7 +3,10 @@
 
 package org.torproject.metrics.onionoo.server;
 
+import org.torproject.metrics.onionoo.docs.DateTimeHelper;
 import org.torproject.metrics.onionoo.updater.TorVersion;
+
+import static org.torproject.metrics.onionoo.docs.DateTimeHelper.ONE_DAY;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,6 +14,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -71,9 +75,9 @@ public class ResourceServlet extends HttpServlet {
   private static Set<String> knownParameters = new HashSet<>(
       Arrays.asList("type", "running", "search", "lookup",
           "country", "as", "as_name", "flag", "first_seen_days",
-          "last_seen_days", "contact", "order", "limit", "offset", "fields",
-          "family", "version", "os", "host_name", "recommended_version",
-          "overload_status"));
+          "first_seen_since", "last_seen_days", "last_seen_since", "contact",
+          "order", "limit", "offset", "fields", "family", "version", "os",
+          "host_name", "recommended_version", "overload_status"));
 
   private static Set<String> illegalSearchQualifiers =
       new HashSet<>(Arrays.asList(("search,fingerprint,order,limit,"
@@ -287,6 +291,30 @@ public class ResourceServlet extends HttpServlet {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         return;
       }
+      rh.setLastSeenDays(days);
+    }
+    if (parameterMap.containsKey("first_seen_since")) {
+      long dateSince = this.parseDateSinceParameter(
+          parameterMap.get("first_seen_since"));
+      if (dateSince == -1L) {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        return;
+      }
+      int daysParam = (int)
+          (DateTimeHelper.millisFromNow(dateSince) / DateTimeHelper.ONE_DAY);
+      int[] days = this.parseDaysParameter("0-" + daysParam);
+      rh.setFirstSeenDays(days);
+    }
+    if (parameterMap.containsKey("last_seen_since")) {
+      long dateSince = this.parseDateSinceParameter(
+          parameterMap.get("last_seen_since"));
+      if (dateSince == -1L) {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        return;
+      }
+      int daysParam = (int)
+          (DateTimeHelper.millisFromNow(dateSince) / DateTimeHelper.ONE_DAY);
+      int[] days = this.parseDaysParameter("0-" + daysParam);
       rh.setLastSeenDays(days);
     }
     if (parameterMap.containsKey("contact")) {
@@ -587,6 +615,11 @@ public class ResourceServlet extends HttpServlet {
   }
 
   private static Pattern daysPattern = Pattern.compile("^[0-9-]{1,10}$");
+
+  private long parseDateSinceParameter(String parameter) {
+    long timeMillis = DateTimeHelper.parse(parameter + " " + "00:00:00");
+    return timeMillis;
+  }
 
   private int[] parseDaysParameter(String parameter) {
     if (!daysPattern.matcher(parameter).matches()) {

@@ -15,6 +15,7 @@ import org.torproject.metrics.onionoo.docs.UpdateStatus;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,7 +44,7 @@ public class ResourceServletTest {
   private SortedMap<String, org.torproject.metrics.onionoo.docs.SummaryDocument>
       bridges;
 
-  private static long TEST_TIME = DateTimeHelper.parse("2013-04-24 12:22:22");
+  private static long TEST_TIME = DateTimeHelper.millisNow();
 
   private static class TestingHttpServletRequestWrapper
       extends HttpServletRequestWrapper {
@@ -136,10 +137,11 @@ public class ResourceServletTest {
         new org.torproject.metrics.onionoo.docs.SummaryDocument(true, "TorkaZ",
         "000C5F55BD4814B917CC474BD537F1A3B33CCE2A", Arrays.asList(
             "62.216.201.221", "62.216.201.222",
-            "62.216.201.223"), DateTimeHelper.parse("2013-04-19 05:00:00"),
+            "62.216.201.223"),
+            DateTimeHelper.daysFromDate(5, 7, 22, 22, TEST_TIME),
         false, new TreeSet<>(Arrays.asList("Running",
             "Valid")), 20L, "de",
-        DateTimeHelper.parse("2013-04-18 05:00:00"), "AS8767",
+        DateTimeHelper.daysFromDate(6, 7, 22, 22, TEST_TIME), "AS8767",
         "m-net telekommunikations gmbh",
         "torkaz <klaus dot zufall at gmx dot de> "
         + "<fb-token:np5_g_83jmf=>", new TreeSet<>(Arrays.asList(
@@ -157,10 +159,10 @@ public class ResourceServletTest {
         new org.torproject.metrics.onionoo.docs.SummaryDocument(true,
             "Ferrari458", "001C13B3A55A71B977CA65EC85539D79C653A3FC",
             Arrays.asList("68.38.171.200", "[2001:4f8:3:2e::51]"),
-        DateTimeHelper.parse("2013-04-24 12:00:00"), true,
+        DateTimeHelper.daysFromDate(0, 0, 22, 22, TEST_TIME), true,
         new TreeSet<>(Arrays.asList("Fast", "Named",
             "Running", "V2Dir", "Valid")), 1140L, "us",
-        DateTimeHelper.parse("2013-04-16 18:00:00"), "AS7922",
+        DateTimeHelper.daysFromDate(7, 18, 22, 22, TEST_TIME), "AS7922",
         "comcast cable communications, llc", null,
         new TreeSet<>(Arrays.asList(
             "000C5F55BD4814B917CC474BD537F1A3B33CCE2A")),
@@ -176,10 +178,10 @@ public class ResourceServletTest {
         new org.torproject.metrics.onionoo.docs.SummaryDocument(true,
             "TimMayTribute", "0025C136C1F3A9EEFE2AE3F918F03BFA21B5070B",
             Arrays.asList("89.69.68.246"),
-        DateTimeHelper.parse("2013-04-22 20:00:00"), false,
+        DateTimeHelper.daysFromDate(1, 16, 22, 22, TEST_TIME), false,
         new TreeSet<>(Arrays.asList("Fast",
             "Running", "Unnamed", "V2Dir", "Valid")), 63L, "a1",
-        DateTimeHelper.parse("2013-04-16 18:00:00"), null,
+        DateTimeHelper.daysFromDate(7, 18, 22, 22, TEST_TIME), null,
         "liberty global operations b.v.",
         "1024d/51e2a1c7 \"steven j. murdoch\" "
         + "<tor+steven.murdoch@cl.cam.ac.uk> <fb-token:5sr_k_zs2wm=>",
@@ -193,31 +195,33 @@ public class ResourceServletTest {
         new org.torproject.metrics.onionoo.docs.SummaryDocument(false,
         "ec2bridgercc7f31fe", "0000831B236DFF73D409AD17B40E2A728A53994F",
         Arrays.asList("10.199.7.176"),
-        DateTimeHelper.parse("2013-04-21 18:07:03"), false,
+        DateTimeHelper.daysFromDate(2, 18, 15, 19, TEST_TIME), false,
         new TreeSet<>(Arrays.asList("Valid")), -1L,
-        null, DateTimeHelper.parse("2013-04-20 15:37:04"), null, null, null,
-        null, null, "0.2.2.39", null, null, null, true, false);
+        null, DateTimeHelper.daysFromDate(3, 20, 45, 18, TEST_TIME),
+        null, null, null, null, null, "0.2.2.39", null, null, null,
+        true, false);
     this.bridges.put("0000831B236DFF73D409AD17B40E2A728A53994F",
         bridgeec2bridgercc7f31fe);
     org.torproject.metrics.onionoo.docs.SummaryDocument bridgeUnnamed =
         new org.torproject.metrics.onionoo.docs.SummaryDocument(false,
             "Unnamed", "0002D9BDBBC230BD9C78FF502A16E0033EF87E0C",
             Arrays.asList("10.0.52.84"),
-        DateTimeHelper.parse("2013-04-20 17:37:04"), false,
+        DateTimeHelper.daysFromDate(3, 20, 45, 18, TEST_TIME), false,
         new TreeSet<>(Arrays.asList("Valid")), -1L,
-        null, DateTimeHelper.parse("2013-04-14 07:07:05"), null, null, null,
-        null, null, null, null, null, null, null, false);
+        null, DateTimeHelper.daysFromDate(10, 5, 15, 17, TEST_TIME),
+        null, null, null, null, null, null, null, null, null, null, false);
     this.bridges.put("0002D9BDBBC230BD9C78FF502A16E0033EF87E0C",
         bridgeUnnamed);
     org.torproject.metrics.onionoo.docs.SummaryDocument bridgegummy =
         new org.torproject.metrics.onionoo.docs.SummaryDocument(false, "gummy",
         "1FEDE50ED8DBA1DD9F9165F78C8131E4A44AB756", Arrays.asList(
             "10.63.169.98"),
-        DateTimeHelper.parse("2013-04-24 01:07:04"), true,
+        DateTimeHelper.daysFromDate(0, 11, 15, 18, TEST_TIME), true,
         new TreeSet<>(Arrays.asList("Running",
             "Valid")), -1L, null,
-        DateTimeHelper.parse("2013-01-16 21:07:04"), null, null, null, null,
-        null, "0.2.4.4-alpha-dev", "windows 7", null, null, false, false);
+        DateTimeHelper.daysFromDate(7, 15, 15, 18, TEST_TIME), null, null,
+        null, null, null, "0.2.4.4-alpha-dev", "windows 7", null, null,
+        false, false);
     this.bridges.put("1FEDE50ED8DBA1DD9F9165F78C8131E4A44AB756",
         bridgegummy);
   }
@@ -386,7 +390,10 @@ public class ResourceServletTest {
   @Test(timeout = 100)
   public void testValidSummaryRelay() {
     this.runTest("/summary");
-    assertEquals("2013-04-24 12:00:00",
+    long relaysPublishedMillis = DateTimeHelper.daysFromDate(0, 0, 22, 22,
+        TEST_TIME);
+    String relaysPublished = DateTimeHelper.format(relaysPublishedMillis);
+    assertEquals(relaysPublished,
         this.summaryDocument.relays_published);
     assertEquals(3, this.summaryDocument.relays.length);
     RelaySummary relay = null;
@@ -406,7 +413,10 @@ public class ResourceServletTest {
   @Test(timeout = 100)
   public void testValidSummaryBridge() {
     this.runTest("/summary");
-    assertEquals("2013-04-24 01:07:04",
+    long bridgesPublishedMillis = DateTimeHelper.daysFromDate(0, 11, 15, 18,
+        TEST_TIME);
+    String bridgesPublished = DateTimeHelper.format(bridgesPublishedMillis);
+    assertEquals(bridgesPublished,
         this.summaryDocument.bridges_published);
     assertEquals(3, this.summaryDocument.bridges.length);
     BridgeSummary bridge = null;
@@ -1311,9 +1321,27 @@ public class ResourceServletTest {
   }
 
   @Test(timeout = 100)
-  public void testFirstSeenDaysZeroToTwo() {
+  public void testFirstSeenSince() {
+    long dateMillis = DateTimeHelper.daysFromDate(4, 0, 0, 0, TEST_TIME);
+    String dateString = DateTimeHelper.format(dateMillis,
+        DateTimeHelper.ISO_YEARMONTHDAY_FORMAT);
     this.assertSummaryDocument(
-        "/summary?first_seen_days=0-2", 0, null, 0, null);
+        "/summary?first_seen_since=" + dateString, 0, null, 1, null);
+  }
+
+  @Test(timeout = 100)
+  public void testLastSeenSince() {
+    long dateMillis = DateTimeHelper.daysFromDate(3, 0, 0, 0, TEST_TIME);
+    String dateString = DateTimeHelper.format(dateMillis,
+        DateTimeHelper.ISO_YEARMONTHDAY_FORMAT);
+    this.assertSummaryDocument(
+        "/summary?last_seen_since=" + dateString, 2, null, 3, null);
+  }
+
+  @Test(timeout = 100)
+  public void testFirstSeenDaysZeroToFour() {
+    this.assertSummaryDocument(
+        "/summary?first_seen_days=0-4", 0, null, 1, null);
   }
 
   @Test(timeout = 100)
@@ -1337,13 +1365,13 @@ public class ResourceServletTest {
   @Test(timeout = 100)
   public void testFirstSeenDaysSevenToSixteen() {
     this.assertSummaryDocument(
-        "/summary?first_seen_days=7-16", 2, null, 1, null);
+        "/summary?first_seen_days=7-16", 2, null, 2, null);
   }
 
   @Test(timeout = 100)
   public void testFirstSeenDaysNinetysevenOrMore() {
     this.assertSummaryDocument(
-        "/summary?first_seen_days=97-", 0, null, 1, null);
+        "/summary?first_seen_days=97-", 0, null, 0, null);
   }
 
   @Test(timeout = 100)
@@ -1538,7 +1566,7 @@ public class ResourceServletTest {
         "/summary?order=" + OrderParameterValues.FIRST_SEEN_ASC + ","
         + OrderParameterValues.CONSENSUS_WEIGHT_ASC, 3,
         new String[] { "TimMayTribute", "Ferrari458", "TorkaZ" }, 3,
-        new String[] { "gummy", "Unnamed", "ec2bridgercc7f31fe" });
+        new String[] { "Unnamed", "gummy", "ec2bridgercc7f31fe" });
   }
 
   @Test(timeout = 100)
@@ -1547,7 +1575,7 @@ public class ResourceServletTest {
         + OrderParameterValues.FIRST_SEEN_DES + ","
         + OrderParameterValues.CONSENSUS_WEIGHT_ASC, 3,
         new String[] { "TorkaZ", "TimMayTribute", "Ferrari458" }, 3,
-        new String[] { "ec2bridgercc7f31fe", "Unnamed", "gummy" });
+        new String[] { "ec2bridgercc7f31fe", "gummy", "Unnamed" });
   }
 
   @Test(timeout = 100)

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,6 +70,8 @@ public class DateTimeHelper {
 
   public static final String ISO_YEARMONTH_FORMAT = "yyyy-MM";
 
+  public static final String ISO_YEARMONTHDAY_FORMAT = "yyyy-MM-dd";
+
   public static final String DATEHOUR_NOSPACE_FORMAT = "yyyy-MM-dd-HH";
 
   private static ThreadLocal<Map<String, DateFormat>> dateFormats =
@@ -114,5 +117,38 @@ public class DateTimeHelper {
   public static long parse(String string) {
     return parse(string, ISO_DATETIME_FORMAT);
   }
-}
 
+  /** Return the time difference in milliseconds from the current time. Take
+   * a timestamp in milliseconds as input. Return {@link #NO_TIME_AVAILABLE}
+   * if the passed timestamp is in the future.
+   */
+  public static long millisFromNow(long millis) {
+    Date date = new Date();
+    long timeNowMillis = date.getTime();
+    if (millis > timeNowMillis) {
+      return NO_TIME_AVAILABLE;
+    }
+    return (timeNowMillis - millis);
+  }
+
+  /** Return the current time in milliseconds.
+   */
+  public static long millisNow() {
+    Date date = new Date();
+    long timeNowMillis = date.getTime();
+    return timeNowMillis;
+  }
+
+  /** Return the timedifference in milliseconds given a timestamp and a duration
+   * in days, hours, minutes, seconds.
+   */
+  public static long daysFromDate(int days, int hours, int minutes, int seconds,
+      long dateNow) {
+    long daysMillis = days * ONE_DAY;
+    long hoursMillis = hours * ONE_HOUR;
+    long minutesMillis = minutes * ONE_MINUTE;
+    long secondsMillis = seconds * ONE_SECOND;
+    return (dateNow - daysMillis - hoursMillis - minutesMillis - secondsMillis);
+  }
+
+}
