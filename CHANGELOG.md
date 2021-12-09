@@ -1,3 +1,5 @@
+# Changes in version 8.2-1.xx.x - 2021-xx-xx
+
 # Changes in version 8.2-1.29.0 - 2021-12-09
 
  * Medium changes
