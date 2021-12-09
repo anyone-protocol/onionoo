@@ -6,15 +6,12 @@ package org.torproject.metrics.onionoo.server;
 import org.torproject.metrics.onionoo.docs.DateTimeHelper;
 import org.torproject.metrics.onionoo.updater.TorVersion;
 
-import static org.torproject.metrics.onionoo.docs.DateTimeHelper.ONE_DAY;
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;

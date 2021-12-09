@@ -1,6 +1,16 @@
-# Changes in version 8.0-1.xx.x - 2021-xx-xx
+# Changes in version 8.2-1.29.0 - 2021-12-09
 
-# Changes in version 8.0-1.28.0 - 2021-08-30
+ * Medium changes
+     - Add two new filters to search nodes by first_seen and last_seen dates
+     - Add metrics endpoint to /network and /service to export prometheus
+       statistics for the onionoo service and the Tor network.
+
+ * Minor changes
+     - Add new utilities function in DateTimeHelper class
+     - Add a test for status update with a malformed descriptor
+     - Add tests to make sure the bandwidth status is updated properly
+
+# Changes in version 8.1-1.28.0 - 2021-08-30
 
  * Medium changes
      - Reads bridgestrap statistics from CollecTor.
@@ -16,7 +26,7 @@
      - The overload-general server descriptor should be null when
        not present and not 0
 
-# Changes in version 8.0-1.27.0 - 2021-08-23
+# Changes in version 8.1-1.27.0 - 2021-08-23
 
  * Medium changes
      - Add overload-ratelimits and overload-fd-exhausted ExtraInfo
