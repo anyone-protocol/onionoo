@@ -583,11 +583,10 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
          * We should check instead why the firstSeenMillis attribute get set to
          * 0 but it might be diggin to deep into the onionoo cave.
          **/
-        UptimeStatus uptimeStatus = this.documentStore.retrieve(
-            UptimeStatus.class, true, fingerprint);
-        System.out.println(uptimeStatus);
         if (nodeStatus.getFirstSeenMillis()
             > updatedNodeStatus.getLastSeenMillis()) {
+          UptimeStatus uptimeStatus = this.documentStore.retrieve(
+              UptimeStatus.class, true, fingerprint);
           if (updatedNodeStatus.isRelay()) {
             updatedNodeStatus.setFirstSeenMillis(
                 uptimeStatus.getRelayHistory().first().getStartMillis()
