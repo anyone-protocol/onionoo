@@ -588,16 +588,15 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
         System.out.println(uptimeStatus);
         if (nodeStatus.getFirstSeenMillis()
             > updatedNodeStatus.getLastSeenMillis()) {
-              if (updatedNodeStatus.isRelay()){
-                updatedNodeStatus.setFirstSeenMillis(
-                    uptimeStatus.getRelayHistory().first().getStartMillis()
-                );
-              }
-              else {
-                updatedNodeStatus.setFirstSeenMillis(
-                  uptimeStatus.getBridgeHistory().first().getStartMillis()
-                );
-              }
+          if (updatedNodeStatus.isRelay()) {
+            updatedNodeStatus.setFirstSeenMillis(
+                uptimeStatus.getRelayHistory().first().getStartMillis()
+            );
+          } else {
+            updatedNodeStatus.setFirstSeenMillis(
+                uptimeStatus.getBridgeHistory().first().getStartMillis()
+            );
+          }
         }
 
         updatedNodeStatus.setDeclaredFamily(

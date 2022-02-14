@@ -70,6 +70,7 @@ public class NodeDetailsStatusUpdaterTest {
         "reject *:*", dd.getExitPolicy().get(0));
     assertNull(dd.getExitPolicyV6Summary());
   }
+
   private static final String FP = "42CAF9C0588BBADDD338025E8F2D3CCF35CEEC25";
 
   private static final String RELAY1 = "@type server-descriptor 1.0\n"
