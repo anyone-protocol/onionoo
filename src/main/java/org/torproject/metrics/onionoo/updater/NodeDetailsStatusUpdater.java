@@ -579,22 +579,24 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
 
         /**
          * This is a bit of a hack. We read the uptime document to see if
-         * the relay/bridge had been on the network longer than what we though.
+         * the relay/bridge had been on the network longer than what we thought.
          * We should check instead why the firstSeenMillis attribute get set to
-         * 0 but it might be diggin to deep into the onionoo cave.
+         * 0 but it might be digging to deep into the onionoo cave.
          **/
         if (nodeStatus.getFirstSeenMillis()
             > updatedNodeStatus.getLastSeenMillis()) {
           UptimeStatus uptimeStatus = this.documentStore.retrieve(
               UptimeStatus.class, true, fingerprint);
-          if (updatedNodeStatus.isRelay()) {
-            updatedNodeStatus.setFirstSeenMillis(
-                uptimeStatus.getRelayHistory().first().getStartMillis()
-            );
-          } else {
-            updatedNodeStatus.setFirstSeenMillis(
-                uptimeStatus.getBridgeHistory().first().getStartMillis()
-            );
+          if (uptimeStatus != null) {
+            if (updatedNodeStatus.isRelay()) {
+              updatedNodeStatus.setFirstSeenMillis(
+                  uptimeStatus.getRelayHistory().first().getStartMillis()
+              );
+            } else {
+              updatedNodeStatus.setFirstSeenMillis(
+                  uptimeStatus.getBridgeHistory().first().getStartMillis()
+              );
+            }
           }
         }
 
