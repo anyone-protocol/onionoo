@@ -139,4 +139,3 @@ public class NodeDetailsStatusUpdaterTest {
       + "-----END SIGNATURE-----\n";
 
 }
-

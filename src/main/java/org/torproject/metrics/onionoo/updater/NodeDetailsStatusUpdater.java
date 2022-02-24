@@ -18,6 +18,7 @@ import org.torproject.metrics.onionoo.docs.DetailsStatus;
 import org.torproject.metrics.onionoo.docs.DocumentStore;
 import org.torproject.metrics.onionoo.docs.DocumentStoreFactory;
 import org.torproject.metrics.onionoo.docs.NodeStatus;
+import org.torproject.metrics.onionoo.docs.UptimeStatus;
 import org.torproject.metrics.onionoo.util.FormattingUtils;
 
 import org.slf4j.Logger;
@@ -262,6 +263,7 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
     if (validAfterMillis > this.relaysLastValidAfterMillis) {
       this.relaysLastValidAfterMillis = validAfterMillis;
     }
+
     for (Map.Entry<String, NetworkStatusEntry> e :
         consensus.getStatusEntries().entrySet()) {
       String fingerprint = e.getKey();
@@ -574,6 +576,30 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
           updatedNodeStatus.setFirstSeenMillis(
               nodeStatus.getFirstSeenMillis());
         }
+
+        /**
+         * This is a bit of a hack. We read the uptime document to see if
+         * the relay/bridge had been on the network longer than what we thought.
+         * We should check instead why the firstSeenMillis attribute get set to
+         * 0 but it might be digging to deep into the onionoo cave.
+         **/
+        if (nodeStatus.getFirstSeenMillis()
+            > updatedNodeStatus.getLastSeenMillis()) {
+          UptimeStatus uptimeStatus = this.documentStore.retrieve(
+              UptimeStatus.class, true, fingerprint);
+          if (uptimeStatus != null) {
+            if (updatedNodeStatus.isRelay()) {
+              updatedNodeStatus.setFirstSeenMillis(
+                  uptimeStatus.getRelayHistory().first().getStartMillis()
+              );
+            } else {
+              updatedNodeStatus.setFirstSeenMillis(
+                  uptimeStatus.getBridgeHistory().first().getStartMillis()
+              );
+            }
+          }
+        }
+
         updatedNodeStatus.setDeclaredFamily(
             nodeStatus.getDeclaredFamily());
         updatedNodeStatus.setEffectiveFamily(

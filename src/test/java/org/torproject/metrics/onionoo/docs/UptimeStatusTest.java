@@ -264,4 +264,3 @@ public class UptimeStatusTest {
         + "compressed.", 2, uptimeStatus.getRelayHistory().size());
   }
 }
-
