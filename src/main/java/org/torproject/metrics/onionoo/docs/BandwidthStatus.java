@@ -235,26 +235,10 @@ public class BandwidthStatus extends Document {
       long endMillis = e.getKey();
       long startMillis = endMillis - intervalMillis;
       long bandwidthValue = e.getValue();
-      /* Check whether an interval is already contained in history.
-       * If it is sum the new bandwidth value to the old bandwidth.
-       */
-      if (history.get(startMillis) != null) {
-        long[] prvHistory = history.get(startMillis);
-        long prvEndMillis = prvHistory[1];
-        long prvBandwidth = prvHistory[2];
-        /*
-         * This check is not needed probably. Just making extra sure we are not
-         * mixing intervals.
-         */
-        if (endMillis == prvEndMillis) {
-          long newBandwidth = prvBandwidth + bandwidthValue;
-          history.put(startMillis, new long[] { startMillis, endMillis,
-              newBandwidth });
-        }
-      } else {
-        history.put(startMillis, new long[] { startMillis, endMillis,
-            bandwidthValue });
-      }
+      /* TODO Should we first check whether an interval is already
+       * contained in history? */
+      history.put(startMillis, new long[] { startMillis, endMillis,
+          bandwidthValue });
       this.isDirty = true;
     }
   }

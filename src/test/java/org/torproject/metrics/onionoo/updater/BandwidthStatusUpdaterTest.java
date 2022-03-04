@@ -132,29 +132,9 @@ public class BandwidthStatusUpdaterTest {
     assertEquals(-1L, bsUpdated.getOverloadRatelimitsTimestamp());
   }
 
-  @Test
-  public void testWithBridgesWithSameFingerprint() {
-    BandwidthStatusUpdater ndsu = new BandwidthStatusUpdater();
-    DescriptorParser dp = DescriptorSourceFactory.createDescriptorParser();
-    String descString = RELAY1 + RELAY1RR;
-    for (Descriptor desc : dp.parseDescriptors(descString.getBytes(),
-        new File("dummy"), "dummy")) {
-      assertTrue(desc.getClass().getName(),
-          desc instanceof ExtraInfoDescriptor);
-      ndsu.processDescriptor(desc, true);
-    }
-    assertEquals(2, this.docStore.getPerformedStoreOperations());
-    assertEquals(2, this.docStore.storedDocuments.size());
-    BandwidthStatus bs = this.docStore.getDocument(
-        BandwidthStatus.class, FP1);
-    long bandwidthValue = 2417664 + 2415864;
-    assertEquals(bandwidthValue, bs.getWriteHistory().get(1633119676000L)[2]);
-  }
-
   private static final String FP1 = "01EE53C3542326D2EA98E77658D40DE8C960EE0F";
   private static final String FP3 = "C1FFF27A38DF8DC8B310D078C13E23F080AF2957";
   private static final String FP4 = "AA4B41C39A456755D76CE923716AB11428165774";
-
 
   private static final String RELAY1 = "@type extra-info 1.0\n"
       + "extra-info Unnamed 01EE53C3542326D2EA98E77658D40DE8C960EE0F\n"
@@ -166,39 +146,6 @@ public class BandwidthStatusUpdaterTest {
       + "-----END ED25519 CERT-----\n"
       + "published 2021-10-07 12:19:12\n"
       + "write-history 2021-10-06 20:21:16 (86400 s) 2417664,3562496,2278400,"
-      + "2227200,2203648\n"
-      + "read-history 2021-10-06 20:21:16 (86400 s) 23422976,25457664,"
-      + "26384384,21670912,20871168\n"
-      + "dirreq-write-history 2021-09-23 20:21:16 (86400 s) 10240,0,0,0,0\n"
-      + "dirreq-read-history 2021-09-23 20:21:16 (86400 s) 20480,0,0,0,0\n"
-      + "hidserv-stats-end 2021-10-06 20:22:47 (86400 s)\n"
-      + "hidserv-rend-relayed-cells -975 delta_f=2048 epsilon=0.30 "
-      + "bin_size=1024\n"
-      + "hidserv-dir-onions-seen 35 delta_f=8 epsilon=0.30 bin_size=8\n"
-      + "padding-counts 2021-10-06 20:22:47 (86400 s) bin-size=10000 "
-      + "write-drop=0 write-pad=10000 write-total=10000 read-drop=0 "
-      + "read-pad=10000 read-total=10000 enabled-read-pad=0 "
-      + "enabled-read-total=0 enabled-write-pad=0 enabled-write-total=0 "
-      + "max-chanpad-timers=0\n"
-      + "router-sig-ed25519 Y5EUmgHUdDzpsFuy24sUit5kI3tmyKPQ6XPPSn52+p+6JAt"
-      + "UL3xSBlo93QMYNFmrtKQsqjKe2hbxWpT932C7Cw\n"
-      + "router-signature\n"
-      + "-----BEGIN SIGNATURE-----\n"
-      + "QnUQwORMwogeYihwDreLdQSl7nITE0FU8r+AbTaqn+huif3R+tEoQ0wjVOC2jQ1M\n"
-      + "JhghiyXH/PxNAe/wH10N8Ee2Z3gYhtd3cCJkk9nRzE0xuIWBFSKwFRXN6ZpijRQB\n"
-      + "gWQhwwIJkBFktik96pugE7ND/hurQJOoBZb1U8yG8P8=\n"
-      + "-----END SIGNATURE-----\n";
-
-  private static final String RELAY1RR = "@type extra-info 1.0\n"
-      + "extra-info Unnamed2 01EE53C3542326D2EA98E77658D40DE8C960EE0F\n"
-      + "identity-ed25519\n"
-      + "-----BEGIN ED25519 CERT-----\n"
-      + "AQQABu1dAb6zQYMFNmDbcdhsQosaVv0rNa7Pu1tg+gwVAl+/ooyDAQAgBAD1RavW\n"
-      + "KwG0NyDAO2JRLELgJe9zVkOKJ3GGR2odHO18VqNGVhFTarRbmpF72V2sFOoK/gVM\n"
-      + "z4Mi562CQKgFQ4im1e3VHmNXmqS+v/D78fCRaqFzPKGCCEjzg0wpjIUG7AY=\n"
-      + "-----END ED25519 CERT-----\n"
-      + "published 2021-10-07 12:29:15\n"
-      + "write-history 2021-10-06 20:21:16 (86400 s) 2415864,3562798,2275470,"
       + "2227200,2203648\n"
       + "read-history 2021-10-06 20:21:16 (86400 s) 23422976,25457664,"
       + "26384384,21670912,20871168\n"
