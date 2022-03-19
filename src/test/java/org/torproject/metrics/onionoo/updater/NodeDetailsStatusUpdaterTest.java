@@ -92,7 +92,6 @@ public class NodeDetailsStatusUpdaterTest {
       assertTrue(desc.getClass().getName(),
           desc instanceof BridgePoolAssignment);
       ndsu.processDescriptor(desc, true);
-      ndsu.updateStatuses();
     }
     assertEquals(1, this.docStore.getPerformedStoreOperations());
     assertEquals(1, this.docStore.storedDocuments.size());
