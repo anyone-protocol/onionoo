@@ -221,6 +221,8 @@ public class DetailsDocumentWriter implements DocumentWriter {
     detailsDocument.setVersionStatus(detailsStatus.getVersionStatus());
     detailsDocument.setBridgedbDistributor(
         detailsStatus.getBridgedbDistributor());
+    detailsDocument.setBlocklist(
+        detailsStatus.getBlocklist());
     this.documentStore.store(detailsDocument, fingerprint);
   }
 

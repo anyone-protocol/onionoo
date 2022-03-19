@@ -967,6 +967,11 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
           if (null != assignment && !assignment.isEmpty()) {
             String bridgedbDistributor = assignment.split(" ")[0];
             detailsStatus.setBridgedbDistributor(bridgedbDistributor);
+            String[] blocklistParts =  assignment.split("blocklist=");
+            if (blocklistParts != null && blocklistParts.length > 1) {
+              List<String> blocklist = Arrays.asList(blocklistParts[1].split(","));
+              detailsStatus.setBlocklist(blocklist);
+            }
           }
         } else {
           detailsStatus.setBridgePoolAssignmentPublished(0L);

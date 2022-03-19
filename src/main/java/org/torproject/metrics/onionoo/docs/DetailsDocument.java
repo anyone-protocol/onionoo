@@ -607,4 +607,15 @@ public class DetailsDocument extends Document {
   public String getBridgedbDistributor() {
     return this.bridgedbDistributor;
   }
+
+  private List<String> blocklist;
+
+  public void setBlocklist(List<String> blocklist) {
+    this.blocklist = (blocklist != null && !blocklist.isEmpty())
+        ? blocklist : null;
+  }
+
+  public List<String> getBlocklist() {
+    return this.blocklist;
+  }
 }

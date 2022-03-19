@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.torproject.descriptor.BridgePoolAssignment;
 import org.torproject.descriptor.Descriptor;
 import org.torproject.descriptor.DescriptorParser;
 import org.torproject.descriptor.DescriptorSourceFactory;
@@ -71,7 +72,62 @@ public class NodeDetailsStatusUpdaterTest {
     assertNull(dd.getExitPolicyV6Summary());
   }
 
+  @Test
+  public void testBridgePoolAssignments() {
+    NodeDetailsStatusUpdater ndsu = new NodeDetailsStatusUpdater(null, null);
+    DescriptorParser dp = DescriptorSourceFactory.createDescriptorParser();
+    String descString = BRIDGE1;
+    for (Descriptor desc : dp.parseDescriptors(descString.getBytes(),
+        new File("dummy"), "dummy")) {
+      assertTrue(desc.getClass().getName(), desc instanceof ServerDescriptor);
+      ndsu.processDescriptor(desc, true);
+    }
+    assertEquals(1, this.docStore.getPerformedStoreOperations());
+    assertEquals(1, this.docStore.storedDocuments.size());
+    DetailsStatus dd = this.docStore.getDocument(DetailsStatus.class, FPB);
+    assertNotNull("docs: " + this.docStore.storedDocuments, dd);
+    descString = BPA;
+    for (Descriptor desc : dp.parseDescriptors(descString.getBytes(),
+        new File("dummy"), "dummy")) {
+      assertTrue(desc.getClass().getName(),
+          desc instanceof BridgePoolAssignment);
+      ndsu.processDescriptor(desc, true);
+      ndsu.updateStatuses();
+    }
+    assertEquals(1, this.docStore.getPerformedStoreOperations());
+    assertEquals(1, this.docStore.storedDocuments.size());
+    dd = this.docStore.getDocument(DetailsStatus.class, FPB);
+    assertNotNull(dd);
+  }
+
   private static final String FP = "42CAF9C0588BBADDD338025E8F2D3CCF35CEEC25";
+  private static final String FPB = "6306C870BE7415EB7167ED2E9C1224F28B7E6C61";
+
+  private static final String BPA = "@type bridge-pool-assignment 1.0\n"
+      + "bridge-pool-assignment 2022-03-18 23:33:42\n"
+      + "6306C870BE7415EB7167ED2E9C1224F28B7E6C61 moat "
+      + "transport=obfs4 ip=4 blocklist=ru\n";
+
+  private static final String BRIDGE1 = "@type bridge-server-descriptor 1.2\n"
+    + "router DockerObfs4Bridge 10.136.176.127 50451 0 0\n"
+    + "master-key-ed25519 J6M6MmuZ2joRKaihSB1LDym+WiuUeId8+9nvtI1Sd1M\n"
+    + "platform Tor 0.4.6.10 on Linux\n"
+    + "proto Cons=1-2 Desc=1-2 DirCache=2 FlowCtrl=1 HSDir=2 HSIntro=4-5 "
+    + "HSRend=1-2 Link=1-5 LinkAuth=1,3 Microdesc=1-2 Padding=2 Relay=1-3\n"
+    + "published 2022-03-17 08:07:11\n"
+    + "fingerprint 6306 C870 BE74 15EB 7167 ED2E 9C12 24F2 8B7E 6C61\n"
+    + "uptime 113883\n"
+    + "bandwidth 1073741824 1073741824 81352\n"
+    + "extra-info-digest 29ECA238A04F0D00E941B2CC430393604430B7D4 "
+    + "X0jHhL7ygWblKzjoTGMG4Eikz8Sqo2X9eIbrKzVANNw\n"
+    + "hidden-service-dir\n"
+    + "contact somebody\n"
+    + "bridge-distribution-request any\n"
+    + "ntor-onion-key kysCjXGfMAx6AdejV2r34d59atkXFkvLNT/9ADcd73M\n"
+    + "reject *:*\n"
+    + "tunnelled-dir-server\n"
+    + "router-digest-sha256 t+rUo6bm75/Qywapm5TTTnY2HGmxZqFAI1/ON2IxNP4\n"
+    + "router-digest 78E7EDA527387064BB4410FC8BAED6DA0902BFE3\n";
 
   private static final String RELAY1 = "@type server-descriptor 1.0\n"
       + "router impedance 84.201.150.89 443 0 0\n"

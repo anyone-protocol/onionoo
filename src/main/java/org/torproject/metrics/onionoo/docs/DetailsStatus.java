@@ -294,6 +294,17 @@ public class DetailsStatus extends Document {
     return bridgedbDistributor;
   }
 
+  private List<String> blocklist;
+
+  public void setBlocklist(List<String> blocklist) {
+    this.blocklist = (blocklist != null && !blocklist.isEmpty())
+        ? blocklist : null;
+  }
+
+  public List<String> getBlocklist() {
+    return this.blocklist;
+  }
+
   /** Returns all addresses used for the onion-routing protocol which
    * includes the primary address and all additionally configured
    * onion-routing addresses. */
