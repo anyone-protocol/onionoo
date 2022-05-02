@@ -351,6 +351,7 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
     detailsStatus.setAdvertisedBandwidth(advertisedBandwidth);
     long overloadGeneralTimestamp = descriptor.getOverloadGeneralTimestamp();
     detailsStatus.setOverloadGeneralTimestamp(overloadGeneralTimestamp);
+    detailsStatus.setContact(descriptor.getContact());
     detailsStatus.setPlatform(descriptor.getPlatform());
     this.documentStore.store(detailsStatus, fingerprint);
   }

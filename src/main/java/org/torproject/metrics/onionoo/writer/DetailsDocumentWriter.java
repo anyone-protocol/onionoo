@@ -215,6 +215,7 @@ public class DetailsDocumentWriter implements DocumentWriter {
     } else {
       detailsDocument.setOverloadGeneralTimestamp(null);
     }
+    detailsDocument.setContact(detailsStatus.getContact());
     detailsDocument.setPlatform(detailsStatus.getPlatform());
     detailsDocument.setTransports(detailsStatus.getTransports());
     detailsDocument.setVersion(detailsStatus.getVersion());
