@@ -155,6 +155,7 @@ public class NodeIndexer implements ServletContextListener, Runnable {
     Map<String, Set<String>> newRelaysByFlag = new HashMap<>();
     Map<String, Set<String>> newBridgesByFlag = new HashMap<>();
     Map<String, Set<String>> newRelaysByContact = new HashMap<>();
+    Map<String, Set<String>> newBridgesByContact = new HashMap<>();
     Map<String, Set<String>> newRelaysByFamily = new HashMap<>();
     Map<TorVersion, Set<String>> newRelaysByVersion = new HashMap<>();
     Map<TorVersion, Set<String>> newBridgesByVersion = new HashMap<>();
@@ -341,6 +342,10 @@ public class NodeIndexer implements ServletContextListener, Runnable {
         newBridgesByFlag.get(flagLowerCase).add(
             hashedHashedFingerprint);
       }
+      String contact = entry.getContact();
+      newBridgesByContact.putIfAbsent(contact, new HashSet<>());
+      newBridgesByContact.get(contact).add(hashedFingerprint);
+      newBridgesByContact.get(contact).add(hashedHashedFingerprint);
       int daysSinceFirstSeen = (int) ((
           (specialTime < 0 ? System.currentTimeMillis() : specialTime)
           - entry.getFirstSeenMillis()) / ONE_DAY);
@@ -399,6 +404,7 @@ public class NodeIndexer implements ServletContextListener, Runnable {
     newNodeIndex.setRelaysByFlag(newRelaysByFlag);
     newNodeIndex.setBridgesByFlag(newBridgesByFlag);
     newNodeIndex.setRelaysByContact(newRelaysByContact);
+    newNodeIndex.setBridgesByContact(newBridgesByContact);
     newNodeIndex.setRelaysByFamily(newRelaysByFamily);
     newNodeIndex.setRelaysByFirstSeenDays(newRelaysByFirstSeenDays);
     newNodeIndex.setRelaysByLastSeenDays(newRelaysByLastSeenDays);

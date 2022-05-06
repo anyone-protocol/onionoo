@@ -124,6 +124,17 @@ class NodeIndex {
     return relaysByContact;
   }
 
+  private Map<String, Set<String>> bridgesByContact = null;
+
+  public void setBridgesByContact(
+      Map<String, Set<String>> bridgesByContact) {
+    this.bridgesByContact = bridgesByContact;
+  }
+
+  public Map<String, Set<String>> getBridgesByContact() {
+    return bridgesByContact;
+  }
+
   private Map<String, Set<String>> relaysByFamily = null;
 
   public void setRelaysByFamily(Map<String, Set<String>> relaysByFamily) {

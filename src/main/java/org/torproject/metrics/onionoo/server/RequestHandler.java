@@ -554,7 +554,21 @@ public class RequestHandler {
     for (String fingerprint : removeRelays) {
       this.filteredRelays.remove(fingerprint);
     }
-    this.filteredBridges.clear();
+    Set<String> removeBridges = new HashSet<>();
+    for (Map.Entry<String, Set<String>> e :
+        this.nodeIndex.getBridgesByContact().entrySet()) {
+      String contact = e.getKey();
+      for (String contactPart : this.contact) {
+        if (contact == null
+            || !contact.contains(contactPart.toLowerCase())) {
+          removeBridges.addAll(e.getValue());
+          break;
+        }
+      }
+    }
+    for (String fingerprint : removeBridges) {
+      this.filteredBridges.remove(fingerprint);
+    }
   }
 
   private void filterByFamily() {
