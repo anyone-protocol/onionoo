@@ -18,7 +18,6 @@ import org.torproject.metrics.onionoo.docs.DetailsStatus;
 import org.torproject.metrics.onionoo.docs.DocumentStore;
 import org.torproject.metrics.onionoo.docs.DocumentStoreFactory;
 import org.torproject.metrics.onionoo.docs.NodeStatus;
-import org.torproject.metrics.onionoo.docs.UptimeStatus;
 import org.torproject.metrics.onionoo.util.FormattingUtils;
 
 import org.slf4j.Logger;
