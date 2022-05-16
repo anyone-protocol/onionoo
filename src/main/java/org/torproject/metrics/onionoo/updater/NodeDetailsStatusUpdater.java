@@ -392,9 +392,9 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
       if (nodeStatus.getFirstSeenMillis() == 0L
           || publishedMillis < nodeStatus.getFirstSeenMillis()) {
         nodeStatus.setFirstSeenMillis(publishedMillis);
-        logger.warn("Set first_seen field to the published statuses timestamp" +
-            "bridge: {}" +
-            "nodeStatus first_seen: {}",
+        logger.warn("Set first_seen field to the published statuses timestamp"
+            + "bridge: {}"
+            + "nodeStatus first_seen: {}",
             fingerprint, nodeStatus.getFirstSeenMillis()
         );
       }
