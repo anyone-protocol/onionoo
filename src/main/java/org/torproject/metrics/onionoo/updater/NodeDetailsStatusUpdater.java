@@ -396,7 +396,7 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
             "bridge: {}" +
             "nodeStatus first_seen: {}",
             fingerprint, nodeStatus.getFirstSeenMillis()
-        )
+        );
       }
       if (publishedMillis > nodeStatus.getLastSeenMillis()) {
         nodeStatus.setRelay(false);
