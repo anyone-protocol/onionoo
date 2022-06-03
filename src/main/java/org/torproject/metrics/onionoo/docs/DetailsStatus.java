@@ -127,7 +127,13 @@ public class DetailsStatus extends Document {
 
   private String contact;
 
+  /**
+   * Santize the contact field if it contains a percent char by removing it.
+   */
   public void setContact(String contact) {
+    if ((contact != null) && (contact.indexOf('%') != -1)) {
+      contact = contact.replace("%", "");
+    }
     this.contact = escapeJson(contact);
   }
 

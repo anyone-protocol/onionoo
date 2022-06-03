@@ -180,9 +180,6 @@ public class ResponseBuilder {
   }
 
   private void write(PrintWriter pw, String format, Object ... args) {
-    if (format.indexOf('%') != -1) {
-      format = format.replace("%", "%%");
-    }
     String stringToWrite = String.format(format, args);
     this.charsWritten += stringToWrite.length();
     pw.write(stringToWrite);

@@ -96,5 +96,46 @@ public class DetailsDocumentWriterTest {
         Arrays.asList(GABELMOO_OR_ADDRESS),
         document.getUnreachableOrAddresses());
   }
-}
 
+  @Test
+  public void testContactDetails() {
+    DetailsStatus status = new DetailsStatus();
+    status.setRelay(true);
+    status.setAdvertisedOrAddresses(Arrays.asList(GABELMOO_OR_ADDRESS));
+    status.setOrAddressesAndPorts(new TreeSet<>(Arrays.asList(
+        GABELMOO_OR_ADDRESS)));
+    status.setContact("gabelmoo@torproject.org");
+    this.documentStore.addDocument(status, GABELMOO_FINGERPRINT);
+    DetailsDocumentWriter writer = new DetailsDocumentWriter();
+    writer.writeDocuments(-1L);
+    assertEquals("One document should be written.", 1,
+        this.documentStore.getPerformedStoreOperations());
+    DetailsDocument document = this.documentStore.getDocument(
+        DetailsDocument.class, GABELMOO_FINGERPRINT);
+    assertNotNull("There should be a document for the given fingerprint.",
+        document);
+    assertEquals("gabelmoo@torproject.org",
+        document.getContact());
+  }
+
+  @Test
+  public void testContactDetailsWithPercentCharacters() {
+    DetailsStatus status = new DetailsStatus();
+    status.setRelay(true);
+    status.setAdvertisedOrAddresses(Arrays.asList(GABELMOO_OR_ADDRESS));
+    status.setOrAddressesAndPorts(new TreeSet<>(Arrays.asList(
+        GABELMOO_OR_ADDRESS)));
+    status.setContact("gabelmoo%@torproject.org (% 2+6)");
+    this.documentStore.addDocument(status, GABELMOO_FINGERPRINT);
+    DetailsDocumentWriter writer = new DetailsDocumentWriter();
+    writer.writeDocuments(-1L);
+    assertEquals("One document should be written.", 1,
+        this.documentStore.getPerformedStoreOperations());
+    DetailsDocument document = this.documentStore.getDocument(
+        DetailsDocument.class, GABELMOO_FINGERPRINT);
+    assertNotNull("There should be a document for the given fingerprint.",
+        document);
+    assertEquals("gabelmoo@torproject.org ( 2+6)",
+        document.getContact());
+  }
+}
