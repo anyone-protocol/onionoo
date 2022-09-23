@@ -304,7 +304,9 @@ public class DocumentStore {
     String documentString;
     if (document.getDocumentString() != null) {
       documentString = document.getDocumentString();
-    } else if (document instanceof BandwidthDocument
+    } else if (document instanceof DetailsStatus
+        || document instanceof DetailsDocument
+        || document instanceof BandwidthDocument
         || document instanceof WeightsDocument
         || document instanceof ClientsDocument
         || document instanceof UptimeDocument) {
@@ -314,31 +316,6 @@ public class DocumentStore {
         logger.error("Serializing failed for type {}.",
             document.getClass().getName(), e);
         return false;
-      }
-    } else if (document instanceof DetailsStatus
-        || document instanceof DetailsDocument) {
-      /* We must ensure that details files only contain ASCII characters
-       * and no UTF-8 characters.  While UTF-8 characters are perfectly
-       * valid in JSON, this would break compatibility with existing files
-       * pretty badly.  We already make sure that all strings in details
-       * objects are escaped JSON, e.g., \u00F2.  When Gson serlializes
-       * this string, it escapes the \ to \\, hence writes \\u00F2.  We
-       * need to undo this and change \\u00F2 back to \u00F2. */
-      try {
-        documentString = FormattingUtils.replaceValidUtf(
-            objectMapper.writeValueAsString(document));
-      } catch (JsonProcessingException e) {
-        logger.error("Serializing failed for type {}.",
-            document.getClass().getName(), e);
-        return false;
-      }
-      /* Existing details statuses don't contain opening and closing curly
-       * brackets, so we should remove them from new details statuses,
-       * too. */
-      if (document instanceof DetailsStatus) {
-        documentString = documentString.substring(
-            documentString.indexOf("{") + 1,
-            documentString.lastIndexOf("}"));
       }
     } else if (document instanceof BandwidthStatus
         || document instanceof WeightsStatus
@@ -501,7 +478,7 @@ public class DocumentStore {
         /* Document file is empty. */
         return null;
       }
-      documentString = new String(allData, StandardCharsets.US_ASCII);
+      documentString = new String(allData, StandardCharsets.UTF_8);
       this.retrievedFiles++;
       this.retrievedBytes += documentString.length();
     } catch (IOException e) {
@@ -518,7 +495,26 @@ public class DocumentStore {
       return this.retrieveUnparsedDocumentFile(documentType,
           documentString);
     } else if (documentType.equals(DetailsDocument.class)
-        || documentType.equals(BandwidthDocument.class)
+        || documentType.equals(DetailsStatus.class)) {
+      /* Details statuses and documents written by older versions had UTF-8
+       * characters escaped as \\u1234 in order to store them encoded as ASCII.
+       * This was undone in memory in getters and setters. This version does not
+       * escape or unescape UTF-8 characters in memory anymore, but it expects
+       * files to either use UTF-8 encoding or to contain valid escaped UTF-8
+       * characters like \u1234. Further, details statuses written by older
+       * versions did not start and end with braces. Fixing both things here. */
+      StringBuilder documentStringBuilder = new StringBuilder();
+      if (!documentString.startsWith("{")) {
+        documentStringBuilder.append('{');
+      }
+      documentStringBuilder.append(documentString.replaceAll(
+          "\\\\(\\\\u[0-9a-fA-F]{4})", "$1"));
+      if (!documentString.endsWith("}")) {
+        documentStringBuilder.append('}');
+      }
+      return this.retrieveParsedDocumentFile(documentType,
+          documentStringBuilder.toString());
+    } else if (documentType.equals(BandwidthDocument.class)
         || documentType.equals(WeightsDocument.class)
         || documentType.equals(ClientsDocument.class)
         || documentType.equals(UptimeDocument.class)) {
@@ -530,9 +526,6 @@ public class DocumentStore {
         || documentType.equals(UptimeStatus.class)
         || documentType.equals(UpdateStatus.class)) {
       return this.retrieveParsedStatusFile(documentType, documentString);
-    } else if (documentType.equals(DetailsStatus.class)) {
-      return this.retrieveParsedDocumentFile(documentType, "{"
-          + documentString + "}");
     } else {
       logger.error("Parsing is not supported for type {}.",
           documentType.getName());
@@ -787,7 +780,7 @@ public class DocumentStore {
       throws IOException {
     try (BufferedOutputStream bos = new BufferedOutputStream(
         new FileOutputStream(file))) {
-      bos.write(content.getBytes(StandardCharsets.US_ASCII));
+      bos.write(content.getBytes(StandardCharsets.UTF_8));
     }
   }
 

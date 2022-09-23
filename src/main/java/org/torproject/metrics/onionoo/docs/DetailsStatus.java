@@ -3,31 +3,12 @@
 
 package org.torproject.metrics.onionoo.docs;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class DetailsStatus extends Document {
-
-  /* We must ensure that details files only contain ASCII characters
-   * and no UTF-8 characters.  While UTF-8 characters are perfectly
-   * valid in JSON, this would break compatibility with existing files
-   * pretty badly.  We do this by escaping non-ASCII characters, e.g.,
-   * \u00F2.  Gson won't treat this as UTF-8, but will think that we want
-   * to write six characters '\', 'u', '0', '0', 'F', '2'.  The only thing
-   * we'll have to do is to change back the '\\' that Gson writes for the
-   * '\'. */
-  private static String escapeJson(String stringToEscape) {
-    return StringEscapeUtils.escapeJava(stringToEscape);
-  }
-
-  private static String unescapeJson(String stringToUnescape) {
-    return StringEscapeUtils.unescapeJava(stringToUnescape);
-  }
 
   /* From most recently published server descriptor: */
 
@@ -134,21 +115,21 @@ public class DetailsStatus extends Document {
     if ((contact != null) && (contact.indexOf('%') != -1)) {
       contact = contact.replace("%", "");
     }
-    this.contact = escapeJson(contact);
+    this.contact = contact;
   }
 
   public String getContact() {
-    return unescapeJson(this.contact);
+    return this.contact;
   }
 
   private String platform;
 
   public void setPlatform(String platform) {
-    this.platform = escapeJson(platform);
+    this.platform = platform;
   }
 
   public String getPlatform() {
-    return unescapeJson(this.platform);
+    return this.platform;
   }
 
   private SortedSet<String> allegedFamily;
@@ -531,51 +512,51 @@ public class DetailsStatus extends Document {
   private String countryName;
 
   public void setCountryName(String countryName) {
-    this.countryName = escapeJson(countryName);
+    this.countryName = countryName;
   }
 
   public String getCountryName() {
-    return unescapeJson(this.countryName);
+    return this.countryName;
   }
 
   private String regionName;
 
   public void setRegionName(String regionName) {
-    this.regionName = escapeJson(regionName);
+    this.regionName = regionName;
   }
 
   public String getRegionName() {
-    return unescapeJson(this.regionName);
+    return this.regionName;
   }
 
   private String cityName;
 
   public void setCityName(String cityName) {
-    this.cityName = escapeJson(cityName);
+    this.cityName = cityName;
   }
 
   public String getCityName() {
-    return unescapeJson(this.cityName);
+    return this.cityName;
   }
 
   private String asName;
 
   public void setAsName(String asName) {
-    this.asName = escapeJson(asName);
+    this.asName = asName;
   }
 
   public String getAsName() {
-    return unescapeJson(this.asName);
+    return this.asName;
   }
 
   private String asNumber;
 
   public void setAsNumber(String asNumber) {
-    this.asNumber = escapeJson(asNumber);
+    this.asNumber = asNumber;
   }
 
   public String getAsNumber() {
-    return unescapeJson(this.asNumber);
+    return this.asNumber;
   }
 
   /* Reverse DNS lookup result: */
@@ -583,79 +564,31 @@ public class DetailsStatus extends Document {
   private String hostName;
 
   public void setHostName(String hostName) {
-    this.hostName = escapeJson(hostName);
+    this.hostName = hostName;
   }
 
   public String getHostName() {
-    return unescapeJson(this.hostName);
+    return this.hostName;
   }
 
-  private List<String> verifiedHostNames;
+  private SortedSet<String> verifiedHostNames;
 
-  /**
-   * Creates a copy of the list with each string escaped for JSON compatibility
-   * and sets this as the verified host names, unless the argument was null in
-   * which case the verified host names are just set to null.
-   */
   public void setVerifiedHostNames(SortedSet<String> verifiedHostNames) {
-    if (null == verifiedHostNames) {
-      this.verifiedHostNames = null;
-      return;
-    }
-    this.verifiedHostNames = new ArrayList<>();
-    for (String hostName : verifiedHostNames) {
-      this.verifiedHostNames.add(escapeJson(hostName));
-    }
+    this.verifiedHostNames = verifiedHostNames;
   }
 
-  /**
-   * Creates a copy of the list with each string having its escaping for JSON
-   * compatibility reversed and returns the copy, unless the held reference was
-   * null in which case null is returned.
-   */
   public SortedSet<String> getVerifiedHostNames() {
-    if (null == this.verifiedHostNames) {
-      return null;
-    }
-    SortedSet<String> verifiedHostNames = new TreeSet<>();
-    for (String escapedHostName : this.verifiedHostNames) {
-      verifiedHostNames.add(unescapeJson(escapedHostName));
-    }
-    return verifiedHostNames;
+    return this.verifiedHostNames;
   }
 
   private SortedSet<String> unverifiedHostNames;
 
-  /**
-   * Creates a copy of the list with each string escaped for JSON compatibility
-   * and sets this as the unverified host names, unless the argument was null in
-   * which case the unverified host names are just set to null.
-   */
   public void setUnverifiedHostNames(SortedSet<String> unverifiedHostNames) {
-    if (null == unverifiedHostNames) {
-      this.unverifiedHostNames = null;
-      return;
-    }
-    this.unverifiedHostNames = new TreeSet<>();
-    for (String hostName : unverifiedHostNames) {
-      this.unverifiedHostNames.add(escapeJson(hostName));
-    }
+    this.unverifiedHostNames = unverifiedHostNames;
   }
 
-  /**
-   * Creates a copy of the list with each string having its escaping for JSON
-   * compatibility reversed and returns the copy, unless the held reference was
-   * null in which case null is returned.
-   */
   public SortedSet<String> getUnverifiedHostNames() {
-    if (null == this.unverifiedHostNames) {
-      return null;
-    }
-    SortedSet<String> unverifiedHostNames = new TreeSet<>();
-    for (String escapedHostName : this.unverifiedHostNames) {
-      unverifiedHostNames.add(unescapeJson(escapedHostName));
-    }
-    return unverifiedHostNames;
+    return this.unverifiedHostNames;
   }
 
   private List<String> advertisedOrAddresses;
