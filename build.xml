@@ -45,7 +45,7 @@
 
   <patternset id="library" >
     <include name="metrics-lib-${metricslibversion}-thin.jar"/>
-    <include name="commons-codec-1.10.jar"/>
+    <include name="commons-codec-1.15.jar"/>
     <include name="commons-compress-1.13.jar"/>
     <include name="commons-lang3-3.5.jar"/>
     <include name="jackson-annotations-2.8.6.jar"/>
