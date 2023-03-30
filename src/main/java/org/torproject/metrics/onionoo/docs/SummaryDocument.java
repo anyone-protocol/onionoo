@@ -272,21 +272,6 @@ public class SummaryDocument extends Document {
     return this.contact;
   }
 
-  /* This attribute can go away once all Onionoo services had their hourly
-   * updater write effective families to summary documents at least once.
-   * Remove this code after September 8, 2015. */
-  @JsonProperty("ff")
-  private String[] familyFingerprints;
-
-  public void setFamilyFingerprints(
-      SortedSet<String> familyFingerprints) {
-    this.familyFingerprints = this.collectionToStringArray(familyFingerprints);
-  }
-
-  public SortedSet<String> getFamilyFingerprints() {
-    return this.stringArrayToSortedSet(this.familyFingerprints);
-  }
-
   @JsonProperty("ef")
   private String[] effectiveFamily;
 
@@ -380,16 +365,13 @@ public class SummaryDocument extends Document {
     /* empty */
   }
 
-  /* The familyFingerprints parameter can go away after September 8, 2015.
-   * See above. */
   /** Instantiates a summary document with all given properties. */
   public SummaryDocument(boolean isRelay, String nickname,
       String fingerprint, List<String> addresses, long lastSeenMillis,
       boolean running, SortedSet<String> relayFlags, long consensusWeight,
       String countryCode, long firstSeenMillis, String asNumber, String asName,
-      String contact, SortedSet<String> familyFingerprints,
-      SortedSet<String> effectiveFamily, String version, String operatingSystem,
-      SortedSet<String> verifiedHostNames,
+      String contact, SortedSet<String> effectiveFamily, String version,
+      String operatingSystem, SortedSet<String> verifiedHostNames,
       SortedSet<String> unverifiedHostNames, Boolean recommendedVersion,
       Boolean overloadStatus) {
     this.setRelay(isRelay);
@@ -405,7 +387,6 @@ public class SummaryDocument extends Document {
     this.setAsNumber(asNumber);
     this.setAsName(asName);
     this.setContact(contact);
-    this.setFamilyFingerprints(familyFingerprints);
     this.setEffectiveFamily(effectiveFamily);
     this.setVersion(version);
     this.setOperatingSystem(operatingSystem);

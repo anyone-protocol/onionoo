@@ -198,10 +198,6 @@ public class NodeIndexer implements ServletContextListener, Runnable {
       }
     }
 
-    /* This variable can go away once all Onionoo services had their
-     * hourly updater write effective families to summary documents at
-     * least once.  Remove this code after September 8, 2015. */
-    SortedMap<String, Set<String>> computedEffectiveFamilies = new TreeMap<>();
     for (SummaryDocument entry : currentRelays) {
       String fingerprint = entry.getFingerprint().toUpperCase();
       String hashedFingerprint = entry.getHashedFingerprint()
@@ -242,14 +238,6 @@ public class NodeIndexer implements ServletContextListener, Runnable {
         newRelaysByFlag.putIfAbsent(flagLowerCase, new HashSet<>());
         newRelaysByFlag.get(flagLowerCase).add(fingerprint);
         newRelaysByFlag.get(flagLowerCase).add(hashedFingerprint);
-      }
-      /* This condition can go away once all Onionoo services had their
-       * hourly updater write effective families to summary documents at
-       * least once.  Remove this code after September 8, 2015. */
-      if (entry.getFamilyFingerprints() != null
-          && !entry.getFamilyFingerprints().isEmpty()) {
-        computedEffectiveFamilies.put(fingerprint,
-            entry.getFamilyFingerprints());
       }
       if (entry.getEffectiveFamily() != null) {
         newRelaysByFamily.put(fingerprint, entry.getEffectiveFamily());
@@ -311,22 +299,6 @@ public class NodeIndexer implements ServletContextListener, Runnable {
         newRelaysByOverloadStatus.get(overloadStatus).add(
             hashedFingerprint);
       }
-    }
-    /* This loop can go away once all Onionoo services had their hourly
-     * updater write effective families to summary documents at least
-     * once.  Remove this code after September 8, 2015. */
-    for (Map.Entry<String, Set<String>> e :
-        computedEffectiveFamilies.entrySet()) {
-      String fingerprint = e.getKey();
-      Set<String> inMutualFamilyRelation = new HashSet<>();
-      for (String otherFingerprint : e.getValue()) {
-        if (computedEffectiveFamilies.containsKey(otherFingerprint)
-            && computedEffectiveFamilies.get(otherFingerprint).contains(
-            fingerprint)) {
-          inMutualFamilyRelation.add(otherFingerprint);
-        }
-      }
-      newRelaysByFamily.put(fingerprint, inMutualFamilyRelation);
     }
     for (SummaryDocument entry : currentBridges) {
       String hashedFingerprint = entry.getFingerprint().toUpperCase();
