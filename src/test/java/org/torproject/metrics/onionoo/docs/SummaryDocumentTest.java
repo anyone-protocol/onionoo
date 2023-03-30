@@ -23,9 +23,7 @@ public class SummaryDocumentTest {
         DateTimeHelper.parse("2013-04-18 05:00:00"), "AS8767",
         "m-net telekommunikations gmbh",
         "torkaz <klaus dot zufall at gmx dot de> "
-        + "<fb-token:np5_g_83jmf=>", new TreeSet<>(Arrays.asList(
-        "001C13B3A55A71B977CA65EC85539D79C653A3FC",
-        "0025C136C1F3A9EEFE2AE3F918F03BFA21B5070B")),
+        + "<fb-token:np5_g_83jmf=>",
         new TreeSet<>(Arrays.asList(
             "001C13B3A55A71B977CA65EC85539D79C653A3FC")), null,
         null, null, null, true, false);

@@ -144,9 +144,7 @@ public class ResourceServletTest {
         DateTimeHelper.daysFromDate(6, 7, 22, 22, TEST_TIME), "AS8767",
         "m-net telekommunikations gmbh",
         "torkaz <klaus dot zufall at gmx dot de> "
-        + "<fb-token:np5_g_83jmf=>", new TreeSet<>(Arrays.asList(
-            "001C13B3A55A71B977CA65EC85539D79C653A3FC",
-            "0025C136C1F3A9EEFE2AE3F918F03BFA21B5070B")),
+        + "<fb-token:np5_g_83jmf=>",
         new TreeSet<>(Arrays.asList(
             "001C13B3A55A71B977CA65EC85539D79C653A3FC")),
         "0.2.3.25", "linux",
@@ -166,8 +164,6 @@ public class ResourceServletTest {
         "comcast cable communications, llc", null,
         new TreeSet<>(Arrays.asList(
             "000C5F55BD4814B917CC474BD537F1A3B33CCE2A")),
-        new TreeSet<>(Arrays.asList(
-            "000C5F55BD4814B917CC474BD537F1A3B33CCE2A")),
         null, null,
         new TreeSet<>(Arrays.asList(
             "c-68-38-171-200.hsd1.in.comcast.net")),
@@ -185,7 +181,7 @@ public class ResourceServletTest {
         "liberty global operations b.v.",
         "1024d/51e2a1c7 \"steven j. murdoch\" "
         + "<tor+steven.murdoch@cl.cam.ac.uk> <fb-token:5sr_k_zs2wm=>",
-            new TreeSet<>(), new TreeSet<>(), "0.2.3.24-rc-dev",
+            new TreeSet<>(), "0.2.3.24-rc-dev",
         "windows xp", null, null, false, false);
     this.relays.put("0025C136C1F3A9EEFE2AE3F918F03BFA21B5070B",
         relayTimMayTribute);
@@ -198,7 +194,7 @@ public class ResourceServletTest {
         DateTimeHelper.daysFromDate(2, 18, 15, 19, TEST_TIME), false,
         new TreeSet<>(Arrays.asList("Valid")), -1L,
         null, DateTimeHelper.daysFromDate(3, 20, 45, 18, TEST_TIME),
-        null, null, null, null, null, "0.2.2.39", null, null, null,
+        null, null, null, null, "0.2.2.39", null, null, null,
         true, false);
     this.bridges.put("0000831B236DFF73D409AD17B40E2A728A53994F",
         bridgeec2bridgercc7f31fe);
@@ -209,7 +205,7 @@ public class ResourceServletTest {
         DateTimeHelper.daysFromDate(3, 20, 45, 18, TEST_TIME), false,
         new TreeSet<>(Arrays.asList("Valid")), -1L,
         null, DateTimeHelper.daysFromDate(10, 5, 15, 17, TEST_TIME),
-        null, null, null, null, null, null, null, null, null, null, false);
+        null, null, null, null, null, null, null, null, null, false);
     this.bridges.put("0002D9BDBBC230BD9C78FF502A16E0033EF87E0C",
         bridgeUnnamed);
     org.torproject.metrics.onionoo.docs.SummaryDocument bridgegummy =
@@ -220,7 +216,7 @@ public class ResourceServletTest {
         new TreeSet<>(Arrays.asList("Running",
             "Valid")), -1L, null,
         DateTimeHelper.daysFromDate(7, 15, 15, 18, TEST_TIME), null, null,
-        null, null, null, "0.2.4.4-alpha-dev", "windows 7", null, null,
+        null, null, "0.2.4.4-alpha-dev", "windows 7", null, null,
         false, false);
     this.bridges.put("1FEDE50ED8DBA1DD9F9165F78C8131E4A44AB756",
         bridgegummy);

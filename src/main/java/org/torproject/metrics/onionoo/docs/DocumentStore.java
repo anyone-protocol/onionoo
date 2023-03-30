@@ -448,7 +448,7 @@ public class DocumentStore {
     return new SummaryDocument(isRelay,
         nickname, fingerprint, addresses, lastSeenMillis, running,
         relayFlags, consensusWeight, countryCode, firstSeenMillis,
-        asNumber, asName, contact, family, family, version, operatingSystem,
+        asNumber, asName, contact, family, version, operatingSystem,
         verifiedHostNames, unverifiedHostNames,
         recommendedVersion, overloadStatus);
   }
