@@ -9,7 +9,7 @@ test:
  stage: test
  image:
    name: debian:bookworm
-   pull_policy: if-not-present # available: always, if-not-present, never
+   pull_policy: always # available: always, if-not-present, never
  script:
   - apt update
   - apt install -y wget apt-transport-https gnupg
