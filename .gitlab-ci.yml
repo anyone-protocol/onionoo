@@ -7,14 +7,14 @@ stages:
 
 test:
  stage: test
- image: debian:buster
+ image: debian:bullseye
  script:
   - apt update
   - apt install -y wget apt-transport-https gnupg
-  - wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add -
-  - echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb buster main" | tee /etc/apt/sources.list.d/adoptopenjdk.list
+  - wget -qO - https://packages.adoptium.net/artifactory/api/security/keypair/default-gpg-key/public | apt-key add -
+  - echo "deb https://packages.adoptium.net/artifactory/deb/ bullseye main" | tee /etc/apt/sources.list.d/adoptopenjdk.list
   - apt update
-  - apt install -y adoptopenjdk-8-hotspot ant ivy git curl
+  - apt install -y adoptopenjdk-11-hotspot ant ivy git curl
   - git submodule init
   - git submodule update
   - ant fetch-metrics-lib
