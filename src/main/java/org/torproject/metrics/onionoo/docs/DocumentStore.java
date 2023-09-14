@@ -445,12 +445,13 @@ public class DocumentStore {
     SortedSet<String> unverifiedHostNames = null;
     Boolean recommendedVersion = null;
     Boolean overloadStatus = null;
+    List<String> transports = null;
     return new SummaryDocument(isRelay,
         nickname, fingerprint, addresses, lastSeenMillis, running,
         relayFlags, consensusWeight, countryCode, firstSeenMillis,
         asNumber, asName, contact, family, version, operatingSystem,
         verifiedHostNames, unverifiedHostNames,
-        recommendedVersion, overloadStatus);
+        recommendedVersion, overloadStatus, transports);
   }
 
   private <T extends Document> T retrieveDocumentFile(

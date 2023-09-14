@@ -888,6 +888,8 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
           detailsStatus.getOverloadGeneralTimestamp() != -1L);
       nodeStatus.setOverloadStatus(overloadStatus);
 
+      nodeStatus.setTransports(detailsStatus.getTransports());
+
       /* Extract tor software version for bridges from their "platform" line.
        * (We already know this for relays from "v" lines in the consensus.) */
       if (!nodeStatus.isRelay()) {

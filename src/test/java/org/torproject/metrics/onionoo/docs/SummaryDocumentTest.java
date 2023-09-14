@@ -26,7 +26,7 @@ public class SummaryDocumentTest {
         + "<fb-token:np5_g_83jmf=>",
         new TreeSet<>(Arrays.asList(
             "001C13B3A55A71B977CA65EC85539D79C653A3FC")), null,
-        null, null, null, true, false);
+        null, null, null, true, false, null);
   }
 
   @Test()

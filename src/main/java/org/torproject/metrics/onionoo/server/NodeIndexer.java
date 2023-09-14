@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -178,6 +179,7 @@ public class NodeIndexer implements ServletContextListener, Runnable {
     SortedMap<Integer, Set<String>> newBridgesByFirstSeenDays = new TreeMap<>();
     SortedMap<Integer, Set<String>> newRelaysByLastSeenDays = new TreeMap<>();
     SortedMap<Integer, Set<String>> newBridgesByLastSeenDays = new TreeMap<>();
+    Map<String, Set<String>> newBridgesByTransport = new HashMap<>();
     Set<SummaryDocument> currentRelays = new HashSet<>();
     Set<SummaryDocument> currentBridges = new HashSet<>();
     SortedSet<String> fingerprints = documentStore.list(
@@ -197,7 +199,7 @@ public class NodeIndexer implements ServletContextListener, Runnable {
         currentBridges.add(node);
       }
     }
-
+    SortedMap<String, Set<String>> computedEffectiveFamilies = new TreeMap<>();
     for (SummaryDocument entry : currentRelays) {
       String fingerprint = entry.getFingerprint().toUpperCase();
       String hashedFingerprint = entry.getHashedFingerprint()
@@ -296,6 +298,7 @@ public class NodeIndexer implements ServletContextListener, Runnable {
       }
       Boolean overloadStatus = entry.isOverloadStatus();
       if (null != overloadStatus) {
+        newRelaysByOverloadStatus.get(overloadStatus).add(fingerprint);
         newRelaysByOverloadStatus.get(overloadStatus).add(
             hashedFingerprint);
       }
@@ -364,6 +367,15 @@ public class NodeIndexer implements ServletContextListener, Runnable {
         newBridgesByOverloadStatus.get(overloadStatus).add(
             hashedHashedFingerprint);
       }
+      List<String> transports = entry.getTransports();
+      if (null != transports) {
+        for (String transport : transports) {
+          newBridgesByTransport.putIfAbsent(transport, new HashSet<>());
+          newBridgesByTransport.get(transport).add(hashedFingerprint);
+          newBridgesByTransport.get(transport).add(
+              hashedHashedFingerprint);
+        }
+      }
     }
     NodeIndex newNodeIndex = new NodeIndex();
     newNodeIndex.setRelayFingerprintSummaryLines(
@@ -393,6 +405,7 @@ public class NodeIndexer implements ServletContextListener, Runnable {
     newNodeIndex.setBridgesByRecommendedVersion(newBridgesByRecommendedVersion);
     newNodeIndex.setRelaysByOverloadStatus(newRelaysByOverloadStatus);
     newNodeIndex.setBridgesByOverloadStatus(newBridgesByOverloadStatus);
+    newNodeIndex.setBridgesByTransport(newBridgesByTransport);
     synchronized (this) {
       this.lastIndexed = updateStatusMillis;
       this.latestNodeIndex = newNodeIndex;

@@ -285,4 +285,15 @@ class NodeIndex {
   public Map<Boolean, Set<String>> getBridgesByOverloadStatus() {
     return this.bridgesByOverloadStatus;
   }
+
+  private Map<String, Set<String>> bridgesByTransport = null;
+
+  public void setBridgesByTransport(
+      Map<String, Set<String>> bridgesByTransport) {
+    this.bridgesByTransport = bridgesByTransport;
+  }
+
+  public Map<String, Set<String>> getBridgesByTransport() {
+    return this.bridgesByTransport;
+  }
 }

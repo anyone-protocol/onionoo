@@ -39,7 +39,7 @@ public class SummaryDocumentComparatorTest {
         + "<fb-token:np5_g_83jmf=>",
         new TreeSet<>(Arrays.asList(
             "001C13B3A55A71B977CA65EC85539D79C653A3FC")), null,
-        null, null, null, null, false);
+        null, null, null, null, false, Arrays.asList("obfs4"));
   }
 
   /** Some values for running all comparison types. */
