@@ -514,21 +514,26 @@ public class ResourceServlet extends HttpServlet {
     List<String> searchParameters = new ArrayList<>();
     StringBuilder doubleQuotedSearchTerm = null;
     for (String spaceSeparatedPart : spaceSeparatedParts) {
-      if ((StringUtils.countMatches(spaceSeparatedPart, '"')
-          - StringUtils.countMatches(spaceSeparatedPart, "\\\"")) % 2 == 0) {
-        if (null == doubleQuotedSearchTerm) {
-          searchParameters.add(spaceSeparatedPart);
+      try {
+        if ((StringUtils.countMatches(spaceSeparatedPart, '"')
+            - StringUtils.countMatches(spaceSeparatedPart, "\\\"")) % 2 == 0) {
+          if (null == doubleQuotedSearchTerm) {
+            searchParameters.add(spaceSeparatedPart);
+          } else {
+            doubleQuotedSearchTerm.append(' ').append(spaceSeparatedPart);
+          }
         } else {
-          doubleQuotedSearchTerm.append(' ').append(spaceSeparatedPart);
+          if (null == doubleQuotedSearchTerm) {
+            doubleQuotedSearchTerm = new StringBuilder(spaceSeparatedPart);
+          } else {
+            doubleQuotedSearchTerm.append(' ').append(spaceSeparatedPart);
+            searchParameters.add(doubleQuotedSearchTerm.toString());
+            doubleQuotedSearchTerm = null;
+          }
         }
-      } else {
-        if (null == doubleQuotedSearchTerm) {
-          doubleQuotedSearchTerm = new StringBuilder(spaceSeparatedPart);
-        } else {
-          doubleQuotedSearchTerm.append(' ').append(spaceSeparatedPart);
-          searchParameters.add(doubleQuotedSearchTerm.toString());
-          doubleQuotedSearchTerm = null;
-        }
+      } catch (OutOfMemoryError err) {
+        /* Not enough memory to create the search string. */
+        return null;
       }
     }
     if (null != doubleQuotedSearchTerm) {
