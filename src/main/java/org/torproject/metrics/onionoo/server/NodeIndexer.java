@@ -298,6 +298,7 @@ public class NodeIndexer implements ServletContextListener, Runnable {
       }
       Boolean overloadStatus = entry.isOverloadStatus();
       if (null != overloadStatus) {
+        newRelaysByOverloadStatus.get(overloadStatus).add(fingerprint);
         newRelaysByOverloadStatus.get(overloadStatus).add(
             hashedFingerprint);
       }
