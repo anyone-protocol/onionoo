@@ -74,7 +74,7 @@ public class ResourceServlet extends HttpServlet {
           "country", "as", "as_name", "flag", "first_seen_days",
           "first_seen_since", "last_seen_days", "last_seen_since", "contact",
           "order", "limit", "offset", "fields", "family", "version", "os",
-          "host_name", "recommended_version", "overload_status"));
+          "host_name", "recommended_version", "overload_status", "transport"));
 
   private static Set<String> illegalSearchQualifiers =
       new HashSet<>(Arrays.asList(("search,fingerprint,order,limit,"
@@ -333,7 +333,7 @@ public class ResourceServlet extends HttpServlet {
       rh.setVersion(versionParameter);
     }
     if (parameterMap.containsKey("os")) {
-      String osParameter = this.parseOperatingSystemParameter(
+      String osParameter = this.parseAsciiParameter(
               parameterMap.get("os"));
       if (null == osParameter) {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -373,6 +373,15 @@ public class ResourceServlet extends HttpServlet {
         return;
       }
       rh.setOverloadStatus(overloadStatusRequested);
+    }
+    if (parameterMap.containsKey("transport")) {
+      String transportParameter = this.parseAsciiParameter(
+              parameterMap.get("transport"));
+      if (null == transportParameter) {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        return;
+      }
+      rh.setTransport(transportParameter);
     }
     if (parameterMap.containsKey("order")) {
       String[] order = this.parseOrderParameter(parameterMap.get("order"));
@@ -732,7 +741,7 @@ public class ResourceServlet extends HttpServlet {
     return result;
   }
 
-  private String parseOperatingSystemParameter(String parameter) {
+  private String parseAsciiParameter(String parameter) {
     for (char c : parameter.toCharArray()) {
       if (c < 32 || c >= 127) {
         /* Only accept printable ASCII. */

@@ -98,12 +98,13 @@ public class SummaryDocumentWriter implements DocumentWriter {
           nodeStatus.getUnverifiedHostNames();
       Boolean recommendedVersion = nodeStatus.isRecommendedVersion();
       Boolean overloadStatus = nodeStatus.isOverloadStatus();
+      List<String> transports = nodeStatus.getTransports();
       SummaryDocument summaryDocument = new SummaryDocument(isRelay,
           nickname, fingerprint, addresses, lastSeenMillis, running,
           relayFlags, consensusWeight, countryCode, firstSeenMillis,
           asNumber, asName, contact, effectiveFamily, version,
           operatingSystem, verifiedHostNames,
-          unverifiedHostNames, recommendedVersion, overloadStatus);
+          unverifiedHostNames, recommendedVersion, overloadStatus, transports);
       if (this.documentStore.store(summaryDocument, fingerprint)) {
         this.writtenDocuments++;
       }

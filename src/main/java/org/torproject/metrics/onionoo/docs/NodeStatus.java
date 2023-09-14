@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -538,6 +539,17 @@ public class NodeStatus extends Document {
         stringArrayToSortedSet(this.extendedFamily));
     indirectFamily.removeAll(stringArrayToSortedSet(this.effectiveFamily));
     return indirectFamily;
+  }
+
+  private List<String> transports;
+
+  public void setTransports(List<String> transports) {
+    this.transports = (transports != null && !transports.isEmpty())
+        ? transports : null;
+  }
+
+  public List<String> getTransports() {
+    return this.transports;
   }
 
   /* Constructor and (de-)serialization methods: */

@@ -170,6 +170,12 @@ public class RequestHandler {
     this.overloadStatus = overloadStatus;
   }
 
+  private String transport;
+
+  public void setTransport(String transport) {
+    this.transport = transport;
+  }
+
   private Map<String, SummaryDocument> filteredRelays = new HashMap<>();
 
   private Map<String, SummaryDocument> filteredBridges = new HashMap<>();
@@ -200,6 +206,7 @@ public class RequestHandler {
     this.filterByHostName();
     this.filterByRecommendedVersion();
     this.filterByOverloadStatus();
+    this.filterByTransport();
     this.order();
     this.offset();
     this.limit();
@@ -688,6 +695,22 @@ public class RequestHandler {
     this.filteredRelays.keySet().retainAll(keepRelays);
     Set<String> keepBridges = this.nodeIndex.getBridgesByOverloadStatus()
         .get(this.overloadStatus);
+    this.filteredBridges.keySet().retainAll(keepBridges);
+  }
+
+  private void filterByTransport() {
+    if (null == this.transport) {
+      /* Not filtering by transport. */
+      return;
+    }
+    this.filteredRelays.clear();
+    Set<String> keepBridges = new HashSet<>();
+    for (Map.Entry<String, Set<String>> e
+        : this.nodeIndex.getBridgesByTransport().entrySet()) {
+      if (e.getKey().startsWith(this.transport)) {
+        keepBridges.addAll(e.getValue());
+      }
+    }
     this.filteredBridges.keySet().retainAll(keepBridges);
   }
 

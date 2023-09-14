@@ -360,6 +360,18 @@ public class SummaryDocument extends Document {
     return this.overloadStatus;
   }
 
+  @JsonProperty("tr")
+  private List<String> transports;
+
+  public void setTransports(List<String> transports) {
+    this.transports = (transports != null && !transports.isEmpty())
+        ? transports : null;
+  }
+
+  public List<String> getTransports() {
+    return this.transports;
+  }
+
   /** Instantiate an empty summary document. */
   public SummaryDocument() {
     /* empty */
@@ -373,7 +385,7 @@ public class SummaryDocument extends Document {
       String contact, SortedSet<String> effectiveFamily, String version,
       String operatingSystem, SortedSet<String> verifiedHostNames,
       SortedSet<String> unverifiedHostNames, Boolean recommendedVersion,
-      Boolean overloadStatus) {
+      Boolean overloadStatus, List<String> transports) {
     this.setRelay(isRelay);
     this.setNickname(nickname);
     this.setFingerprint(fingerprint);
@@ -394,5 +406,6 @@ public class SummaryDocument extends Document {
     this.setUnverifiedHostNames(unverifiedHostNames);
     this.setRecommendedVersion(recommendedVersion);
     this.setOverloadStatus(overloadStatus);
+    this.setTransports(transports);
   }
 }
