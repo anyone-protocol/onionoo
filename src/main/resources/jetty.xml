@@ -24,7 +24,7 @@
     <Arg>
       <New class="org.eclipse.jetty.server.ServerConnector">
         <Arg>
-          <Ref id="server"/>
+          <Ref refid="server"/>
         </Arg>
         <Set name="port">
           <SystemProperty name="onionoo.jetty.port" default="8080" />
@@ -44,7 +44,7 @@
           <New class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
             <Call name="addHandler">
               <Arg>
-                <Ref id="webAppContext"/>
+                <Ref refid="webAppContext"/>
               </Arg>
             </Call>
             <Call name="addHandler">
