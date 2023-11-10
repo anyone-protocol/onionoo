@@ -13,7 +13,7 @@ import java.util.SortedSet;
  * Helper class to compare Tor versions.
  *
  * <p>Based on "How Tor Version Numbers Work", available at
- * https://gitweb.torproject.org/torspec.git/tree/version-spec.txt</p>
+ * https://spec.torproject.org/version-spec.html</p>
  */
 public class TorVersion implements Comparable<TorVersion> {
 
