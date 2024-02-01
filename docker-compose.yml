@@ -1,0 +1,28 @@
+version: '2.2'
+services:
+  jar:
+    image: onionoo
+    environment:
+      TYPE: jar
+      COLLECTOR_HOST: localhost:9000
+      COLLECCTOR_PROTOCOL: "http://"
+      UPDATER_PERIOD: 5
+      UPDATER_OFFSET: 3
+    volumes:
+      - ./onionoo-data/out/:/srv/onionoo.torproject.org/onionoo/out
+      - ./onionoo-data/logs/:/srv/onionoo.torproject.org/onionoo/logs
+      - ./onionoo-data/status/:/srv/onionoo.torproject.org/onionoo/status
+  war:
+    image: onionoo
+    environment:
+      TYPE: war
+      COLLECTOR_HOST: localhost:9000
+      COLLECCTOR_PROTOCOL: "http://"
+      UPDATER_PERIOD: 5
+      UPDATER_OFFSET: 3
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./onionoo-data/out/:/srv/onionoo.torproject.org/onionoo/out
+      - ./onionoo-data/logs/:/srv/onionoo.torproject.org/onionoo/logs
+      - ./onionoo-data/status/:/srv/onionoo.torproject.org/onionoo/status

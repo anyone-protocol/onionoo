@@ -25,8 +25,7 @@ public class DescriptorSource {
 
   private final File inDir = new File("in");
 
-  private final String[] collecTorHosts = new String[] {
-      "collector.torproject.org", "collector2.torproject.org" };
+  private final String[] collecTorHosts = System.getProperty("collector.tor.hosts").split(",");
 
   private File[] inCollecTorHostDirs;
 
@@ -94,7 +93,7 @@ public class DescriptorSource {
     for (int collecTorHostIndex = 0;
          collecTorHostIndex < this.collecTorHosts.length;
          collecTorHostIndex++) {
-      String collecTorBaseUrl = "https://"
+      String collecTorBaseUrl = System.getProperty("collector.host.protocol", "https://")
           + this.collecTorHosts[collecTorHostIndex];
       String[] remoteDirectories = remoteDirectoriesList.toArray(new String[0]);
       long minLastModified = 0L;

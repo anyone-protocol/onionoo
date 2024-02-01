@@ -30,7 +30,7 @@
           <SystemProperty name="onionoo.jetty.port" default="8080" />
         </Set>
         <Set name="host">
-          <SystemProperty name="onionoo.jetty.host" default="127.0.0.1" />
+          <SystemProperty name="onionoo.jetty.host" default="0.0.0.0" />
         </Set>
       </New>
     </Arg>
