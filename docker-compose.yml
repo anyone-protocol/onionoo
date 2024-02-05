@@ -1,21 +1,8 @@
 version: '2.2'
 services:
-  jar:
+  onionoo:
     image: atorforte/onionoo
     environment:
-      TYPE: jar
-      COLLECTOR_HOST: host.docker.internal:9000
-      COLLECTOR_PROTOCOL: "http://"
-      UPDATER_PERIOD: 5
-      UPDATER_OFFSET: 2
-    volumes:
-      - ./onionoo-data/out/:/srv/onionoo.torproject.org/onionoo/out
-      - ./onionoo-data/logs/:/srv/onionoo.torproject.org/onionoo/logs
-      - ./onionoo-data/status/:/srv/onionoo.torproject.org/onionoo/status
-  war:
-    image: atorforte/onionoo
-    environment:
-      TYPE: war
       COLLECTOR_HOST: host.docker.internal:9000
       COLLECTOR_PROTOCOL: "http://"
       UPDATER_PERIOD: 5
