@@ -5,7 +5,7 @@ services:
     environment:
       TYPE: jar
       COLLECTOR_HOST: host.docker.internal:9000
-      COLLECCTOR_PROTOCOL: "http://"
+      COLLECTOR_PROTOCOL: "http://"
       UPDATER_PERIOD: 5
       UPDATER_OFFSET: 2
     volumes:
@@ -17,7 +17,7 @@ services:
     environment:
       TYPE: war
       COLLECTOR_HOST: host.docker.internal:9000
-      COLLECCTOR_PROTOCOL: "http://"
+      COLLECTOR_PROTOCOL: "http://"
       UPDATER_PERIOD: 5
       UPDATER_OFFSET: 2
     ports:
