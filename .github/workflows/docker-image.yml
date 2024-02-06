@@ -25,4 +25,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: atorforte/onionoo:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/onionoo:latest
