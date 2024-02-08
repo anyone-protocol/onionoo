@@ -35,7 +35,7 @@ public class DescriptorSource {
 
   private final File inArchiveDir = new File(inDir, "archive");
 
-  private final File statusDir = new File("status");
+  private final File statusDir = new File("data/status");
 
   private DescriptorQueue archiveDescriptorQueue;
 

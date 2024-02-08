@@ -142,7 +142,7 @@ public class Main implements Runnable {
 
   private DocumentStore ds;
 
-  private File outDir = new File("out");
+  private File outDir = new File("data/out");
 
   private StatusUpdateRunner sur;
 

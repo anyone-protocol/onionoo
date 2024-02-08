@@ -37,7 +37,7 @@ public class NodeIndexer implements ServletContextListener, Runnable {
   @Override
   public void contextInitialized(ServletContextEvent contextEvent) {
     File outDir = new File(System.getProperty("onionoo.basedir",
-        "/srv/onionoo.torproject.org/onionoo"), "out");
+        "/srv/onionoo"), "data/out");
     if (!outDir.exists() || !outDir.isDirectory()) {
       logger.error("\n\n\tOut-dir not found! Expected directory: {}"
           + "\n\tSet system property 'onionoo.basedir'.", outDir);

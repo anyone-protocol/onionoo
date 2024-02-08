@@ -48,7 +48,7 @@ Onionoo service, if you prefer.
 
 The Onionoo service requires running in a working directory where it can store
 data and statistics files.  This working directory currently is
-```/srv/onionoo.torproject.org/onionoo```.
+```/srv/onionoo```.
 
 Onionoo does not require setting up a database.
 
@@ -84,16 +84,16 @@ https://www.maxmind.com/download/geoip/database/asnum/GeoIPASNum2.zip
 ### Planning the service setup
 
 Currently Onionoo expects all files to be in the working folder
-```/srv/onionoo.torproject.org/onionoo/```
+```/srv/onionoo/```
 This is not as strict as it seems as this path can be a symbolic link.
 
-The updater needs to be run in `/srv/onionoo.torproject.org/onionoo/`,
+The updater needs to be run in `/srv/onionoo/`,
 but the web application war file can be started anywhere on the filesystem
 as long as the executing user has access to everything in
-`/srv/onionoo.torproject.org/onionoo/`.
+`/srv/onionoo/`.
 
 The additional data downloaded above needs to be unzipped to
-```/srv/onionoo.torproject.org/onionoo/geoip```
+```/srv/onionoo/geoip```
 
 Onionoo consists of a background updater with an internal scheduler and
 an embedded Jetty web module.
@@ -246,13 +246,13 @@ Watch the logs to see if the upgrade or downgrade was successful.
 ### Backing up data and settings
 
 A backup of your Onionoo instance should include the directories `status` and
-`out` in `/srv/onionoo.torproject.org/onionoo/`.
+`out` in `/srv/onionoo/`.
 
 
 ### Performing recurring tasks
 
 Most of Onionoo is designed to just run in the background forever.  One
-exception are the files in `/srv/onionoo.torproject.org/onionoo/geoip` that
+exception are the files in `/srv/onionoo/geoip` that
 should be updated once per month.
 
 
