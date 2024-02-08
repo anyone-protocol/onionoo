@@ -33,7 +33,7 @@ job "onionoo-dev" {
       driver = "docker"
 
       env {
-        DIR_BASE           = "/srv/onionoo"
+        BASE_DIR           = "/srv/onionoo"
         LOGBASE            = "data/logs"
         TYPE               = "jar"
         COLLECTOR_HOST     = "88.99.219.105:9000"
@@ -51,7 +51,9 @@ job "onionoo-dev" {
       config {
         image   = "svforte/onionoo"
         volumes = [
-          "local/data/:/srv/onionoo/data",
+          "local/logs/:/srv/onionoo/data/logs",
+          # todo - remove when mount is done
+          "local/data/:/srv/onionoo/data"
         ]
       }
 
@@ -86,7 +88,7 @@ job "onionoo-dev" {
         volumes = [
           "local/logs/:/srv/onionoo/data/logs",
           # todo - remove when mount is done
-          "local/data/:/srv/onionoo/data",
+          "local/data/:/srv/onionoo/data"
         ]
       }
 

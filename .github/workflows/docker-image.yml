@@ -26,4 +26,4 @@ jobs:
           context: .
           file: ./docker/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/onionoo:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/onionoo:${{ github.sha }},${{ secrets.DOCKER_HUB_USERNAME }}/onionoo:latest

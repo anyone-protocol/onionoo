@@ -33,13 +33,13 @@ job "onionoo-stage" {
       driver = "docker"
 
       env {
+        BASE_DIR           = "/srv/onionoo"
+        LOGBASE            = "data/logs"
+        TYPE               = "jar"
         COLLECTOR_HOST     = "88.99.219.105:9000"
         COLLECTOR_PROTOCOL = "http://"
         UPDATER_PERIOD     = "5"
         UPDATER_OFFSET     = "3"
-        LOGBASE            = "data/logs"
-        DIR_BASE           = "/srv/onionoo"
-        TYPE               = "jar"
       }
 
       #      volume_mount {
@@ -53,7 +53,7 @@ job "onionoo-stage" {
         volumes = [
           "local/logs/:/srv/onionoo/data/logs",
           # todo - remove when mount is done
-          "local/data/:/srv/onionoo/data",
+          "local/data/:/srv/onionoo/data"
         ]
       }
 
@@ -71,8 +71,8 @@ job "onionoo-stage" {
       driver = "docker"
 
       env {
-        LOGBASE  = "data/logs"
         DIR_BASE = "/srv/onionoo"
+        LOGBASE  = "data/logs"
         TYPE     = "war"
       }
 
@@ -88,7 +88,7 @@ job "onionoo-stage" {
         volumes = [
           "local/logs/:/srv/onionoo/data/logs",
           # todo - remove when mount is done
-          "local/data/:/srv/onionoo/data",
+          "local/data/:/srv/onionoo/data"
         ]
       }
 
