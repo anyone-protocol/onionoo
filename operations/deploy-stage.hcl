@@ -71,7 +71,7 @@ job "onionoo-stage" {
       driver = "docker"
 
       env {
-        DIR_BASE = "/srv/onionoo"
+        BASE_DIR = "/srv/onionoo"
         LOGBASE  = "data/logs"
         TYPE     = "war"
       }
