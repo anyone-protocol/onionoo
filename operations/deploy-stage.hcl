@@ -51,9 +51,7 @@ job "onionoo-stage" {
       config {
         image   = "svforte/onionoo"
         volumes = [
-          "local/logs/:/srv/onionoo/data/logs",
-          # todo - remove when mount is done
-          "local/data/:/srv/onionoo/data"
+          "local/logs/:/srv/onionoo/data/logs"
         ]
       }
 
@@ -86,9 +84,7 @@ job "onionoo-stage" {
         image   = "svforte/onionoo"
         ports   = ["http-port"]
         volumes = [
-          "local/logs/:/srv/onionoo/data/logs",
-          # todo - remove when mount is done
-          "local/data/:/srv/onionoo/data"
+          "local/logs/:/srv/onionoo/data/logs"
         ]
       }
 
