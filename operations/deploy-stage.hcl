@@ -19,7 +19,7 @@ job "onionoo-stage" {
 
     network {
       port "http-port" {
-        static = 9090
+        static = 9190
         to     = 8080
       }
     }
