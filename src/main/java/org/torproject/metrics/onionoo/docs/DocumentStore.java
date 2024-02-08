@@ -46,7 +46,7 @@ public class DocumentStore {
 
   private static ObjectMapper objectMapper = new ObjectMapper();
 
-  private final File statusDir = new File("status");
+  private final File statusDir = new File("data/status");
 
   private File outDir = null;
 

@@ -115,14 +115,16 @@ public class Main implements Runnable {
   private void scheduleExecutions() {
     logger.info("Periodic updater started.");
     final Runnable mainRunnable = this;
-    int currentMinute = Calendar.getInstance().get(Calendar.MINUTE);
-    int initialDelay = (75 - currentMinute + currentMinute % 5) % 60;
+    int period = Integer.parseInt(System.getProperty("updater.period.minutes", "60"));
+    int offset = Integer.parseInt(System.getProperty("updater.offset.minutes", "5"));
 
+    int currentMinute = Calendar.getInstance().get(Calendar.MINUTE);
+
+    int module = currentMinute % period;
+    int initialDelay = module < offset ? offset - module : period - module + offset;
     /* Run after initialDelay delay and then every hour. */
-    logger.info("Periodic updater will start every hour at minute {}.",
-        (currentMinute + initialDelay) % 60);
-    this.scheduler.scheduleAtFixedRate(mainRunnable, initialDelay, 60,
-        TimeUnit.MINUTES);
+    logger.info("Periodic updater will start in {} minutes and will be run every {} minutes", initialDelay, period);
+    this.scheduler.scheduleAtFixedRate(mainRunnable, initialDelay, period, TimeUnit.MINUTES);
   }
 
   @Override
@@ -140,7 +142,7 @@ public class Main implements Runnable {
 
   private DocumentStore ds;
 
-  private File outDir = new File("out");
+  private File outDir = new File("data/out");
 
   private StatusUpdateRunner sur;
 
