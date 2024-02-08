@@ -36,7 +36,7 @@ job "onionoo-stage" {
         BASE_DIR           = "/srv/onionoo"
         LOGBASE            = "data/logs"
         TYPE               = "jar"
-        COLLECTOR_HOST     = "88.99.219.105:9000"
+        COLLECTOR_HOST     = "88.99.219.105:9100"
         COLLECTOR_PROTOCOL = "http://"
         UPDATER_PERIOD     = "5"
         UPDATER_OFFSET     = "3"
