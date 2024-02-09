@@ -14,13 +14,15 @@ job "onionoo-dev" {
     #    volume "onionoo-data" {
     #      type      = "host"
     #      read_only = false
-    #      source    = "onionoo-data"
+    #      source    = "onionoo-data-dev"
     #    }
 
     network {
+      mode = "bridge"
       port "http-port" {
         static = 9090
         to     = 8080
+        host_network = "wireguard"
       }
     }
 
@@ -36,7 +38,7 @@ job "onionoo-dev" {
         BASE_DIR           = "/srv/onionoo"
         LOGBASE            = "data/logs"
         TYPE               = "jar"
-        COLLECTOR_HOST     = "88.99.219.105:9000"
+        COLLECTOR_HOST     = "{{with nomadService "collector-dev"}}{{.Address}}:{{.Port}}{{end}}"
         COLLECTOR_PROTOCOL = "http://"
         UPDATER_PERIOD     = "5"
         UPDATER_OFFSET     = "3"
