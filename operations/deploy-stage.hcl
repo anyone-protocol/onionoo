@@ -18,9 +18,11 @@ job "onionoo-stage" {
     #    }
 
     network {
+      mode = "bridge"
       port "http-port" {
         static = 9190
         to     = 8080
+        host_network = "wireguard"
       }
     }
 
