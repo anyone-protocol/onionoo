@@ -14,7 +14,7 @@ job "onionoo-stage" {
     #    volume "onionoo-data" {
     #      type      = "host"
     #      read_only = false
-    #      source    = "onionoo-data"
+    #      source    = "onionoo-data-stage"
     #    }
 
     network {
@@ -36,7 +36,7 @@ job "onionoo-stage" {
         BASE_DIR           = "/srv/onionoo"
         LOGBASE            = "data/logs"
         TYPE               = "jar"
-        COLLECTOR_HOST     = "88.99.219.105:9100"
+        COLLECTOR_HOST     = "{{with nomadService "collector-stage"}}{{.Address}}:{{.Port}}{{end}}"
         COLLECTOR_PROTOCOL = "http://"
         UPDATER_PERIOD     = "5"
         UPDATER_OFFSET     = "3"
