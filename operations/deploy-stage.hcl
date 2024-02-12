@@ -105,5 +105,36 @@ job "onionoo-stage" {
         #        ]
       }
     }
+
+    task "onionoo-cron-stage-task" {
+      driver = "docker"
+
+      env {
+        ONIONOO_HOST      = "http://88.99.219.105:9190"
+        METRICS_FILE_PATH = "/srv/onionoo/data/out/network/metrics"
+      }
+
+      #      volume_mount {
+      #        volume      = "onionoo-data"
+      #        destination = "/srv/onionoo/data"
+      #        read_only   = true
+      #      }
+
+      config {
+        image   = "svforte/onionoo-cron"
+        volumes = [
+          "local/logs/:/srv/onionoo/data/logs"
+        ]
+      }
+
+      resources {
+        cpu    = 256
+        memory = 256
+      }
+
+      service {
+        name = "onionoo-cron-stage"
+      }
+    }
   }
 }

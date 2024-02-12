@@ -12,7 +12,7 @@ RUN apt-get update && \
     ant fetch-metrics-lib && \
     ant -lib /usr/share/java resolve && \
     ant tar && \
-    cp generated/dist/**dev.jar generated/dist/**dev.war docker/**.sh .. && \
+    cp -r generated/dist/**dev.jar generated/dist/**dev.war docker/**.sh geoip .. && \
     cd .. && \
     rm -rf temp
 

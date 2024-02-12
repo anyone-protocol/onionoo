@@ -24,3 +24,11 @@ services:
       - "8080:8080"
     volumes:
       - ./onionoo-data/:/srv/onionoo/data
+  onionoo-cron:
+    image: onionoo-cron
+    restart: always
+    environment:
+      ONIONOO_HOST: "http://host.docker.internal:8080"
+      METRICS_FILE_PATH: "/srv/onionoo/data/out/network/metrics"
+    volumes:
+      - ./onionoo-data/:/srv/onionoo/data
