@@ -1,5 +1,4 @@
 name: Build and Push Docker Image
-
 inputs:
   docker-username:
     required: true
