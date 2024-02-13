@@ -3,7 +3,6 @@ name: Build and Push Docker Image
 on:
   pull_request:
     branches:
-      - main
       - develop
   workflow_dispatch:
 
@@ -36,3 +35,13 @@ jobs:
           file: ./metrics/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/onionoo-cron:${{ github.sha }},${{ secrets.DOCKER_HUB_USERNAME }}/onionoo-cron:latest
+
+      - name: Deploy new version
+        env:
+          NOMAD_CACERT: operations/admin-ui-ca.crt
+          NOMAD_TOKEN: ${{ secrets.NOMAD_TOKEN_ONIONOO_DEPLOY }}
+          NOMAD_ADDR: ${{ secrets.NOMAD_DEPLOY_ADDR }}
+        run: |
+          curl -L https://releases.hashicorp.com/nomad/1.6.3/nomad_1.6.3_linux_amd64.zip -o nomad.zip
+          unzip nomad.zip
+          ./nomad job run operations/deploy-dev.hcl

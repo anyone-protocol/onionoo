@@ -21,7 +21,6 @@ def __check_time_delta(node, field, interval):
         else:
             return False
 
-
 if __name__ == '__main__':
 
     onionoo_host = os.getenv('ONIONOO_HOST', 'http://host.docker.internal:8080')
