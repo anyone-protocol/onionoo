@@ -10,10 +10,12 @@ COPY network-metrics-cron /etc/cron.d/network-metrics-cron
 
 COPY generate-network-metrics.py .
 
+COPY docker-entrypoint.sh .
+
 RUN mkdir -p data/out/network && touch data/out/network/metrics
 
 RUN mkdir -p data/logs && touch data/logs/cron.log
 
 RUN crontab /etc/cron.d/network-metrics-cron
 
-CMD [ "cron", "-f"]
+ENTRYPOINT ["sh", "docker-entrypoint.sh"]

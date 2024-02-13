@@ -113,14 +113,14 @@ job "onionoo-stage" {
       driver = "docker"
 
       env {
-        ONIONOO_HOST      = "http://88.99.219.105:9190"
+        ONIONOO_HOST      = "http://127.0.0.1:8080"
         METRICS_FILE_PATH = "/srv/onionoo/data/out/network/metrics"
       }
 
       volume_mount {
         volume      = "onionoo-data"
         destination = "/srv/onionoo/data"
-        read_only   = true
+        read_only   = false
       }
 
       config {
