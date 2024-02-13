@@ -6,11 +6,6 @@ job "onionoo-stage" {
   group "onionoo-stage-group" {
     count = 1
 
-    constraint {
-      attribute = "${node.unique.id}"
-      value     = "c8e55509-a756-0aa7-563b-9665aa4915ab"
-    }
-
     volume "onionoo-data" {
       type      = "host"
       read_only = false
