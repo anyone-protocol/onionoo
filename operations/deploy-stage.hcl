@@ -6,21 +6,18 @@ job "onionoo-stage" {
   group "onionoo-stage-group" {
     count = 1
 
-    constraint {
-      attribute = "${node.unique.id}"
-      value     = "c8e55509-a756-0aa7-563b-9665aa4915ab"
+    volume "onionoo-data" {
+      type      = "host"
+      read_only = false
+      source    = "onionoo-stage"
     }
 
-    #    volume "onionoo-data" {
-    #      type      = "host"
-    #      read_only = false
-    #      source    = "onionoo-data"
-    #    }
-
     network {
+      mode = "bridge"
       port "http-port" {
         static = 9190
         to     = 8080
+        host_network = "wireguard"
       }
     }
 
@@ -32,21 +29,27 @@ job "onionoo-stage" {
     task "onionoo-jar-stage-task" {
       driver = "docker"
 
-      env {
-        BASE_DIR           = "/srv/onionoo"
-        LOGBASE            = "data/logs"
-        TYPE               = "jar"
-        COLLECTOR_HOST     = "88.99.219.105:9100"
-        COLLECTOR_PROTOCOL = "http://"
-        UPDATER_PERIOD     = "5"
-        UPDATER_OFFSET     = "3"
+      template {
+        data = <<EOH
+            BASE_DIR="/srv/onionoo"
+            LOGBASE="data/logs"
+            TYPE="jar"
+	      {{- range nomadService "collector-stage" }}
+  	        COLLECTOR_HOST="{{ .Address }}:{{ .Port }}"
+	      {{ end -}}                
+            COLLECTOR_PROTOCOL="http://"
+            UPDATER_PERIOD="5"
+            UPDATER_OFFSET="3"
+            EOH
+        destination = "secrets/file.env"
+        env         = true
       }
 
-      #      volume_mount {
-      #        volume      = "onionoo-data"
-      #        destination = "/srv/onionoo/data"
-      #        read_only   = false
-      #      }
+      volume_mount {
+        volume      = "onionoo-data"
+        destination = "/srv/onionoo/data"
+        read_only   = false
+      }
 
       config {
         image   = "svforte/onionoo"
@@ -74,11 +77,11 @@ job "onionoo-stage" {
         TYPE     = "war"
       }
 
-      #      volume_mount {
-      #        volume      = "onionoo-data"
-      #        destination = "/srv/onionoo/data"
-      #        read_only   = true
-      #      }
+      volume_mount {
+        volume      = "onionoo-data"
+        destination = "/srv/onionoo/data"
+        read_only   = true
+      }
 
       config {
         image   = "svforte/onionoo"
