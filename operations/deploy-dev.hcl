@@ -52,6 +52,7 @@ job "onionoo-dev" {
 
       config {
         image   = "svforte/onionoo:latest-dev"
+        force_pull = true
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
@@ -84,6 +85,7 @@ job "onionoo-dev" {
 
       config {
         image   = "svforte/onionoo:latest-dev"
+        force_pull = true
         ports   = ["http-port"]
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
@@ -124,6 +126,7 @@ job "onionoo-dev" {
 
       config {
         image   = "svforte/onionoo-cron:latest-dev"
+        force_pull = true
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
