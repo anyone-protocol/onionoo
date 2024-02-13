@@ -49,7 +49,7 @@ job "onionoo-dev" {
       #      }
 
       config {
-        image   = "svforte/onionoo"
+        image   = "svforte/onionoo:latest-dev"
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
@@ -81,7 +81,7 @@ job "onionoo-dev" {
       #      }
 
       config {
-        image   = "svforte/onionoo"
+        image   = "svforte/onionoo:latest-dev"
         ports   = ["http-port"]
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
@@ -121,7 +121,7 @@ job "onionoo-dev" {
       #      }
 
       config {
-        image   = "svforte/onionoo-cron"
+        image   = "svforte/onionoo-cron:latest-dev"
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
