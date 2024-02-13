@@ -23,7 +23,7 @@ def __check_time_delta(node, field, interval):
 
 if __name__ == '__main__':
 
-    onionoo_host = os.getenv('ONIONOO_HOST', 'http://host.docker.internal:8080')
+    onionoo_host = os.getenv('ONIONOO_HOST')
 
     details = json.loads(requests.get(f'{onionoo_host}/details').text)
     bandwidth = json.loads(requests.get(f'{onionoo_host}/bandwidth').text)
