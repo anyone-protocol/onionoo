@@ -6,16 +6,11 @@ job "onionoo-dev" {
   group "onionoo-dev-group" {
     count = 1
 
-    constraint {
-      attribute = "${node.unique.id}"
-      value     = "c8e55509-a756-0aa7-563b-9665aa4915ab"
+    volume "onionoo-data" {
+      type      = "host"
+      read_only = false
+      source    = "onionoo-dev"
     }
-
-    #    volume "onionoo-data" {
-    #      type      = "host"
-    #      read_only = false
-    #      source    = "onionoo-data-dev"
-    #    }
 
     network {
       mode = "bridge"
@@ -44,11 +39,11 @@ job "onionoo-dev" {
         UPDATER_OFFSET     = "3"
       }
 
-      #      volume_mount {
-      #        volume      = "onionoo-data"
-      #        destination = "/srv/onionoo/data"
-      #        read_only   = false
-      #      }
+      volume_mount {
+        volume      = "onionoo-data"
+        destination = "/srv/onionoo/data"
+        read_only   = false
+      }
 
       config {
         image   = "svforte/onionoo"
@@ -76,11 +71,11 @@ job "onionoo-dev" {
         TYPE     = "war"
       }
 
-      #      volume_mount {
-      #        volume      = "onionoo-data"
-      #        destination = "/srv/onionoo/data"
-      #        read_only   = true
-      #      }
+      volume_mount {
+        volume      = "onionoo-data"
+        destination = "/srv/onionoo/data"
+        read_only   = true
+      }
 
       config {
         image   = "svforte/onionoo"
