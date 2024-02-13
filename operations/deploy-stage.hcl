@@ -117,11 +117,11 @@ job "onionoo-stage" {
         METRICS_FILE_PATH = "/srv/onionoo/data/out/network/metrics"
       }
 
-      #      volume_mount {
-      #        volume      = "onionoo-data"
-      #        destination = "/srv/onionoo/data"
-      #        read_only   = true
-      #      }
+      volume_mount {
+        volume      = "onionoo-data"
+        destination = "/srv/onionoo/data"
+        read_only   = true
+      }
 
       config {
         image   = "svforte/onionoo-cron"
@@ -133,10 +133,6 @@ job "onionoo-stage" {
       resources {
         cpu    = 256
         memory = 256
-      }
-
-      service {
-        name = "onionoo-cron-stage"
       }
     }
   }

@@ -112,15 +112,15 @@ job "onionoo-dev" {
       driver = "docker"
 
       env {
-        ONIONOO_HOST      = "http://88.99.219.105:9090"
+        ONIONOO_HOST      = "http://10.1.244.1:9090"
         METRICS_FILE_PATH = "/srv/onionoo/data/out/network/metrics"
       }
 
-      #      volume_mount {
-      #        volume      = "onionoo-data"
-      #        destination = "/srv/onionoo/data"
-      #        read_only   = true
-      #      }
+      volume_mount {
+        volume      = "onionoo-data"
+        destination = "/srv/onionoo/data"
+        read_only   = true
+      }
 
       config {
         image   = "svforte/onionoo-cron:latest-dev"
@@ -132,10 +132,6 @@ job "onionoo-dev" {
       resources {
         cpu    = 256
         memory = 256
-      }
-
-      service {
-        name = "onionoo-cron-dev"
       }
     }
   }
