@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
       - name: Build and push
         uses: ./.github/actions/build-and-push
         with:
