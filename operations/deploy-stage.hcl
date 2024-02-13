@@ -35,7 +35,7 @@ job "onionoo-stage" {
             LOGBASE="data/logs"
             TYPE="jar"
 	      {{- range nomadService "collector-dev" }}
-  	        COLLECTOR_HOST=http://{{ .Address }}:{{ .Port }}/api/v1/write
+  	        COLLECTOR_HOST={{ .Address }}:{{ .Port }}/api/v1/write
 	      {{ end -}}                
             COLLECTOR_PROTOCOL="http://"
             UPDATER_PERIOD="5"
