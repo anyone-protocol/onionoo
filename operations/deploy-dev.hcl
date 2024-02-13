@@ -28,15 +28,20 @@ job "onionoo-dev" {
 
     task "onionoo-jar-dev-task" {
       driver = "docker"
-
-      env {
-        BASE_DIR           = "/srv/onionoo"
-        LOGBASE            = "data/logs"
-        TYPE               = "jar"
-        COLLECTOR_HOST     = "{{with nomadService "collector-dev"}}{{.Address}}:{{.Port}}{{end}}"
-        COLLECTOR_PROTOCOL = "http://"
-        UPDATER_PERIOD     = "5"
-        UPDATER_OFFSET     = "3"
+      template {
+        data = <<EOH
+            BASE_DIR="/srv/onionoo"
+            LOGBASE="data/logs"
+            TYPE="jar"
+						{{- range nomadService "collector-dev" }}
+  						COLLECTOR_HOST=http://{{ .Address }}:{{ .Port }}/api/v1/write
+						{{ end -}}                
+            COLLECTOR_PROTOCOL="http://"
+            UPDATER_PERIOD="5"
+            UPDATER_OFFSET="3"
+            EOH
+        destination = "secrets/file.env"
+        env         = true
       }
 
       volume_mount {
