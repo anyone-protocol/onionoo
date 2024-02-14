@@ -29,6 +29,7 @@ services:
     restart: always
     environment:
       ONIONOO_HOST: "http://host.docker.internal:8080"
+      INTERVAL_MINUTES: 5
       METRICS_FILE_PATH: "/srv/onionoo/data/out/network/metrics"
     volumes:
       - ./onionoo-data/:/srv/onionoo/data

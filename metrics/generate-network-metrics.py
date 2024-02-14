@@ -15,7 +15,6 @@ def __check_time_delta(node, field, interval):
         else:
             timestamp = datetime.fromtimestamp(node.get(field).get('timestamp')/1000)
 
-
         if (datetime.utcnow() - timestamp) < timedelta(hours=interval):
             return True
         else:
