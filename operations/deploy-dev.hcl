@@ -107,6 +107,18 @@ job "onionoo-dev" {
         #          "traefik.http.routers.deb-repo.tls=true",
         #          "traefik.http.routers.deb-repo.tls.certresolver=atorresolver",
         #        ]
+        check {
+          name     = "Onionoo web server check"
+          type     = "http"
+          port     = "http-port"
+          path     = "/"
+          interval = "10s"
+          timeout  = "10s"
+          check_restart {
+            limit = 10
+            grace = "30s"
+          }
+        }
       }
     }
 
