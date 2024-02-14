@@ -106,6 +106,46 @@ job "onionoo-stage" {
         #          "traefik.http.routers.deb-repo.tls=true",
         #          "traefik.http.routers.deb-repo.tls.certresolver=atorresolver",
         #        ]
+        check {
+          name     = "Onionoo web server check"
+          type     = "http"
+          port     = "http-port"
+          path     = "/"
+          interval = "10s"
+          timeout  = "10s"
+          check_restart {
+            limit = 10
+            grace = "30s"
+          }
+        }
+      }
+    }
+
+    task "onionoo-cron-stage-task" {
+      driver = "docker"
+
+      env {
+        ONIONOO_HOST      = "http://127.0.0.1:8080"
+        INTERVAL_MINUTES  = "5"
+        METRICS_FILE_PATH = "/srv/onionoo/data/out/network/metrics"
+      }
+
+      volume_mount {
+        volume      = "onionoo-data"
+        destination = "/srv/onionoo/data"
+        read_only   = false
+      }
+
+      config {
+        image   = "svforte/onionoo-cron"
+        volumes = [
+          "local/logs/:/srv/onionoo/data/logs"
+        ]
+      }
+
+      resources {
+        cpu    = 256
+        memory = 256
       }
     }
   }

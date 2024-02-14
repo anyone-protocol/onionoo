@@ -30,6 +30,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+// TODO: GeoIP feature is currently working with outdated data, without ASN and only for IPv4 addresses.
 public class LookupService {
 
   private static final Logger logger = LoggerFactory.getLogger(
@@ -39,11 +40,11 @@ public class LookupService {
 
   private GeoipFile geoip;
 
-  private GeoipFile geoip6;
+//  private GeoipFile geoip6;
 
   private GeoipNamesFile countries;
 
-  private GeoipNamesFile asns;
+//  private GeoipNamesFile asns;
 
   private boolean hasAllFiles = false;
 
@@ -61,13 +62,13 @@ public class LookupService {
         this.geoip = (GeoipFile) g;
       }
     }
-    File geoip6 = new File(this.geoipDir,
-        "geoip6");
-    for (Descriptor g : new DescriptorReaderImpl().readDescriptors(geoip6)) {
-      if (g instanceof GeoipFile) {
-        this.geoip6 = (GeoipFile) g;
-      }
-    }
+//    File geoip6 = new File(this.geoipDir,
+//        "geoip6");
+//    for (Descriptor g : new DescriptorReaderImpl().readDescriptors(geoip6)) {
+//      if (g instanceof GeoipFile) {
+//        this.geoip6 = (GeoipFile) g;
+//      }
+//    }
     File countries = new File(this.geoipDir,
             "countries.txt");
     for (Descriptor g : new DescriptorReaderImpl().readDescriptors(countries)) {
@@ -75,15 +76,19 @@ public class LookupService {
         this.countries = (GeoipNamesFile) g;
       }
     }
-    File asns = new File(this.geoipDir,
-            "asn.txt");
-    for (Descriptor g : new DescriptorReaderImpl().readDescriptors(asns)) {
-      if (g instanceof GeoipNamesFile) {
-        this.asns = (GeoipNamesFile) g;
-      }
-    }
-    this.hasAllFiles = (null != this.geoip && null != this.geoip6
-                        && null != this.countries && null != this.asns);
+//    File asns = new File(this.geoipDir,
+//            "asn.txt");
+//    for (Descriptor g : new DescriptorReaderImpl().readDescriptors(asns)) {
+//      if (g instanceof GeoipNamesFile) {
+//        this.asns = (GeoipNamesFile) g;
+//      }
+//    }
+    this.hasAllFiles = (
+            null != this.geoip
+//            && null != this.geoip6
+            && null != this.countries
+//            && null != this.asns
+    );
   }
 
   private final Pattern ipv4Pattern = Pattern.compile("^[0-9.]{7,15}$");
@@ -107,7 +112,9 @@ public class LookupService {
       if (ipv4Pattern.matcher(addressString).matches()) {
         geoipFile = this.geoip;
       } else {
-        geoipFile = this.geoip6;
+        // geoip6 is not supported yet
+//        geoipFile = this.geoip6;
+        continue;
       }
       try {
         Optional<GeoipFile.GeoipEntry> entry =
@@ -141,10 +148,10 @@ public class LookupService {
         lookupResult.setCountryName(this.countries.get(
                 countryCode.toUpperCase()));
       }
-      if (null != asn) {
-        lookupResult.setAsNumber("AS" + asn);
-        lookupResult.setAsName(this.asns.get(asn));
-      }
+//      if (null != asn) {
+//        lookupResult.setAsNumber("AS" + asn);
+//        lookupResult.setAsName(this.asns.get(asn));
+//      }
       lookupResults.put(addressString, lookupResult);
     }
 
