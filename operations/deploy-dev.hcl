@@ -58,6 +58,10 @@ job "onionoo-dev" {
         ]
       }
 
+      vault {
+      	policies = ["ator-network-read"]
+      }
+
       resources {
         cpu    = 256
         memory = 512
@@ -90,6 +94,10 @@ job "onionoo-dev" {
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
+      }
+
+      vault {
+      	policies = ["ator-network-read"]
       }
 
       resources {
@@ -143,6 +151,10 @@ job "onionoo-dev" {
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
+      }
+
+      vault {
+      	policies = ["ator-network-read"]
       }
 
       resources {
