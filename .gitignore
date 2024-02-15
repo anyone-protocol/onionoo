@@ -1,5 +1,4 @@
 /generated/
-/geoip/
 /in/
 /out/
 /status/
@@ -11,3 +10,4 @@
 
 src/main/main.iml
 src/test/test.iml
+/docker/onionoo-data

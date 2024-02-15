@@ -157,33 +157,35 @@ public class TorVersion implements Comparable<TorVersion> {
    * given recommended tor versions. */
   public TorVersionStatus determineVersionStatus(
       SortedSet<TorVersion> recommendedVersions) {
-    if (null == this.releaseSeries) {
-      /* Only consider full versions, not partial versions. */
-      return TorVersionStatus.UNRECOMMENDED;
-    } else if (recommendedVersions.contains(this)) {
-      return TorVersionStatus.RECOMMENDED;
-    } else if (this.compareTo(recommendedVersions.last()) > 0) {
-      return TorVersionStatus.EXPERIMENTAL;
-    } else if (this.compareTo(recommendedVersions.first()) < 0) {
-      return TorVersionStatus.OBSOLETE;
-    } else {
-      boolean seriesHasRecommendedVersions = false;
-      boolean notNewInSeries = false;
-      for (TorVersion recommendedVersion : recommendedVersions) {
-        if (this.releaseSeries.equals(
-            recommendedVersion.releaseSeries)) {
-          seriesHasRecommendedVersions = true;
-          if (this.compareTo(recommendedVersion) < 0) {
-            notNewInSeries = true;
-          }
-        }
-      }
-      if (seriesHasRecommendedVersions && !notNewInSeries) {
-        return TorVersionStatus.NEW_IN_SERIES;
-      } else {
-        return TorVersionStatus.UNRECOMMENDED;
-      }
-    }
+    return TorVersionStatus.RECOMMENDED;
+    // TODO - fix recommendation anon version from consensus
+//    if (null == this.releaseSeries) {
+//      /* Only consider full versions, not partial versions. */
+//      return TorVersionStatus.UNRECOMMENDED;
+//    } else if (recommendedVersions.contains(this)) {
+//      return TorVersionStatus.RECOMMENDED;
+//    } else if (this.compareTo(recommendedVersions.last()) > 0) {
+//      return TorVersionStatus.EXPERIMENTAL;
+//    } else if (this.compareTo(recommendedVersions.first()) < 0) {
+//      return TorVersionStatus.OBSOLETE;
+//    } else {
+//      boolean seriesHasRecommendedVersions = false;
+//      boolean notNewInSeries = false;
+//      for (TorVersion recommendedVersion : recommendedVersions) {
+//        if (this.releaseSeries.equals(
+//            recommendedVersion.releaseSeries)) {
+//          seriesHasRecommendedVersions = true;
+//          if (this.compareTo(recommendedVersion) < 0) {
+//            notNewInSeries = true;
+//          }
+//        }
+//      }
+//      if (seriesHasRecommendedVersions && !notNewInSeries) {
+//        return TorVersionStatus.NEW_IN_SERIES;
+//      } else {
+//        return TorVersionStatus.UNRECOMMENDED;
+//      }
+//    }
   }
 }
 
