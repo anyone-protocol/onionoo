@@ -6,6 +6,7 @@ import os
 from datetime import datetime, timedelta
 
 from prometheus_client import CollectorRegistry, Gauge, write_to_textfile
+
 def __check_time_delta(node, field, interval):
     if node.get(field):
         timestamp = 0
@@ -514,15 +515,15 @@ if __name__ == '__main__':
     #                 else:
     #                     offline_flags_bridges[flag] = 1
 
-    relays = bandwidth['relays']
-    for relay in relays:
-        if relay.get('overload_ratelimits'):
-            if __check_time_delta(relay, 'overload_ratelimits', 24):
-                total_overload_ratelimits_relays.append(relay)
-
-        if relay.get('overload_fd_exhausted'):
-            if __check_time_delta(relay, 'overload_fd_exhausted', 72):
-                total_overload_fd_exhausted_relays.append(relay)
+    # relays = bandwidth['relays']
+    # for relay in relays:
+    #     if relay.get('overload_ratelimits'):
+    #         if __check_time_delta(relay, 'overload_ratelimits', 24):
+    #             total_overload_ratelimits_relays.append(relay)
+    #
+    #     if relay.get('overload_fd_exhausted'):
+    #         if __check_time_delta(relay, 'overload_fd_exhausted', 72):
+    #             total_overload_fd_exhausted_relays.append(relay)
 
     # bridges = bandwidth['bridges']
     # for bridge in bridges:
