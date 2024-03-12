@@ -1,21 +1,21 @@
-job "onionoo-stage" {
+job "onionoo-live" {
   datacenters = ["ator-fin"]
   type        = "service"
   namespace   = "ator-network"
 
-  group "onionoo-stage-group" {
+  group "onionoo-live-group" {
     count = 1
 
     volume "onionoo-data" {
       type      = "host"
       read_only = false
-      source    = "onionoo-stage"
+      source    = "onionoo-live"
     }
 
     network {
       mode = "bridge"
       port "http-port" {
-        static = 9190
+        static = 9290
         to     = 8080
         host_network = "wireguard"
       }
@@ -26,7 +26,7 @@ job "onionoo-stage" {
       sticky  = true
     }
 
-    task "onionoo-jar-stage-task" {
+    task "onionoo-jar-live-task" {
       driver = "docker"
 
       template {
@@ -34,9 +34,9 @@ job "onionoo-stage" {
             BASE_DIR="/srv/onionoo"
             LOGBASE="data/logs"
             TYPE="jar"
-	      {{- range nomadService "collector-stage" }}
+	      {{- range nomadService "collector-live" }}
   	        COLLECTOR_HOST="{{ .Address }}:{{ .Port }}"
-	      {{ end -}}                
+	      {{ end -}}
             COLLECTOR_PROTOCOL="http://"
             UPDATER_PERIOD="5"
             UPDATER_OFFSET="3"
@@ -52,7 +52,7 @@ job "onionoo-stage" {
       }
 
       config {
-        image   = "svforte/onionoo:latest-stage"
+        image   = "svforte/onionoo"
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
@@ -64,11 +64,11 @@ job "onionoo-stage" {
       }
 
       service {
-        name = "onionoo-jar-stage"
+        name = "onionoo-jar-live"
       }
     }
 
-    task "onionoo-war-stage-task" {
+    task "onionoo-war-live-task" {
       driver = "docker"
 
       env {
@@ -84,7 +84,7 @@ job "onionoo-stage" {
       }
 
       config {
-        image   = "svforte/onionoo:latest-stage"
+        image   = "svforte/onionoo"
         ports   = ["http-port"]
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
@@ -97,12 +97,12 @@ job "onionoo-stage" {
       }
 
       service {
-        name = "onionoo-war-stage"
+        name = "onionoo-war-live"
         port = "http-port"
         #        tags = [
         #          "traefik.enable=true",
         #          "traefik.http.routers.deb-repo.entrypoints=https",
-        #          "traefik.http.routers.deb-repo.rule=Host(`stage.onionoo.dmz.ator.dev`)",
+        #          "traefik.http.routers.deb-repo.rule=Host(`live.onionoo.dmz.ator.dev`)",
         #          "traefik.http.routers.deb-repo.tls=true",
         #          "traefik.http.routers.deb-repo.tls.certresolver=atorresolver",
         #        ]
@@ -121,7 +121,7 @@ job "onionoo-stage" {
       }
     }
 
-    task "onionoo-cron-stage-task" {
+    task "onionoo-cron-live-task" {
       driver = "docker"
 
       env {
@@ -137,7 +137,7 @@ job "onionoo-stage" {
       }
 
       config {
-        image   = "svforte/onionoo-cron:latest-stage"
+        image   = "svforte/onionoo-cron"
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
