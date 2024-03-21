@@ -52,7 +52,8 @@ job "onionoo-live" {
       }
 
       config {
-        image   = "svforte/onionoo"
+        image   = "svforte/onionoo:latest"
+        force_pull = true
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
@@ -84,7 +85,8 @@ job "onionoo-live" {
       }
 
       config {
-        image   = "svforte/onionoo"
+        image   = "svforte/onionoo:latest"
+        force_pull = true
         ports   = ["http-port"]
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
@@ -99,13 +101,6 @@ job "onionoo-live" {
       service {
         name = "onionoo-war-live"
         port = "http-port"
-        #        tags = [
-        #          "traefik.enable=true",
-        #          "traefik.http.routers.deb-repo.entrypoints=https",
-        #          "traefik.http.routers.deb-repo.rule=Host(`live.onionoo.dmz.ator.dev`)",
-        #          "traefik.http.routers.deb-repo.tls=true",
-        #          "traefik.http.routers.deb-repo.tls.certresolver=atorresolver",
-        #        ]
         check {
           name     = "Onionoo web server check"
           type     = "http"
@@ -137,7 +132,8 @@ job "onionoo-live" {
       }
 
       config {
-        image   = "svforte/onionoo-cron"
+        image   = "svforte/onionoo-cron:latest"
+        force_pull = true
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
