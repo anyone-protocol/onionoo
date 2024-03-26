@@ -108,13 +108,6 @@ job "onionoo-dev" {
       service {
         name = "onionoo-war-dev"
         port = "http-port"
-        #        tags = [
-        #          "traefik.enable=true",
-        #          "traefik.http.routers.deb-repo.entrypoints=https",
-        #          "traefik.http.routers.deb-repo.rule=Host(`dev.onionoo.dmz.ator.dev`)",
-        #          "traefik.http.routers.deb-repo.tls=true",
-        #          "traefik.http.routers.deb-repo.tls.certresolver=atorresolver",
-        #        ]
         check {
           name     = "Onionoo web server check"
           type     = "http"
