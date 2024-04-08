@@ -131,6 +131,9 @@ if __name__ == '__main__':
     online_bandwidth_rate = 0
     offline_bandwidth_rate = 0
 
+    total_online_measured = 0
+    total_online_unmeasured = 0
+
     total_relays = details['relays']
 
     for relay in total_relays:
@@ -216,6 +219,8 @@ if __name__ == '__main__':
         bandwidth_rate = relay.get('bandwidth_rate')
         total_bandwidth_rate += bandwidth_rate
 
+        is_measured = relay.get('measured')
+
         if relay.get('running') == True:
             online_relays.append(relay)
             contact = "None"
@@ -275,6 +280,11 @@ if __name__ == '__main__':
             online_observed_bandwidth += observed_bandwidth
 
             online_bandwidth_rate += bandwidth_rate
+
+            if is_measured:
+                total_online_measured += 1
+            else:
+                total_online_unmeasured += 1
 
         else:
             offline_relays.append(relay)
@@ -712,6 +722,15 @@ if __name__ == '__main__':
     network_bandwidth_rate.labels(status='online').set(average_bandwidth_rate_online)
     average_bandwidth_rate_offline = offline_relays == 0 and 0 or offline_bandwidth_rate / len(offline_relays)
     network_bandwidth_rate.labels(status='offline').set(average_bandwidth_rate_offline)
+
+    online_measured_count = Gauge('total_online_measured_count', 'Current total online measured relays', registry=registry)
+    online_measured_count.set(total_online_measured)
+
+    online_unmeasured_count = Gauge('total_online_unmeasured_count', 'Current total online unmeasured relays', registry=registry)
+    online_unmeasured_count.set(total_online_unmeasured)
+
+    online_measured_ratio = Gauge('total_online_measured_ratio', 'Current total online measured ratio', registry=registry)
+    online_measured_ratio.set(total_online_measured / online_unmeasured_count)
 
     file_path = os.getenv('METRICS_FILE_PATH', '/srv/onionoo/data/out/network/metrics')
     write_to_textfile(file_path, registry)
