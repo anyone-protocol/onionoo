@@ -733,7 +733,7 @@ if __name__ == '__main__':
     online_measured_ratio.set(total_online_measured / total_online_unmeasured)
 
     online_measured_percentage = Gauge('total_online_measured_percentage', 'Current total online measured percentage', registry=registry)
-    online_measured_percentage.set(total_online_measured / len(total_relays) * 100)
+    online_measured_percentage.set(total_online_measured / len(online_relays) * 100)
 
     file_path = os.getenv('METRICS_FILE_PATH', '/srv/onionoo/data/out/network/metrics')
     write_to_textfile(file_path, registry)
