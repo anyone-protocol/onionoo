@@ -99,6 +99,10 @@ if __name__ == '__main__':
     online_countries_relays = {}
     offline_countries_relays = {}
 
+    average_countries_bandwidth = {}
+    online_countries_bandwidth = {}
+    offline_countries_bandwidth = {}
+
     total_flags_relays = {}
     online_flags_relays = {}
     offline_flags_relays = {}
@@ -216,6 +220,11 @@ if __name__ == '__main__':
         observed_bandwidth = relay.get('observed_bandwidth')
         total_observed_bandwidth += observed_bandwidth
 
+        if average_countries_bandwidth.get(country):
+            average_countries_bandwidth[country] += observed_bandwidth
+        else:
+            average_countries_bandwidth[country] = observed_bandwidth
+
         bandwidth_rate = relay.get('bandwidth_rate')
         total_bandwidth_rate += bandwidth_rate
 
@@ -278,6 +287,11 @@ if __name__ == '__main__':
                     online_flags_relays[flag] = 1
 
             online_observed_bandwidth += observed_bandwidth
+
+            if online_countries_bandwidth.get(country):
+                online_countries_bandwidth[country] += observed_bandwidth
+            else:
+                online_countries_bandwidth[country] = observed_bandwidth
 
             online_bandwidth_rate += bandwidth_rate
 
@@ -343,6 +357,11 @@ if __name__ == '__main__':
                     offline_flags_relays[flag] = 1
 
             offline_observed_bandwidth += observed_bandwidth
+
+            if offline_countries_bandwidth.get(country):
+                offline_countries_bandwidth[country] += observed_bandwidth
+            else:
+                offline_countries_bandwidth[country] = observed_bandwidth
 
             offline_bandwidth_rate += bandwidth_rate
 
@@ -734,6 +753,17 @@ if __name__ == '__main__':
 
     online_measured_percentage = Gauge('total_online_measured_percentage', 'Current total online measured percentage', registry=registry)
     online_measured_percentage.set(total_online_measured / len(online_relays) * 100)
+
+    countries_average_observed_bandwidth = Gauge('countries_average_observed_bandwidth', 'Аverage observed bandwidth per country', ['country'], registry=registry)
+    for country in average_countries_bandwidth.keys():
+        if country is not None and country.isalpha():
+            countries_average_observed_bandwidth.labels(status='all', country=country).set(average_countries_bandwidth[country])
+    for country in online_countries_relays.keys():
+        if country is not None and country.isalpha():
+            countries_average_observed_bandwidth.labels(status='online', country=country).set(online_countries_bandwidth[country])
+    for country in offline_countries_relays.keys():
+        if country is not None and country.isalpha():
+            countries_average_observed_bandwidth.labels(status='offline', country=country).set(offline_countries_bandwidth[country])
 
     file_path = os.getenv('METRICS_FILE_PATH', '/srv/onionoo/data/out/network/metrics')
     write_to_textfile(file_path, registry)
