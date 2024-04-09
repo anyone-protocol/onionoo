@@ -103,6 +103,10 @@ if __name__ == '__main__':
     online_countries_bandwidth = {}
     offline_countries_bandwidth = {}
 
+    bandwidth_per_flag = {}
+    online_bandwidth_per_flag = {}
+    offline_bandwidth_per_flag = {}
+
     total_flags_relays = {}
     online_flags_relays = {}
     offline_flags_relays = {}
@@ -220,6 +224,12 @@ if __name__ == '__main__':
         observed_bandwidth = relay.get('observed_bandwidth')
         total_observed_bandwidth += observed_bandwidth
 
+        for flag in flags:
+            if bandwidth_per_flag.get(flag):
+                bandwidth_per_flag[flag].append(observed_bandwidth)
+            else:
+                bandwidth_per_flag[flag] = [observed_bandwidth]
+
         if total_countries_bandwidth.get(country):
             total_countries_bandwidth[country] += observed_bandwidth
         else:
@@ -287,6 +297,12 @@ if __name__ == '__main__':
                     online_flags_relays[flag] = 1
 
             online_observed_bandwidth += observed_bandwidth
+
+            for flag in flags:
+                if online_bandwidth_per_flag.get(flag):
+                    online_bandwidth_per_flag[flag].append(observed_bandwidth)
+                else:
+                    online_bandwidth_per_flag[flag] = [observed_bandwidth]
 
             if online_countries_bandwidth.get(country):
                 online_countries_bandwidth[country] += observed_bandwidth
@@ -357,6 +373,12 @@ if __name__ == '__main__':
                     offline_flags_relays[flag] = 1
 
             offline_observed_bandwidth += observed_bandwidth
+
+            for flag in flags:
+                if offline_bandwidth_per_flag.get(flag):
+                    offline_bandwidth_per_flag[flag].append(observed_bandwidth)
+                else:
+                    offline_bandwidth_per_flag[flag] = [observed_bandwidth]
 
             if offline_countries_bandwidth.get(country):
                 offline_countries_bandwidth[country] += observed_bandwidth
@@ -754,7 +776,7 @@ if __name__ == '__main__':
     online_measured_percentage = Gauge('total_online_measured_percentage', 'Current total online measured percentage', registry=registry)
     online_measured_percentage.set(total_online_measured / len(online_relays) * 100)
 
-    countries_average_observed_bandwidth = Gauge('countries_average_observed_bandwidth', 'Аverage observed bandwidth per country', ['status','country'], registry=registry)
+    countries_average_observed_bandwidth = Gauge('countries_average_observed_bandwidth', 'Average observed bandwidth per country', ['status','country'], registry=registry)
     for country in total_countries_bandwidth.keys():
         if country is not None and country.isalpha():
             average_countries_bandwidth = total_countries_bandwidth[country] / total_countries_relays[country]
@@ -767,6 +789,24 @@ if __name__ == '__main__':
         if country is not None and country.isalpha():
             average_offline_countries_bandwidth = offline_countries_bandwidth[country] / offline_countries_relays[country]
             countries_average_observed_bandwidth.labels(status='offline', country=country).set(average_offline_countries_bandwidth)
+
+    median_banwidth_per_flag = Gauge('median_bandwidth_per_flag', 'Median bandwidth per flag', ['status','flag'], registry=registry)
+    for flag in bandwidth_per_flag.keys():
+        if flag is not None and flag.isalpha():
+            bandwidth_per_flag[flag].sort()
+            middle_index = int(len(bandwidth_per_flag[flag])/2)
+            print(f"flag: {flag} middle_index: {middle_index} value: {bandwidth_per_flag[flag]}")
+            median_banwidth_per_flag.labels(status='all', flag=flag).set(bandwidth_per_flag[flag][middle_index])
+    for flag in online_bandwidth_per_flag.keys():
+        if flag is not None and flag.isalpha():
+            online_bandwidth_per_flag[flag].sort()
+            middle_index = int(len(online_bandwidth_per_flag[flag])/2)
+            median_banwidth_per_flag.labels(status='online', flag=flag).set(online_bandwidth_per_flag[flag][middle_index])
+    for flag in online_bandwidth_per_flag.keys():
+        if flag is not None and flag.isalpha():
+            offline_bandwidth_per_flag[flag].sort()
+            middle_index = int(len(offline_bandwidth_per_flag[flag])/2)
+            median_banwidth_per_flag.labels(status='offline', flag=flag).set(offline_bandwidth_per_flag[flag][middle_index])
 
     file_path = os.getenv('METRICS_FILE_PATH', '/srv/onionoo/data/out/network/metrics')
     write_to_textfile(file_path, registry)
