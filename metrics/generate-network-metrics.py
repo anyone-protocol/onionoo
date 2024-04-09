@@ -754,7 +754,7 @@ if __name__ == '__main__':
     online_measured_percentage = Gauge('total_online_measured_percentage', 'Current total online measured percentage', registry=registry)
     online_measured_percentage.set(total_online_measured / len(online_relays) * 100)
 
-    countries_average_observed_bandwidth = Gauge('countries_average_observed_bandwidth', 'Аverage observed bandwidth per country', ['country'], registry=registry)
+    countries_average_observed_bandwidth = Gauge('countries_average_observed_bandwidth', 'Аverage observed bandwidth per country', ['status','country'], registry=registry)
     for country in total_countries_bandwidth.keys():
         if country is not None and country.isalpha():
             average_countries_bandwidth = total_countries_bandwidth[country] / total_countries_relays[country]
