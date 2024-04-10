@@ -7,27 +7,23 @@ from datetime import datetime, timedelta
 
 from prometheus_client import CollectorRegistry, Gauge, write_to_textfile
 
-def __check_time_delta(node, field, interval):
-    if node.get(field):
-        timestamp = 0
-        if type(node.get(field)) is int:
-            timestamp = datetime.fromtimestamp(node.get(field)/1000)
-        else:
-            timestamp = datetime.fromtimestamp(node.get(field).get('timestamp')/1000)
-
-        if (datetime.utcnow() - timestamp) < timedelta(hours=interval):
-            return True
-        else:
-            return False
-
 if __name__ == '__main__':
 
     onionoo_host = os.getenv('ONIONOO_HOST')
+    interval_minutes = int(os.getenv('$INTERVAL_MINUTES'))
 
     details = json.loads(requests.get(f'{onionoo_host}/details').text)
     bandwidth = json.loads(requests.get(f'{onionoo_host}/bandwidth').text)
 
-    timestamp = time.time_ns()
+    time_string = details["relays_published"]
+    time_object = datetime.strptime(time_string, '%Y-%m-%d %H:%M:%S')
+    fresh_until = time_object + timedelta(minutes=interval_minutes)
+
+    consensus_is_fresh = 0
+    if datetime.now() < fresh_until:
+        consensus_is_fresh = 1
+    else:
+        consensus_is_fresh = 0
 
     total_relays = []
     online_relays = []
@@ -427,7 +423,6 @@ if __name__ == '__main__':
         if flag is not None and flag.isalpha():
             bandwidth_per_flag[flag].sort()
             middle_index = int(len(bandwidth_per_flag[flag])/2)
-            print(f"flag: {flag} middle_index: {middle_index} value: {bandwidth_per_flag[flag]}")
             median_bandwidth_per_flag.labels(status='all', flag=flag).set(bandwidth_per_flag[flag][middle_index])
     for flag in online_bandwidth_per_flag.keys():
         if flag is not None and flag.isalpha():
@@ -439,6 +434,9 @@ if __name__ == '__main__':
             offline_bandwidth_per_flag[flag].sort()
             middle_index = int(len(offline_bandwidth_per_flag[flag])/2)
             median_bandwidth_per_flag.labels(status='offline', flag=flag).set(offline_bandwidth_per_flag[flag][middle_index])
+
+    network_consensus_is_fresh = Gauge('network_consensus_is_fresh', 'Current network consensus freshness', registry=registry)
+    network_consensus_is_fresh.set(consensus_is_fresh)
 
     file_path = os.getenv('METRICS_FILE_PATH', '/srv/onionoo/data/out/network/metrics')
     write_to_textfile(file_path, registry)
