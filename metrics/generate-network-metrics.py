@@ -10,7 +10,7 @@ from prometheus_client import CollectorRegistry, Gauge, write_to_textfile
 if __name__ == '__main__':
 
     onionoo_host = os.getenv('ONIONOO_HOST')
-    interval_minutes = int(os.getenv('$INTERVAL_MINUTES'))
+    interval_minutes = int(os.getenv('INTERVAL_MINUTES'))
 
     details = json.loads(requests.get(f'{onionoo_host}/details').text)
     bandwidth = json.loads(requests.get(f'{onionoo_host}/bandwidth').text)
@@ -18,12 +18,19 @@ if __name__ == '__main__':
     time_string = details["relays_published"]
     time_object = datetime.strptime(time_string, '%Y-%m-%d %H:%M:%S')
     fresh_until = time_object + timedelta(minutes=interval_minutes)
+    valid_until = time_object + timedelta(minutes=(interval_minutes*3))
 
     consensus_is_fresh = 0
     if datetime.now() < fresh_until:
         consensus_is_fresh = 1
     else:
         consensus_is_fresh = 0
+
+    consensus_is_valid = 0
+    if datetime.now() < valid_until:
+        consensus_is_valid = 1
+    else:
+        consensus_is_valid = 0
 
     total_relays = []
     online_relays = []
@@ -437,6 +444,9 @@ if __name__ == '__main__':
 
     network_consensus_is_fresh = Gauge('network_consensus_is_fresh', 'Current network consensus freshness', registry=registry)
     network_consensus_is_fresh.set(consensus_is_fresh)
+
+    network_consensus_is_valid = Gauge('network_consensus_is_valid', 'Current network consensus validity', registry=registry)
+    network_consensus_is_valid.set(consensus_is_valid)
 
     file_path = os.getenv('METRICS_FILE_PATH', '/srv/onionoo/data/out/network/metrics')
     write_to_textfile(file_path, registry)
