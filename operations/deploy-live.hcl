@@ -123,6 +123,7 @@ job "onionoo-live" {
         ONIONOO_HOST      = "http://127.0.0.1:8080"
         INTERVAL_MINUTES  = "60"
         METRICS_FILE_PATH = "/srv/onionoo/data/out/network/metrics"
+        CRON_EXPRESSION = "5 * * * *"
       }
 
       volume_mount {
