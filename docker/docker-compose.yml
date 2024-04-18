@@ -31,5 +31,6 @@ services:
       ONIONOO_HOST: "http://host.docker.internal:8080"
       INTERVAL_MINUTES: 5
       METRICS_FILE_PATH: "/srv/onionoo/data/out/network/metrics"
+      CRON_EXPRESSION: "*/5 * * * *"
     volumes:
       - ./onionoo-data/:/srv/onionoo/data
