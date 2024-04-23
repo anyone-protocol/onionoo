@@ -13,8 +13,8 @@ jobs:
       - name: Log in to Github Container Registry
         uses: docker/login-action@v3
         with:
-          docker-username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          docker-password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
       - name: Tag latest
         run: |
           docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/onionoo:latest-stage
