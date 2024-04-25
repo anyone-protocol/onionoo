@@ -37,8 +37,8 @@ job "onionoo-dev" {
   	    COLLECTOR_HOST="{{ .Address }}:{{ .Port }}"
 	{{ end -}}                
             COLLECTOR_PROTOCOL="http://"
-            UPDATER_PERIOD="5"
-            UPDATER_OFFSET="3"
+            UPDATER_PERIOD="1"
+            UPDATER_OFFSET="0"
             EOH
         destination = "secrets/file.env"
         env         = true
@@ -130,7 +130,7 @@ job "onionoo-dev" {
         ONIONOO_HOST      = "http://127.0.0.1:8080"
         INTERVAL_MINUTES  = "5"
         METRICS_FILE_PATH = "/srv/onionoo/data/out/network/metrics"
-        CRON_EXPRESSION = "*/5 * * * *"
+        CRON_EXPRESSION = "* * * * *"
       }
 
       volume_mount {

@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     time_string = details["relays_published"]
     time_object = datetime.strptime(time_string, '%Y-%m-%d %H:%M:%S')
-    fresh_until = time_object + timedelta(minutes=interval_minutes)
+    fresh_until = time_object + timedelta(minutes=(interval_minutes*2))
     valid_until = time_object + timedelta(minutes=(interval_minutes*3))
 
     consensus_is_fresh = 0
