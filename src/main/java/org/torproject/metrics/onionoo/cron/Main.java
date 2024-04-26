@@ -117,7 +117,7 @@ public class Main implements Runnable {
     final Runnable mainRunnable = this;
     int period = Integer.parseInt(System.getProperty("updater.period.minutes", "60"));
     int offset = Integer.parseInt(System.getProperty("updater.offset.minutes", "5"));
-    logger.info("Periodic updater will run every {} minutes with an offset of {} minutes", period, offset);
+
     int currentMinute = Calendar.getInstance().get(Calendar.MINUTE);
 
     int module = currentMinute % period;

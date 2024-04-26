@@ -32,9 +32,9 @@ job "onionoo-dev" {
         data = <<EOH
             BASE_DIR="/srv/onionoo"
             LOGBASE="data/logs"
-	{{ range nomadService "collector-dev" }}
+	{{- range nomadService "collector-dev" }}
   	    COLLECTOR_HOST="{{ .Address }}:{{ .Port }}"
-	{{ end }}
+	{{ end -}}
             COLLECTOR_PROTOCOL="http://"
             UPDATER_PERIOD="1"
             UPDATER_OFFSET="0"
