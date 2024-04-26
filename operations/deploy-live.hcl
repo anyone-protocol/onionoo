@@ -33,13 +33,13 @@ job "onionoo-live" {
         data = <<EOH
             BASE_DIR="/srv/onionoo"
             LOGBASE="data/logs"
-            TYPE="jar"
 	      {{- range nomadService "collector-live" }}
   	        COLLECTOR_HOST="{{ .Address }}:{{ .Port }}"
 	      {{ end -}}
             COLLECTOR_PROTOCOL="http://"
             UPDATER_PERIOD="10"
             UPDATER_OFFSET="5"
+            TYPE="jar"
             EOH
         destination = "secrets/file.env"
         env         = true
