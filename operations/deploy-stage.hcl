@@ -36,10 +36,10 @@ job "onionoo-stage" {
             TYPE="jar"
 	      {{- range nomadService "collector-stage" }}
   	        COLLECTOR_HOST="{{ .Address }}:{{ .Port }}"
-	      {{ end -}}                
+	      {{ end -}}
             COLLECTOR_PROTOCOL="http://"
-            UPDATER_PERIOD="60"
-            UPDATER_OFFSET="6"
+            UPDATER_PERIOD="5"
+            UPDATER_OFFSET="0"
             EOH
         destination = "secrets/file.env"
         env         = true
@@ -123,7 +123,7 @@ job "onionoo-stage" {
         ONIONOO_HOST      = "http://127.0.0.1:8080"
         INTERVAL_MINUTES  = "60"
         METRICS_FILE_PATH = "/srv/onionoo/data/out/network/metrics"
-        CRON_EXPRESSION = "10 * * * *"
+        CRON_EXPRESSION = "*/5 * * * *"
       }
 
       volume_mount {
