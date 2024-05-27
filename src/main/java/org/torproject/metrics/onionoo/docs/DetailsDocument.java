@@ -557,4 +557,14 @@ public class DetailsDocument extends Document {
   public List<String> getBlocklist() {
     return this.blocklist;
   }
+
+  private HardwareInfoDocument hardwareInfoDocument;
+
+  public HardwareInfoDocument getHardwareInfo() {
+    return hardwareInfoDocument;
+  }
+
+  public void setHardwareInfo(HardwareInfoDocument hardwareInfoDocument) {
+    this.hardwareInfoDocument = hardwareInfoDocument;
+  }
 }
