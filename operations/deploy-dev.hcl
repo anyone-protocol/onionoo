@@ -84,7 +84,7 @@ job "onionoo-dev" {
       volume_mount {
         volume      = "onionoo-data"
         destination = "/srv/onionoo/data"
-        read_only   = true
+        read_only   = false
       }
 
       config {
