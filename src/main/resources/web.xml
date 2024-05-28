@@ -42,7 +42,7 @@
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>Resource</servlet-name>
-    <url-pattern>/hardware/relays/*</url-pattern>
+    <url-pattern>/hardware/*</url-pattern>
   </servlet-mapping>
 
   <listener>

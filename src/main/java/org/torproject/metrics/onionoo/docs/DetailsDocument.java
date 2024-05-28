@@ -558,13 +558,13 @@ public class DetailsDocument extends Document {
     return this.blocklist;
   }
 
-  private HardwareInfoDocument hardwareInfoDocument;
+  private HardwareInfoDocument hardwareInfo;
 
   public HardwareInfoDocument getHardwareInfo() {
-    return hardwareInfoDocument;
+    return hardwareInfo;
   }
 
   public void setHardwareInfo(HardwareInfoDocument hardwareInfoDocument) {
-    this.hardwareInfoDocument = hardwareInfoDocument;
+    this.hardwareInfo = hardwareInfoDocument;
   }
 }
