@@ -80,10 +80,20 @@ public class ResourceServlet extends HttpServlet {
       requestBody.append(reader.readLine());
     }
 
-    HardwareInfoDocument hardware = objectMapper.readValue(requestBody.toString(), HardwareInfoDocument.class);
-    documentStore.store(hardware, hardware.getFingerprint());
+    HardwareInfoUpdateRequest request = objectMapper.readValue(requestBody.toString(), HardwareInfoUpdateRequest.class);
+    HardwareInfoDocument document = new HardwareInfoDocument();
+    document.setId(request.getId());
+    document.setCompany(request.getCompany());
+    document.setFormat(request.getFormat());
+    document.setWallet(request.getWallet());
+    document.setFingerprint(request.getFingerprint());
+    document.setSerNums(request.getSerNums());
+    document.setPubKeys(request.getPubKeys());
+    document.setCerts(request.getCerts());
+    documentStore.store(document, document.getFingerprint());
 
     resp.setStatus(HttpServletResponse.SC_OK);
+    resp.getWriter().write("Hardware relay info is updated. Fingerprint: " + request.getFingerprint());
   }
 
   private static final long CACHE_MIN_TIME = 5L * 60L * 1000L;
