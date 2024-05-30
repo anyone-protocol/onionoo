@@ -3,7 +3,7 @@ package org.torproject.metrics.onionoo.docs;
 public class Cert {
 
     private String type;
-    private String certificate;
+    private String signature;
 
     public String getType() {
         return type;
@@ -13,11 +13,11 @@ public class Cert {
         this.type = type;
     }
 
-    public String getCertificate() {
-        return certificate;
+    public String getSignature() {
+        return signature;
     }
 
-    public void setCertificate(String certificate) {
-        this.certificate = certificate;
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 }
