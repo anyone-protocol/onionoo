@@ -3,11 +3,16 @@
 
 package org.torproject.metrics.onionoo.server;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.torproject.metrics.onionoo.docs.DateTimeHelper;
+import org.torproject.metrics.onionoo.docs.DocumentStore;
+import org.torproject.metrics.onionoo.docs.DocumentStoreFactory;
+import org.torproject.metrics.onionoo.docs.HardwareInfoDocument;
 import org.torproject.metrics.onionoo.updater.TorVersion;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -32,6 +37,9 @@ public class ResourceServlet extends HttpServlet {
   private static final long serialVersionUID = 7236658979947465319L;
 
   private boolean maintenanceMode = false;
+
+  private ObjectMapper objectMapper = new ObjectMapper();
+  private DocumentStore documentStore = DocumentStoreFactory.getDocumentStore();
 
   /* Called by servlet container, not by test class. */
   @Override
@@ -61,6 +69,31 @@ public class ResourceServlet extends HttpServlet {
     HttpServletResponseWrapper responseWrapper =
         new HttpServletResponseWrapper(response);
     this.doGet(requestWrapper, responseWrapper);
+  }
+
+  @Override
+  protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    BufferedReader reader = req.getReader();
+
+    StringBuilder requestBody = new StringBuilder();
+    while (reader.ready()) {
+      requestBody.append(reader.readLine());
+    }
+
+    HardwareInfoUpdateRequest request = objectMapper.readValue(requestBody.toString(), HardwareInfoUpdateRequest.class);
+    HardwareInfoDocument document = new HardwareInfoDocument();
+    document.setId(request.getId());
+    document.setCompany(request.getCompany());
+    document.setFormat(request.getFormat());
+    document.setWallet(request.getWallet());
+    document.setFingerprint(request.getFingerprint());
+    document.setSerNums(request.getSerNums());
+    document.setPubKeys(request.getPubKeys());
+    document.setCerts(request.getCerts());
+    documentStore.store(document, document.getFingerprint());
+
+    resp.setStatus(HttpServletResponse.SC_OK);
+    resp.getWriter().write("Hardware relay info is updated. Fingerprint: " + request.getFingerprint());
   }
 
   private static final long CACHE_MIN_TIME = 5L * 60L * 1000L;
