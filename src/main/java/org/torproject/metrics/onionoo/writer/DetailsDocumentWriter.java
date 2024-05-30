@@ -3,11 +3,7 @@
 
 package org.torproject.metrics.onionoo.writer;
 
-import org.torproject.metrics.onionoo.docs.DetailsDocument;
-import org.torproject.metrics.onionoo.docs.DetailsStatus;
-import org.torproject.metrics.onionoo.docs.DocumentStore;
-import org.torproject.metrics.onionoo.docs.DocumentStoreFactory;
-import org.torproject.metrics.onionoo.docs.UpdateStatus;
+import org.torproject.metrics.onionoo.docs.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,8 +46,10 @@ public class DetailsDocumentWriter implements DocumentWriter {
     for (String fingerprint : updatedDetailsStatuses) {
       DetailsStatus detailsStatus = this.documentStore.retrieve(
           DetailsStatus.class, true, fingerprint);
+      HardwareInfoDocument hardwareInfoDocument = this.documentStore.retrieve(
+              HardwareInfoDocument.class, true, fingerprint);
       if (detailsStatus.isRelay()) {
-        this.updateRelayDetailsFile(fingerprint, detailsStatus);
+        this.updateRelayDetailsFile(fingerprint, detailsStatus, hardwareInfoDocument);
       } else {
         this.updateBridgeDetailsFile(fingerprint, detailsStatus);
       }
@@ -61,13 +59,15 @@ public class DetailsDocumentWriter implements DocumentWriter {
 
   /**
    * Update the relay details document file for a relay.
-   *
-   * @param fingerprint, a String
+   *  @param fingerprint, a String
    * @param detailsStatus, a DetailsStatus
+   * @param hardwareInfoDocument
    */
   private void updateRelayDetailsFile(String fingerprint,
-      DetailsStatus detailsStatus) {
+                                      DetailsStatus detailsStatus,
+                                      HardwareInfoDocument hardwareInfoDocument) {
     DetailsDocument detailsDocument = new DetailsDocument();
+    detailsDocument.setHardwareInfo(hardwareInfoDocument);
     detailsDocument.setNickname(detailsStatus.getNickname());
     detailsDocument.setFingerprint(fingerprint);
     List<String> orAddresses = new ArrayList<>();
