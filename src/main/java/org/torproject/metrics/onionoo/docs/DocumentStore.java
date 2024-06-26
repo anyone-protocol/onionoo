@@ -307,6 +307,7 @@ public class DocumentStore {
     } else if (document instanceof DetailsStatus
         || document instanceof DetailsDocument
         || document instanceof BandwidthDocument
+        || document instanceof HardwareInfoDocument
         || document instanceof WeightsDocument
         || document instanceof ClientsDocument
         || document instanceof UptimeDocument) {
@@ -517,6 +518,7 @@ public class DocumentStore {
           documentStringBuilder.toString());
     } else if (documentType.equals(BandwidthDocument.class)
         || documentType.equals(WeightsDocument.class)
+        || documentType.equals(HardwareInfoDocument.class)
         || documentType.equals(ClientsDocument.class)
         || documentType.equals(UptimeDocument.class)) {
       return this.retrieveParsedDocumentFile(documentType,
@@ -680,6 +682,9 @@ public class DocumentStore {
     } else if (documentType.equals(BandwidthDocument.class)) {
       directory = this.outDir;
       fileName = String.format("bandwidth/%s", fingerprint);
+    } else if (documentType.equals(HardwareInfoDocument.class)) {
+      directory = this.outDir;
+      fileName = String.format("hardware/%s", fingerprint);
     } else if (documentType.equals(WeightsDocument.class)) {
       directory = this.outDir;
       fileName = String.format("weights/%s", fingerprint);
