@@ -15,6 +15,9 @@ public class HardwareInfoUpdateRequest {
     private String format;
     private String wallet;
     private String fingerprint;
+    private String nftid;
+    private String build;
+    private String flags;
     private List<SerNum> serNums;
     private List<PubKey> pubKeys;
     private List<Cert> certs;
@@ -57,6 +60,30 @@ public class HardwareInfoUpdateRequest {
 
     public void setFingerprint(String fingerprint) {
         this.fingerprint = fingerprint;
+    }
+
+    public String getNftid() {
+        return nftid;
+    }
+
+    public void setNftid(String nftid) {
+        this.nftid = nftid;
+    }
+
+    public String getBuild() {
+        return build;
+    }
+
+    public void setBuild(String build) {
+        this.build = build;
+    }
+
+    public String getFlags() {
+        return flags;
+    }
+
+    public void setFlags(String flags) {
+        this.flags = flags;
     }
 
     public List<SerNum> getSerNums() {
