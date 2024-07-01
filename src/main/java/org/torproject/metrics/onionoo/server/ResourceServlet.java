@@ -86,6 +86,9 @@ public class ResourceServlet extends HttpServlet {
     document.setCompany(request.getCompany());
     document.setFormat(request.getFormat());
     document.setWallet(request.getWallet());
+    document.setNftid(request.getNftid());
+    document.setBuild(request.getBuild());
+    document.setFlags(request.getFlags());
     document.setFingerprint(request.getFingerprint());
     document.setSerNums(request.getSerNums());
     document.setPubKeys(request.getPubKeys());
