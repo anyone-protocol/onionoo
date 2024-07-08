@@ -69,6 +69,7 @@ job "onionoo-dev" {
 
       service {
         name = "onionoo-jar-dev"
+        tags = ["logging"]
       }
     }
 
@@ -108,6 +109,7 @@ job "onionoo-dev" {
       service {
         name = "onionoo-war-dev"
         port = "http-port"
+        tags = ["logging"]
         check {
           name     = "Onionoo web server check"
           type     = "http"
@@ -149,6 +151,11 @@ job "onionoo-dev" {
 
       vault {
       	policies = ["ator-network-read"]
+      }
+
+      service {
+        name = "onionoo-cron-dev"
+        tags = ["logging"]
       }
 
       resources {

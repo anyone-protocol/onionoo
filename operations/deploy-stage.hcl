@@ -66,6 +66,7 @@ job "onionoo-stage" {
 
       service {
         name = "onionoo-jar-stage"
+        tags = ["logging"]
       }
     }
 
@@ -101,6 +102,7 @@ job "onionoo-stage" {
       service {
         name = "onionoo-war-stage"
         port = "http-port"
+        tags = ["logging"]
         check {
           name     = "Onionoo web server check"
           type     = "http"
@@ -138,6 +140,11 @@ job "onionoo-stage" {
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
+      }
+
+      service {
+        name = "onionoo-cron-stage"
+        tags = ["logging"]
       }
 
       resources {
