@@ -66,6 +66,7 @@ job "onionoo-live" {
 
       service {
         name = "onionoo-jar-live"
+        tags = ["logging"]
       }
     }
 
@@ -101,6 +102,7 @@ job "onionoo-live" {
       service {
         name = "onionoo-war-live"
         port = "http-port"
+        tags = ["logging"]
         check {
           name     = "Onionoo web server check"
           type     = "http"
@@ -138,6 +140,11 @@ job "onionoo-live" {
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
+      }
+
+      service {
+        name = "onionoo-cron-live"
+        tags = ["logging"]
       }
 
       resources {
