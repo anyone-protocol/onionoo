@@ -34,7 +34,7 @@ job "onionoo-live" {
             BASE_DIR="/srv/onionoo"
             LOGBASE="data/logs"
             TYPE="jar"
-	      {{- range nomadService "collector-live" }}
+	      {{- range service "collector-live" }}
   	        COLLECTOR_HOST="{{ .Address }}:{{ .Port }}"
 	      {{ end -}}
             COLLECTOR_PROTOCOL="http://"
