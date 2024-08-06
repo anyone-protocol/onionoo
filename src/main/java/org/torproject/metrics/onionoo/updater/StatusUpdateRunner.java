@@ -30,8 +30,8 @@ public class StatusUpdateRunner {
     WeightsStatusUpdater wsu = new WeightsStatusUpdater();
     ClientsStatusUpdater csu = new ClientsStatusUpdater();
     UptimeStatusUpdater usu = new UptimeStatusUpdater();
-    this.statusUpdaters = new StatusUpdater[] { ndsu, bsu, wsu, csu,
-        usu };
+    OnionperfStatusUpdater opsu = new OnionperfStatusUpdater();
+    this.statusUpdaters = new StatusUpdater[] { ndsu, bsu, wsu, csu, usu, opsu };
   }
 
   /** Lets each configured status updater update its status files. */
