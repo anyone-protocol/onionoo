@@ -557,10 +557,6 @@ public class DocumentStore {
 
   private <T extends Document> T retrieveParsedDocumentFile(
       Class<T> documentType, String documentString) {
-    if (documentType == OnionperfStatus.class) {
-      System.out.println("yes");
-    }
-
     T result = null;
     try {
       result = objectMapper.readValue(documentString, documentType);
