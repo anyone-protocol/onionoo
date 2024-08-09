@@ -6,10 +6,18 @@ import org.torproject.descriptor.Descriptor;
 import org.torproject.descriptor.TorperfResult;
 import org.torproject.metrics.onionoo.docs.DocumentStore;
 import org.torproject.metrics.onionoo.docs.DocumentStoreFactory;
+import org.torproject.metrics.onionoo.docs.OnionperfStatus;
+import org.torproject.metrics.onionoo.onionperf.Measurement;
+import org.torproject.metrics.onionoo.onionperf.TorperfResultConverter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OnionperfStatusUpdater implements DescriptorListener, StatusUpdater {
 
     private static final Logger logger = LoggerFactory.getLogger(OnionperfStatusUpdater.class);
+
+    private final TorperfResultConverter torperfResultConverter = new TorperfResultConverter();
 
     private DescriptorSource descriptorSource;
     private DocumentStore documentStore;
@@ -26,6 +34,9 @@ public class OnionperfStatusUpdater implements DescriptorListener, StatusUpdater
     private void registerDescriptorListeners() {
         this.descriptorSource.registerDescriptorListener(this, DescriptorType.ONIONPERF);
     }
+
+    private List<Measurement> measurements = new ArrayList<>();
+
     @Override
     public void processDescriptor(Descriptor descriptor, boolean relay) {
         if (descriptor instanceof TorperfResult) {
@@ -34,12 +45,15 @@ public class OnionperfStatusUpdater implements DescriptorListener, StatusUpdater
     }
 
     private void processTorPerfResult(TorperfResult descriptor) {
-        logger.info("Processing Torperf result with cirId: {}", descriptor.getCircId());
+        measurements.add(torperfResultConverter.toMeasurement(descriptor));
     }
 
     @Override
     public void updateStatuses() {
-        /* Nothing to do. */
+        logger.info("Updating Onionperf statuses. Size: {}", measurements.size());
+        OnionperfStatus status = new OnionperfStatus(measurements);
+        documentStore.store(status);
+        measurements.clear();
     }
 
     @Override

@@ -310,6 +310,7 @@ public class DocumentStore {
         || document instanceof HardwareInfoDocument
         || document instanceof WeightsDocument
         || document instanceof ClientsDocument
+        || document instanceof OnionperfStatus
         || document instanceof UptimeDocument) {
       try {
         documentString = objectMapper.writeValueAsString(document);
@@ -520,6 +521,7 @@ public class DocumentStore {
         || documentType.equals(WeightsDocument.class)
         || documentType.equals(HardwareInfoDocument.class)
         || documentType.equals(ClientsDocument.class)
+        || documentType.equals(OnionperfStatus.class)
         || documentType.equals(UptimeDocument.class)) {
       return this.retrieveParsedDocumentFile(documentType,
           documentString);
@@ -555,6 +557,10 @@ public class DocumentStore {
 
   private <T extends Document> T retrieveParsedDocumentFile(
       Class<T> documentType, String documentString) {
+    if (documentType == OnionperfStatus.class) {
+      System.out.println("yes");
+    }
+
     T result = null;
     try {
       result = objectMapper.readValue(documentString, documentType);
@@ -636,6 +642,7 @@ public class DocumentStore {
       String fingerprint) {
     File documentFile = null;
     if (fingerprint == null && !documentType.equals(UpdateStatus.class)
+        && !documentType.equals(OnionperfStatus.class)
         && !documentType.equals(UptimeStatus.class)) {
       logger.warn("Attempted to locate a document file of type {} without "
           + "providing a fingerprint.  Such a file does not exist.",
@@ -673,6 +680,9 @@ public class DocumentStore {
             fingerprint.substring(0, 1), fingerprint.substring(1, 2),
             fingerprint);
       }
+    } else if (documentType.equals(OnionperfStatus.class)) {
+      directory = this.statusDir;
+      fileName = "performance";
     } else if (documentType.equals(UpdateStatus.class)) {
       directory = this.outDir;
       fileName = "update";
@@ -857,4 +867,5 @@ public class DocumentStore {
         FormattingUtils.formatBytes(retrievedBytes),
         FormattingUtils.formatDecimalNumber(removedFiles));
   }
+
 }
