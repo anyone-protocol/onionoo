@@ -5,15 +5,16 @@ import java.util.List;
 
 public class Percentile {
 
-    public static double percentile(List<Integer> values, double percentile) {
-        Collections.sort(values);
+    public static Double percentile(List<Integer> values, double percentile) {
+        if (values.contains(null)) {
+            return null;
+        }
         int index = (int) Math.ceil(percentile * values.size());
-        return values.get(index - 1);
+        return Double.valueOf(values.get(index - 1));
     }
 
-    public static double percentile(double percentile, List<Double> values) {
-        Collections.sort(values);
-        int index = (int) Math.ceil(percentile * values.size());
-        return values.get(index - 1);
+    public static Double percentile(double percentile, List<Double> values) {
+        int index = (int) Math.ceil(percentile * values.size()) - 1;
+        return values.get(Math.min(index, values.size() - 1));
     }
 }

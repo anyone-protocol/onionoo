@@ -1,14 +1,19 @@
-package org.torproject.metrics.onionoo.onionperf;
+package org.torproject.metrics.onionoo.docs.onionperf;
+
+import org.torproject.metrics.onionoo.docs.Document;
+import org.torproject.metrics.onionoo.onionperf.*;
 
 import java.sql.Timestamp;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
-public class OnionPerfData {
+public class OnionperfDocument extends Document {
 
-    private List<Measurement> measurements;
+    private final List<Measurement> measurements;
 
-    public OnionPerfData() {
-        measurements = new ArrayList<>();
+    public OnionperfDocument(List<Measurement> measurements) {
+        this.measurements = measurements;
     }
 
     public List<OnionperfIncludingPartialsStatistic> getIncludingPartialsList() {
@@ -17,6 +22,11 @@ public class OnionPerfData {
         // Extracting the required fields and processing them
         List<MeasurementIncludingPartials> includingPartialsList = new ArrayList<>();
         for (Measurement m : measurements) {
+
+            if (m.getDataComplete() == null || m.getPartial1048576() == null) {
+                continue;
+            }
+
             includingPartialsList.add(new MeasurementIncludingPartials(
                     m.getStart(), m.getFilesize(), m.getSource(), m.getEndpointRemote(), m.getDataComplete()
             ));
@@ -35,12 +45,13 @@ public class OnionPerfData {
         // Group by date, filesize, source, server
         Map<String, List<MeasurementIncludingPartials>> grouped = new HashMap<>();
         for (MeasurementIncludingPartials mip : includingPartialsList) {
+            String date = new Date(mip.getStart().getTime()).toInstant().atOffset(ZoneOffset.UTC).toLocalDate().toString();
             String key = String.format("%s-%d-%s-%s",
-                    new Date(mip.getStart().getTime()).toString(), mip.getFilesize(), mip.getSource(),
-                    mip.getEndpointRemote().endsWith(".onion") ? "onion" : "public"
+                    date, mip.getFilesize(), mip.getSource(),
+                    mip.getEndpointRemote().contains(".onion:") ? "onion" : "public"
             );
             if (!grouped.containsKey(key)) {
-                grouped.put(key, new ArrayList<MeasurementIncludingPartials>());
+                grouped.put(key, new ArrayList<>());
             }
             grouped.get(key).add(mip);
         }
@@ -51,7 +62,7 @@ public class OnionPerfData {
             Date date = new Date(group.get(0).getStart().getTime());
             int filesize = group.get(0).getFilesize();
             String source = group.get(0).getSource();
-            String server = parts[3];
+            String serverType = parts[5];
 
             List<Integer> datacompletes = new ArrayList<>();
             for (MeasurementIncludingPartials mip : group) {
@@ -63,9 +74,11 @@ public class OnionPerfData {
                 q1 = Percentile.percentile(datacompletes, 0.25);
                 md = Percentile.percentile(datacompletes, 0.50);
                 q3 = Percentile.percentile(datacompletes, 0.75);
+            } else {
+                System.err.println("No data completes for " + key);
             }
 
-            results.add(new OnionperfIncludingPartialsStatistic(date, filesize, source, server, q1, md, q3));
+            results.add(new OnionperfIncludingPartialsStatistic(date, filesize, source, serverType, q1, md, q3));
         }
 
         return results;
@@ -79,15 +92,15 @@ public class OnionPerfData {
         Date currentDate = new Date();
         for (Measurement m : measurements) {
             // Ensure the measurement date is before yesterday
-            if (m.getStart().before(new Timestamp(currentDate.getTime() - 24 * 60 * 60 * 1000))) {
-                String serverType = m.getEndpointRemote().endsWith(".onion") ? "onion" : "public";
-                String key = String.format("%s-%s-%s",
-                        new Date(m.getStart().getTime()).toString(), m.getSource(), serverType);
+//            if (m.getStart().before(new Timestamp(currentDate.getTime() - 24 * 60 * 60 * 1000))) {
+                String serverType = m.getEndpointRemote().contains(".onion:") ? "onion" : "public";
+                String date = new Date(m.getStart().getTime()).toInstant().atOffset(ZoneOffset.UTC).toLocalDate().toString();
+                String key = String.format("%s-%s-%s", date, m.getSource(), serverType);
                 if (!grouped.containsKey(key)) {
-                    grouped.put(key, new ArrayList<Measurement>());
+                    grouped.put(key, new ArrayList<>());
                 }
                 grouped.get(key).add(m);
-            }
+//            }
         }
 
         for (String key : grouped.keySet()) {
@@ -122,25 +135,30 @@ public class OnionPerfData {
         Map<String, List<BuildTime>> grouped = new HashMap<>();
         Date currentDate = new Date();
         for (Measurement m : measurements) {
-            if (m.getStart().before(new Timestamp(currentDate.getTime() - 24 * 60 * 60 * 1000))) {
-                for (BuildTime bt : m.getBuildTimes()) {
-                    if (bt.getPosition() <= 3) {
-                        String key = String.format("%s-%s-%d",
-                                new Date(m.getStart().getTime()).toString(), m.getSource(), bt.getPosition());
-                        if (!grouped.containsKey(key)) {
-                            grouped.put(key, new ArrayList<BuildTime>());
+//            if (m.getStart().before(new Timestamp(currentDate.getTime() - 24 * 60 * 60 * 1000))) {
+                if (m.getBuildTimes() != null) {
+                    for (BuildTime bt : m.getBuildTimes()) {
+                        if (bt.getPosition() <= 3) {
+                            String date = new Date(m.getStart().getTime()).toInstant().atOffset(ZoneOffset.UTC).toLocalDate().toString();
+                            String key = String.format("%s-%s-%d", date, m.getSource(), bt.getPosition());
+                            if (!grouped.containsKey(key)) {
+                                grouped.put(key, new ArrayList<>());
+                            }
+                            grouped.get(key).add(bt);
                         }
-                        grouped.get(key).add(bt);
                     }
                 }
-            }
+//            }
         }
 
         for (String key : grouped.keySet()) {
+
             List<BuildTime> group = grouped.get(key);
-            String[] parts = key.split("-");
+            if (group.get(0).getStart() == null) {
+                continue;
+            }
             Date date = new Date(group.get(0).getStart().getTime());
-            String source = parts[1];
+            String source = group.get(0).getSource();
             int position = group.get(0).getPosition();
 
             List<Integer> deltas = new ArrayList<>();
@@ -166,12 +184,12 @@ public class OnionPerfData {
 
         // Filter and process data
         List<FilteredMeasurement> filteredMeasurements = new ArrayList<>();
-        Date currentDate = new Date();
+//        Date currentDate = new Date();
         for (int i = 0; i < measurements.size(); i++) {
             Measurement m = measurements.get(i);
-            if (m.getStart().before(new Timestamp(currentDate.getTime() - 24 * 60 * 60 * 1000)) &&
+            if (m.getDataResponse() != null &&
                     m.getDataRequest() > 0 && m.getDataResponse() > 0) {
-                String serverType = m.getEndpointRemote().endsWith(".onion") ? "onion" : "public";
+                String serverType = m.getEndpointRemote().contains(".onion:") ? "onion" : "public";
                 int latency = m.getDataResponse() - m.getDataRequest();
                 filteredMeasurements.add(new FilteredMeasurement(
                         new Date(m.getStart().getTime()), m.getSource(), serverType, latency
@@ -183,10 +201,10 @@ public class OnionPerfData {
         Map<String, List<FilteredMeasurement>> grouped = new HashMap<>();
         for (int i = 0; i < filteredMeasurements.size(); i++) {
             FilteredMeasurement fm = filteredMeasurements.get(i);
-            String key = String.format("%s-%s-%s",
-                    fm.getDate().toString(), fm.getSource(), fm.getServer());
+            String date = fm.getDate().toInstant().atOffset(ZoneOffset.UTC).toLocalDate().toString();
+            String key = String.format("%s-%s-%s", date, fm.getSource(), fm.getServer());
             if (!grouped.containsKey(key)) {
-                grouped.put(key, new ArrayList<FilteredMeasurement>());
+                grouped.put(key, new ArrayList<>());
             }
             grouped.get(key).add(fm);
         }
@@ -196,13 +214,15 @@ public class OnionPerfData {
             String[] parts = key.split("-");
             Date date = group.get(0).getDate();
             String source = group.get(0).getSource();
-            String server = parts[2];
+            String server = group.get(0).getServer();
 
             List<Integer> latencies = new ArrayList<>();
             for (int i = 0; i < group.size(); i++) {
                 FilteredMeasurement fm = group.get(i);
                 latencies.add(fm.getLatency());
             }
+
+            Collections.sort(latencies);
 
             Double q1 = null, md = null, q3 = null;
             if (!latencies.isEmpty()) {
@@ -229,51 +249,52 @@ public class OnionPerfData {
     public List<ThroughputStatistic> getThroughputList() {
         List<ThroughputStatistic> results = new ArrayList<>();
 
-        // Filter and process data
         List<ThroughputMeasurement> throughputMeasurements = new ArrayList<>();
-        Date currentDate = new Date();
         for (int i = 0; i < measurements.size(); i++) {
             Measurement m = measurements.get(i);
-            if (m.getStart().before(new Timestamp(currentDate.getTime() - 24 * 60 * 60 * 1000))) {
-                String serverType = m.getEndpointRemote().endsWith(".onion") ? "onion" : "public";
-                Double kbps = null;
-                if (m.getFilesize() == 1048576 && m.getDataPerc100() > m.getDataPerc50()) {
-                    kbps = 4194304.0 / (m.getDataPerc100() - m.getDataPerc50());
-                } else if (m.getFilesize() == 5242880 && m.getDataPerc100() > m.getDataPerc80()) {
-                    kbps = 8388608.0 / (m.getDataPerc100() - m.getDataPerc80());
+//            if (m.getStart().before(new Timestamp(currentDate.getTime() - 24 * 60 * 60 * 1000))) {
+                String serverType = m.getEndpointRemote().contains(".onion:") ? "onion" : "public";
+                if (m.getDataPerc100() != null && m.getDataPerc50() != null && m.getDataPerc80() != null) {
+                    Double kbps = null;
+                    if (1048576 == m.getFilesize() && m.getDataPerc100() > m.getDataPerc50()){
+                        kbps = 4194304.0 / (m.getDataPerc100() - m.getDataPerc50());
+                    } else if (5242880 == m.getFilesize() && m.getDataPerc100() > m.getDataPerc80()) {
+                        kbps = 8388608.0 / (m.getDataPerc100() - m.getDataPerc80());
+                    }
+                    if (kbps != null) {
+                        throughputMeasurements.add(new ThroughputMeasurement(
+                                new Date(m.getStart().getTime()), m.getSource(), serverType, kbps
+                        ));
+                    }
                 }
-                if (kbps != null) {
-                    throughputMeasurements.add(new ThroughputMeasurement(
-                            new Date(m.getStart().getTime()), m.getSource(), serverType, kbps
-                    ));
-                }
-            }
+//            }
         }
 
         // Group by date, source, server
         Map<String, List<ThroughputMeasurement>> grouped = new HashMap<>();
         for (int i = 0; i < throughputMeasurements.size(); i++) {
             ThroughputMeasurement tm = throughputMeasurements.get(i);
-            String key = String.format("%s-%s-%s",
-                    tm.getDate().toString(), tm.getSource(), tm.getServer());
+            OffsetDateTime offsetDateTime = tm.getDate().toInstant().atOffset(ZoneOffset.UTC);
+            String date = offsetDateTime.toLocalDate().toString();
+            String key = String.format("%s-%s-%s", date, tm.getSource(), tm.getServerType());
             if (!grouped.containsKey(key)) {
-                grouped.put(key, new ArrayList<ThroughputMeasurement>());
+                grouped.put(key, new ArrayList<>());
             }
             grouped.get(key).add(tm);
         }
 
         for (String key : grouped.keySet()) {
             List<ThroughputMeasurement> group = grouped.get(key);
-            String[] parts = key.split("-");
             Date date = group.get(0).getDate();
             String source = group.get(0).getSource();
-            String server = parts[2];
+            String serverType = group.get(0).getServerType();
 
             List<Double> kbpsValues = new ArrayList<>();
             for (int i = 0; i < group.size(); i++) {
                 ThroughputMeasurement tm = group.get(i);
                 kbpsValues.add(tm.getKbps());
             }
+            Collections.sort(kbpsValues);
 
             Double q1 = null, md = null, q3 = null;
             if (!kbpsValues.isEmpty()) {
@@ -289,8 +310,9 @@ public class OnionPerfData {
                 high = getMaxKbps(kbpsValues, q3 + 1.5 * iqr);
             }
 
-            results.add(new ThroughputStatistic(date, source, server,
-                    low, q1 != null ? Math.floor(q1) : null, md != null ? Math.floor(md) : null,
+            results.add(new ThroughputStatistic(date, source, serverType,
+                    low, q1 != null ? Math.floor(q1) : null,
+                    md != null ? Math.floor(md) : null,
                     q3 != null ? Math.floor(q3) : null, high));
         }
 
@@ -325,28 +347,24 @@ public class OnionPerfData {
 
     private Double getMinKbps(List<Double> kbpsValues, double threshold) {
         Double min = null;
-        for (int i = 0; i < kbpsValues.size(); i++) {
-            double kbps = kbpsValues.get(i);
+        for (double kbps : kbpsValues) {
             if (kbps >= threshold) {
-                if (min == null || kbps < min) {
-                    min = kbps;
-                }
+                return kbps;
             }
         }
-        return min;
+        return min; //todo - add NaN
     }
 
     private Double getMaxKbps(List<Double> kbpsValues, double threshold) {
         Double max = null;
-        for (int i = 0; i < kbpsValues.size(); i++) {
-            double kbps = kbpsValues.get(i);
+        for (double kbps : kbpsValues) {
             if (kbps <= threshold) {
                 if (max == null || kbps > max) {
                     max = kbps;
                 }
             }
         }
-        return max;
+        return max; //todo - add NaN
     }
 
     class MeasurementIncludingPartials {
@@ -418,13 +436,13 @@ public class OnionPerfData {
     class ThroughputMeasurement {
         private Date date;
         private String source;
-        private String server;
+        private String serverType;
         private double kbps;
 
-        public ThroughputMeasurement(Date date, String source, String server, double kbps) {
+        public ThroughputMeasurement(Date date, String source, String serverType, double kbps) {
             this.date = date;
             this.source = source;
-            this.server = server;
+            this.serverType = serverType;
             this.kbps = kbps;
         }
 
@@ -436,8 +454,8 @@ public class OnionPerfData {
             return source;
         }
 
-        public String getServer() {
-            return server;
+        public String getServerType() {
+            return serverType;
         }
 
         public double getKbps() {

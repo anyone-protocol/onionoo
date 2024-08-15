@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.torproject.metrics.onionoo.docs.DocumentStore;
 import org.torproject.metrics.onionoo.docs.DocumentStoreFactory;
 import org.torproject.metrics.onionoo.docs.OnionperfStatus;
+import org.torproject.metrics.onionoo.docs.onionperf.*;
 
 public class OnionperfDocumentWriter implements DocumentWriter {
 
@@ -21,6 +22,11 @@ public class OnionperfDocumentWriter implements DocumentWriter {
         logger.info("Writing onionperf documents time: {}", mostRecentStatusMillis);
         OnionperfStatus status = documentStore.retrieve(OnionperfStatus.class, true);
         logger.info("OnionperfStatus: {}", status.getMeasurements().size());
+        documentStore.store(new CircuitDocument(status.getMeasurements()));
+        documentStore.store(new DownloadDocument(status.getMeasurements()));
+        documentStore.store(new FailureDocument(status.getMeasurements()));
+        documentStore.store(new LatencyDocument(status.getMeasurements()));
+        documentStore.store(new ThroughputDocument(status.getMeasurements()));
     }
 
     @Override

@@ -76,6 +76,11 @@ public class TorperfResultConverter {
         }
         m.setEndpointLocal(truncateString(tr.getEndpointLocal(), 64));
         m.setEndpointProxy(truncateString(tr.getEndpointProxy(), 64));
+
+        if (m.getEndpointRemote() != null && !m.getEndpointRemote().contains("onion")) {
+            m.setEndpointRemote(truncateString(m.getEndpointRemote(), 64));
+        }
+
         m.setEndpointRemote(truncateString(tr.getEndpointRemote(), 64));
         m.setHostnameLocal(truncateString(tr.getHostnameLocal(), 64));
         m.setHostnameRemote(truncateString(tr.getHostnameRemote(), 64));
@@ -97,6 +102,8 @@ public class TorperfResultConverter {
             long previousBuildTime = 0L;
             for (long buildtime : tr.getBuildTimes()) {
                 BuildTime buildTime = new BuildTime();
+                buildTime.setStart(new Timestamp(tr.getStartMillis()));
+                buildTime.setSource(truncatedSource);
                 buildTime.setPosition(position);
                 buildTime.setBuildtime((int) buildtime);
                 buildTime.setDelta((int) (buildtime - previousBuildTime));

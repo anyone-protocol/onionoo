@@ -40,6 +40,10 @@ public class OnionperfStatusUpdater implements DescriptorListener, StatusUpdater
     @Override
     public void processDescriptor(Descriptor descriptor, boolean relay) {
         if (descriptor instanceof TorperfResult) {
+            if (((TorperfResult) descriptor).getStartMillis() > 1723593600000L) {
+                logger.info("Processing Torperf result: {}", descriptor);
+            }
+
             this.processTorPerfResult((TorperfResult) descriptor);
         }
     }

@@ -3,6 +3,7 @@ import re
 import requests
 import time
 import os
+import pandas as pd
 from datetime import datetime, timedelta
 
 from prometheus_client import CollectorRegistry, Gauge, write_to_textfile
