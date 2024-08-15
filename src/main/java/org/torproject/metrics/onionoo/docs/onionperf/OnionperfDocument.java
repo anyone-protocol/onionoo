@@ -58,6 +58,11 @@ public class OnionperfDocument extends Document {
 
         for (String key : grouped.keySet()) {
             List<MeasurementIncludingPartials> group = grouped.get(key);
+
+            if (group.size() < 3) {
+                continue;
+            }
+
             String[] parts = key.split("-");
             Date date = new Date(group.get(0).getStart().getTime());
             int filesize = group.get(0).getFilesize();
@@ -68,6 +73,8 @@ public class OnionperfDocument extends Document {
             for (MeasurementIncludingPartials mip : group) {
                 datacompletes.add(mip.getDataComplete());
             }
+
+            Collections.sort(datacompletes);
 
             Double q1 = null, md = null, q3 = null;
             if (!datacompletes.isEmpty()) {
@@ -105,6 +112,11 @@ public class OnionperfDocument extends Document {
 
         for (String key : grouped.keySet()) {
             List<Measurement> group = grouped.get(key);
+
+            if (group.size() < 3) {
+                continue;
+            }
+
             String[] parts = key.split("-");
             Date date = new Date(group.get(0).getStart().getTime());
             String source = group.get(0).getSource();
@@ -131,11 +143,8 @@ public class OnionperfDocument extends Document {
     public List<BuildTimeStatistic> getBuildTimeList() {
         List<BuildTimeStatistic> results = new ArrayList<>();
 
-        // Group by date, source, position
         Map<String, List<BuildTime>> grouped = new HashMap<>();
-        Date currentDate = new Date();
         for (Measurement m : measurements) {
-//            if (m.getStart().before(new Timestamp(currentDate.getTime() - 24 * 60 * 60 * 1000))) {
                 if (m.getBuildTimes() != null) {
                     for (BuildTime bt : m.getBuildTimes()) {
                         if (bt.getPosition() <= 3) {
@@ -148,12 +157,16 @@ public class OnionperfDocument extends Document {
                         }
                     }
                 }
-//            }
         }
 
         for (String key : grouped.keySet()) {
 
             List<BuildTime> group = grouped.get(key);
+
+            if (group.size() < 3) {
+                continue;
+            }
+
             if (group.get(0).getStart() == null) {
                 continue;
             }
@@ -165,6 +178,8 @@ public class OnionperfDocument extends Document {
             for (BuildTime bt : group) {
                 deltas.add(bt.getDelta());
             }
+
+            Collections.sort(deltas);
 
             Double q1 = null, md = null, q3 = null;
             if (!deltas.isEmpty()) {
@@ -211,6 +226,11 @@ public class OnionperfDocument extends Document {
 
         for (String key : grouped.keySet()) {
             List<FilteredMeasurement> group = grouped.get(key);
+
+            if (group.size() < 3) {
+                continue;
+            }
+
             String[] parts = key.split("-");
             Date date = group.get(0).getDate();
             String source = group.get(0).getSource();
@@ -285,6 +305,11 @@ public class OnionperfDocument extends Document {
 
         for (String key : grouped.keySet()) {
             List<ThroughputMeasurement> group = grouped.get(key);
+
+            if (group.size() < 3) {
+                continue;
+            }
+
             Date date = group.get(0).getDate();
             String source = group.get(0).getSource();
             String serverType = group.get(0).getServerType();

@@ -3,10 +3,85 @@ import re
 import requests
 import time
 import os
-import pandas as pd
+import csv
 from datetime import datetime, timedelta
 
 from prometheus_client import CollectorRegistry, Gauge, write_to_textfile
+
+# OnionPerf metrics
+
+def throughput_parse_csv(file_path):
+    if not os.path.exists(file_path):
+        print(f"File {file_path} does not exist.")
+        return []
+    
+    data = []
+    with open(file_path, mode='r') as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            # Convert numeric values from strings to integers
+            row['low'] = int(row['low'])
+            row['q1'] = int(row['q1'])
+            row['md'] = int(row['md'])
+            row['q3'] = int(row['q3'])
+            row['high'] = int(row['high'])
+            # Add parsed row to the data list
+            data.append(row)
+    return data
+
+def latency_parse_csv(file_path):
+    if not os.path.exists(file_path):
+        print(f"File {file_path} does not exist.")
+        return []
+
+    data = []
+    with open(file_path, mode='r') as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            # Convert numeric values from strings to integers
+            row['low'] = int(row['low'])
+            row['q1'] = int(row['q1'])
+            row['md'] = int(row['md'])
+            row['q3'] = int(row['q3'])
+            row['high'] = int(row['high'])
+            # Add parsed row to the data list
+            data.append(row)
+    return data
+
+def filter_latest_date(data):
+    if not data:
+        return []
+    # Find the greatest date
+    latest_date = max(row['date'] for row in data)
+    # Filter rows to keep only those with the greatest date
+    filtered_data = [row for row in data if row['date'] == latest_date]
+    return filtered_data
+
+def throughput_generate_prometheus_metrics(data, registry):
+    op_throughput_kbps = Gauge("op_throughput_kbps", "OnionPerf throughput Kbps", ['source', 'server', 'percentile'], registry=registry)
+
+    metrics = []
+    for row in data:
+        source = row['source']
+        server = row['server']
+        for percentile in ['low', 'q1', 'md', 'q3', 'high']:
+            value = row[percentile]
+            op_throughput_kbps.labels(source=source, server=server, percentile=percentile).set(value)
+    return metrics
+
+def latency_generate_prometheus_metrics(data, registry):
+    op_latency_sec = Gauge("op_latency_sec", "OnionPerf latency sec", ['source', 'server', 'percentile'], registry=registry)
+
+    metrics = []
+    for row in data:
+        source = row['source']
+        server = row['server']
+        for percentile in ['low', 'q1', 'md', 'q3', 'high']:
+            value = row[percentile]
+            op_latency_sec.labels(source=source, server=server, percentile=percentile).set(value)
+    return metrics
+
+# main
 
 if __name__ == '__main__':
 
@@ -309,7 +384,12 @@ if __name__ == '__main__':
 
             offline_bandwidth_rate += bandwidth_rate
 
+    # OnionPerf
+
+
     registry = CollectorRegistry()
+
+
 
     network_relays = Gauge('total_relays', 'Current number of relays on the network', ['status'], registry=registry)
     network_relays.labels(status='all').set(len(total_relays))
@@ -444,6 +524,16 @@ if __name__ == '__main__':
 
     network_consensus_is_valid = Gauge('network_consensus_is_valid', 'Current network consensus validity', registry=registry)
     network_consensus_is_valid.set(consensus_is_valid)
+
+    throughput_file_path = '/srv/onionoo/data/out/performance/throughput.csv'  # Replace with the actual path to your CSV file
+    throughput_parsed_data = throughput_parse_csv(throughput_file_path)
+    throughput_latest_data = filter_latest_date(throughput_parsed_data)
+    throughput_generate_prometheus_metrics(throughput_latest_data, registry)
+
+    latency_file_path = '/srv/onionoo/data/out/performance/latency.csv'  # Replace with the actual path to your CSV file
+    latency_parsed_data = latency_parse_csv(latency_file_path)
+    latency_latest_data = filter_latest_date(latency_parsed_data)
+    latency_generate_prometheus_metrics(latency_latest_data, registry)
 
     file_path = os.getenv('METRICS_FILE_PATH', '/srv/onionoo/data/out/network/metrics')
     write_to_textfile(file_path, registry)
