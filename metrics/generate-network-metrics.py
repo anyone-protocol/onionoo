@@ -48,6 +48,57 @@ def latency_parse_csv(file_path):
             data.append(row)
     return data
 
+def failure_parse_csv(file_path):
+    if not os.path.exists(file_path):
+        print(f"File {file_path} does not exist.")
+        return []
+
+    data = []
+    with open(file_path, mode='r') as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            # Convert numeric values from strings to integers
+            row['timeout'] = int(row['timeout'])
+            row['failure'] = int(row['failure'])
+            row['requests'] = int(row['requests'])
+            # Add parsed row to the data list
+            data.append(row)
+    return data
+
+def download_parse_csv(file_path):
+    if not os.path.exists(file_path):
+        print(f"File {file_path} does not exist.")
+        return []
+
+    data = []
+    with open(file_path, mode='r') as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            # Convert numeric values from strings to integers
+            row['q1'] = int(row['q1'])
+            row['md'] = int(row['md'])
+            row['q3'] = int(row['q3'])
+            # Add parsed row to the data list
+            data.append(row)
+    return data
+
+def circuit_parse_csv(file_path):
+    if not os.path.exists(file_path):
+        print(f"File {file_path} does not exist.")
+        return []
+
+    data = []
+    with open(file_path, mode='r') as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            # Convert numeric values from strings to integers
+            row['q1'] = int(row['q1'])
+            row['md'] = int(row['md'])
+            row['q3'] = int(row['q3'])
+            # Add parsed row to the data list
+            data.append(row)
+    return data
+
 def filter_latest_date(data):
     if not data:
         return []
@@ -60,28 +111,60 @@ def filter_latest_date(data):
 def throughput_generate_prometheus_metrics(data, registry):
     op_throughput_kbps = Gauge("op_throughput_kbps", "OnionPerf throughput Kbps", ['source', 'server', 'percentile'], registry=registry)
 
-    metrics = []
     for row in data:
         source = row['source']
         server = row['server']
         for percentile in ['low', 'q1', 'md', 'q3', 'high']:
             value = row[percentile]
             op_throughput_kbps.labels(source=source, server=server, percentile=percentile).set(value)
-    return metrics
 
 def latency_generate_prometheus_metrics(data, registry):
     op_latency_sec = Gauge("op_latency_sec", "OnionPerf latency sec", ['source', 'server', 'percentile'], registry=registry)
 
-    metrics = []
     for row in data:
         source = row['source']
         server = row['server']
         for percentile in ['low', 'q1', 'md', 'q3', 'high']:
             value = row[percentile]
             op_latency_sec.labels(source=source, server=server, percentile=percentile).set(value)
-    return metrics
 
-# main
+def failure_generate_prometheus_metrics(data, registry):
+    op_requests_all_count = Gauge("op_requests_all_count", "OnionPerf requests all count", ['server'], registry=registry)
+    op_requests_failure_count = Gauge("op_requests_failure_count", "OnionPerf requests failure count", ['server'], registry=registry)
+    op_requests_timeout_count = Gauge("op_requests_timeout_count", "OnionPerf requests timeout count", ['server'], registry=registry)
+    op_requests_failure_percentage = Gauge("op_requests_failure_percentage", "OnionPerf requests failure percentage", ['server'], registry=registry)
+    op_requests_timeout_percentage = Gauge("op_requests_timeout_percentage", "OnionPerf requests timeout percentage", ['server'], registry=registry)
+
+    for row in data:
+        server = row['server']
+        op_requests_all_count.labels(server=server).set(row['requests'])
+        op_requests_failure_count.labels(server=server).set(row['failure'])
+        op_requests_timeout_count.labels(server=server).set(row['timeout'])
+        op_requests_failure_percentage.labels(server=server).set(row['failure'] / row['requests'])
+        op_requests_timeout_percentage.labels(server=server).set(row['timeout'] / row['requests'])
+
+def download_generate_prometheus_metrics(data, registry):
+    op_download_sec = Gauge("op_download_sec", "OnionPerf download sec", ['source', 'server', 'filesize', 'percentile'], registry=registry)
+
+    for row in data:
+        source = row['source']
+        server = row['server']
+        filesize = row['filesize']
+        for percentile in ['q1', 'md', 'q3']:
+            value = row[percentile]
+            op_download_sec.labels(source=source, server=server, filesize=filesize, percentile=percentile).set(value / 1000)
+
+def circuit_generate_prometheus_metrics(data, registry):
+    op_circuit_millis = Gauge("op_circuit_sec", "OnionPerf circuit millis", ['source', 'position', 'percentile'], registry=registry)
+
+    for row in data:
+        source = row['source']
+        position = row['position']
+        for percentile in ['q1', 'md', 'q3']:
+            value = row[percentile]
+            op_circuit_millis.labels(source=source, position=position, percentile=percentile).set(value)
+
+        # main
 
 if __name__ == '__main__':
 
@@ -534,6 +617,21 @@ if __name__ == '__main__':
     latency_parsed_data = latency_parse_csv(latency_file_path)
     latency_latest_data = filter_latest_date(latency_parsed_data)
     latency_generate_prometheus_metrics(latency_latest_data, registry)
+
+    failure_file_path = '/srv/onionoo/data/out/performance/failure.csv'  # Replace with the actual path to your CSV file
+    failure_parsed_data = failure_parse_csv(failure_file_path)
+    failure_latest_data = filter_latest_date(failure_parsed_data)
+    failure_generate_prometheus_metrics(failure_latest_data, registry)
+
+    download_file_path = '/srv/onionoo/data/out/performance/download.csv'  # Replace with the actual path to your CSV file
+    download_parsed_data = download_parse_csv(download_file_path)
+    download_latest_data = filter_latest_date(download_parsed_data)
+    download_generate_prometheus_metrics(download_latest_data, registry)
+
+    circuit_file_path = '/srv/onionoo/data/out/performance/circuit.csv'  # Replace with the actual path to your CSV file
+    circuit_parsed_data = circuit_parse_csv(circuit_file_path)
+    circuit_latest_data = filter_latest_date(circuit_parsed_data)
+    circuit_generate_prometheus_metrics(circuit_latest_data, registry)
 
     file_path = os.getenv('METRICS_FILE_PATH', '/srv/onionoo/data/out/network/metrics')
     write_to_textfile(file_path, registry)

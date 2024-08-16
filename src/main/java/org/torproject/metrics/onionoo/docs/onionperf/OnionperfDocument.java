@@ -120,7 +120,7 @@ public class OnionperfDocument extends Document {
             String[] parts = key.split("-");
             Date date = new Date(group.get(0).getStart().getTime());
             String source = group.get(0).getSource();
-            String server = parts[2];
+            String server = parts[parts.length - 1];
 
             int timeouts = 0;
             int failures = 0;
