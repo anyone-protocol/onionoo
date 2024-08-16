@@ -94,20 +94,15 @@ public class OnionperfDocument extends Document {
     public List<OnionperfFailureStatistic> getFailureList() {
         List<OnionperfFailureStatistic> results = new ArrayList<>();
 
-        // Group by date, source, server
         Map<String, List<Measurement>> grouped = new HashMap<>();
-        Date currentDate = new Date();
         for (Measurement m : measurements) {
-            // Ensure the measurement date is before yesterday
-//            if (m.getStart().before(new Timestamp(currentDate.getTime() - 24 * 60 * 60 * 1000))) {
-                String serverType = m.getEndpointRemote().contains(".onion:") ? "onion" : "public";
-                String date = new Date(m.getStart().getTime()).toInstant().atOffset(ZoneOffset.UTC).toLocalDate().toString();
-                String key = String.format("%s-%s-%s", date, m.getSource(), serverType);
-                if (!grouped.containsKey(key)) {
-                    grouped.put(key, new ArrayList<>());
-                }
-                grouped.get(key).add(m);
-//            }
+            String serverType = m.getEndpointRemote().contains(".onion:") ? "onion" : "public";
+            String date = new Date(m.getStart().getTime()).toInstant().atOffset(ZoneOffset.UTC).toLocalDate().toString();
+            String key = String.format("%s-%s-%s", date, m.getSource(), serverType);
+            if (!grouped.containsKey(key)) {
+                grouped.put(key, new ArrayList<>());
+            }
+            grouped.get(key).add(m);
         }
 
         for (String key : grouped.keySet()) {

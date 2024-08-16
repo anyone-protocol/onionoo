@@ -109,39 +109,40 @@ def filter_latest_date(data):
     return filtered_data
 
 def throughput_generate_prometheus_metrics(data, registry):
-    op_throughput_kbps = Gauge("op_throughput_kbps", "OnionPerf throughput Kbps", ['source', 'server', 'percentile'], registry=registry)
+    op_throughput_mbps = Gauge("op_throughput_mbps", "OnionPerf throughput Mbps", ['source', 'server', 'percentile'], registry=registry)
 
     for row in data:
         source = row['source']
         server = row['server']
         for percentile in ['low', 'q1', 'md', 'q3', 'high']:
             value = row[percentile]
-            op_throughput_kbps.labels(source=source, server=server, percentile=percentile).set(value)
+            op_throughput_mbps.labels(source=source, server=server, percentile=percentile).set(value / 1000)
 
 def latency_generate_prometheus_metrics(data, registry):
-    op_latency_sec = Gauge("op_latency_sec", "OnionPerf latency sec", ['source', 'server', 'percentile'], registry=registry)
+    op_latency_millis = Gauge("op_latency_millis", "OnionPerf latency milliseconds", ['source', 'server', 'percentile'], registry=registry)
 
     for row in data:
         source = row['source']
         server = row['server']
         for percentile in ['low', 'q1', 'md', 'q3', 'high']:
             value = row[percentile]
-            op_latency_sec.labels(source=source, server=server, percentile=percentile).set(value)
+            op_latency_millis.labels(source=source, server=server, percentile=percentile).set(value)
 
 def failure_generate_prometheus_metrics(data, registry):
-    op_requests_all_count = Gauge("op_requests_all_count", "OnionPerf requests all count", ['server'], registry=registry)
-    op_requests_failure_count = Gauge("op_requests_failure_count", "OnionPerf requests failure count", ['server'], registry=registry)
-    op_requests_timeout_count = Gauge("op_requests_timeout_count", "OnionPerf requests timeout count", ['server'], registry=registry)
-    op_requests_failure_percentage = Gauge("op_requests_failure_percentage", "OnionPerf requests failure percentage", ['server'], registry=registry)
-    op_requests_timeout_percentage = Gauge("op_requests_timeout_percentage", "OnionPerf requests timeout percentage", ['server'], registry=registry)
+    op_requests_all_count = Gauge("op_requests_all_count", "OnionPerf requests all count", ['source', 'server'], registry=registry)
+    op_requests_failure_count = Gauge("op_requests_failure_count", "OnionPerf requests failure count", ['source', 'server'], registry=registry)
+    op_requests_timeout_count = Gauge("op_requests_timeout_count", "OnionPerf requests timeout count", ['source', 'server'], registry=registry)
+    op_requests_failure_percentage = Gauge("op_requests_failure_percentage", "OnionPerf requests failure percentage", ['source', 'server'], registry=registry)
+    op_requests_timeout_percentage = Gauge("op_requests_timeout_percentage", "OnionPerf requests timeout percentage", ['source', 'server'], registry=registry)
 
     for row in data:
+        source = row['source']
         server = row['server']
-        op_requests_all_count.labels(server=server).set(row['requests'])
-        op_requests_failure_count.labels(server=server).set(row['failure'])
-        op_requests_timeout_count.labels(server=server).set(row['timeout'])
-        op_requests_failure_percentage.labels(server=server).set(row['failure'] / row['requests'])
-        op_requests_timeout_percentage.labels(server=server).set(row['timeout'] / row['requests'])
+        op_requests_all_count.labels(source=source, server=server).set(row['requests'])
+        op_requests_failure_count.labels(source=source, server=server).set(row['failure'])
+        op_requests_timeout_count.labels(source=source, server=server).set(row['timeout'])
+        op_requests_failure_percentage.labels(source=source, server=server).set(row['failure'] / row['requests'] * 100)
+        op_requests_timeout_percentage.labels(source=source, server=server).set(row['timeout'] / row['requests'] * 100)
 
 def download_generate_prometheus_metrics(data, registry):
     op_download_sec = Gauge("op_download_sec", "OnionPerf download sec", ['source', 'server', 'filesize', 'percentile'], registry=registry)
@@ -155,7 +156,7 @@ def download_generate_prometheus_metrics(data, registry):
             op_download_sec.labels(source=source, server=server, filesize=filesize, percentile=percentile).set(value / 1000)
 
 def circuit_generate_prometheus_metrics(data, registry):
-    op_circuit_millis = Gauge("op_circuit_sec", "OnionPerf circuit millis", ['source', 'position', 'percentile'], registry=registry)
+    op_circuit_millis = Gauge("op_circuit_millis", "OnionPerf circuit millis", ['source', 'position', 'percentile'], registry=registry)
 
     for row in data:
         source = row['source']
