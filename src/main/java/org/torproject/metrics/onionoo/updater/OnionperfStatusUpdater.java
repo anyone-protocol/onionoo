@@ -10,6 +10,8 @@ import org.torproject.metrics.onionoo.docs.OnionperfStatus;
 import org.torproject.metrics.onionoo.onionperf.Measurement;
 import org.torproject.metrics.onionoo.onionperf.TorperfResultConverter;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +42,10 @@ public class OnionperfStatusUpdater implements DescriptorListener, StatusUpdater
     @Override
     public void processDescriptor(Descriptor descriptor, boolean relay) {
         if (descriptor instanceof TorperfResult) {
-            this.processTorPerfResult((TorperfResult) descriptor);
+            long threshold = LocalDateTime.now().atOffset(ZoneOffset.UTC).minusDays(2).toEpochSecond();
+            if (!(((TorperfResult) descriptor).getStartMillis() / 1000 < threshold)) {
+                this.processTorPerfResult((TorperfResult) descriptor);
+            }
         }
     }
 
