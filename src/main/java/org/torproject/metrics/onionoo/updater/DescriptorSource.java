@@ -141,7 +141,7 @@ public class DescriptorSource {
         DescriptorType.BRIDGESTRAP);
     this.readDescriptors(DescriptorType.BRIDGESTRAP,
         DescriptorHistory.BRIDGESTRAP_HISTORY, false);
-    logger.info("Reading recent {} ...", DescriptorType.ONIONPERF);
+    logger.debug("Reading recent {} ...", DescriptorType.ONIONPERF);
     this.readDescriptors(DescriptorType.ONIONPERF,
         DescriptorHistory.ONIONPERF_HISTORY, false);
   }

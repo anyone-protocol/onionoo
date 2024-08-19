@@ -7,6 +7,7 @@ import org.torproject.descriptor.TorperfResult;
 import org.torproject.metrics.onionoo.docs.DocumentStore;
 import org.torproject.metrics.onionoo.docs.DocumentStoreFactory;
 import org.torproject.metrics.onionoo.docs.OnionperfStatus;
+import org.torproject.metrics.onionoo.docs.onionperf.*;
 import org.torproject.metrics.onionoo.onionperf.Measurement;
 import org.torproject.metrics.onionoo.onionperf.TorperfResultConverter;
 
@@ -56,9 +57,17 @@ public class OnionperfStatusUpdater implements DescriptorListener, StatusUpdater
     @Override
     public void updateStatuses() {
         logger.info("Updating Onionperf statuses. Size: {}", measurements.size());
-        OnionperfStatus status = new OnionperfStatus(measurements);
-        documentStore.store(status);
+//        OnionperfStatus status = new OnionperfStatus(measurements);
+//        documentStore.store(status);
+        documentStore.store(new CircuitDocument(measurements));
+        documentStore.store(new DownloadDocument(measurements));
+        documentStore.store(new FailureDocument(measurements));
+        documentStore.store(new LatencyDocument(measurements));
+        documentStore.store(new ThroughputDocument(measurements));
+        logger.info("Onionperf statuses updated.");
+
         measurements.clear();
+        logger.info("Measurements cleared.");
     }
 
     @Override
