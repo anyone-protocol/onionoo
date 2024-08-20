@@ -67,7 +67,7 @@ public class OnionperfDocument extends Document {
             Date date = new Date(group.get(0).getStart().getTime());
             int filesize = group.get(0).getFilesize();
             String source = group.get(0).getSource();
-            String serverType = parts[5];
+            String serverType = parts[parts.length - 1];
 
             List<Integer> datacompletes = new ArrayList<>();
             for (MeasurementIncludingPartials mip : group) {
