@@ -19,14 +19,15 @@ public class OnionperfDocumentWriter implements DocumentWriter {
 
     @Override
     public void writeDocuments(long mostRecentStatusMillis) {
-//        logger.info("Writing onionperf documents time: {}", mostRecentStatusMillis);
-//        OnionperfStatus status = documentStore.retrieve(OnionperfStatus.class, true);
-//        logger.info("OnionperfStatus: {}", status.getMeasurements().size());
-//        documentStore.store(new CircuitDocument(status.getMeasurements()));
-//        documentStore.store(new DownloadDocument(status.getMeasurements()));
-//        documentStore.store(new FailureDocument(status.getMeasurements()));
-//        documentStore.store(new LatencyDocument(status.getMeasurements()));
-//        documentStore.store(new ThroughputDocument(status.getMeasurements()));
+        logger.info("Writing onionperf documents time: {}", mostRecentStatusMillis);
+        OnionperfStatus status = documentStore.retrieve(OnionperfStatus.class, true);
+        logger.info("OnionperfStatus: {}", status.getMeasurements().size());
+        documentStore.store(new CircuitDocument(status.getMeasurements()));
+        documentStore.store(new DownloadDocument(status.getMeasurements()));
+        documentStore.store(new FailureDocument(status.getMeasurements()));
+        documentStore.store(new LatencyDocument(status.getMeasurements()));
+        documentStore.store(new ThroughputDocument(status.getMeasurements()));
+        logger.info("Performance documents saved");
     }
 
     @Override
