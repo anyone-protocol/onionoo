@@ -26,8 +26,8 @@ public class DocumentWriterRunner {
     WeightsDocumentWriter wdw = new WeightsDocumentWriter();
     ClientsDocumentWriter cdw = new ClientsDocumentWriter();
     UptimeDocumentWriter udw = new UptimeDocumentWriter();
-    this.documentWriters = new DocumentWriter[] { sdw, ddw, bdw, wdw, cdw,
-        udw };
+    OnionperfDocumentWriter opdw = new OnionperfDocumentWriter();
+    this.documentWriters = new DocumentWriter[] { sdw, ddw, bdw, wdw, cdw, udw, opdw };
   }
 
   /** Lets each configured document writer write its documents. */

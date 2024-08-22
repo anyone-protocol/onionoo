@@ -3,6 +3,7 @@
 
 package org.torproject.metrics.onionoo.docs;
 
+import org.torproject.metrics.onionoo.docs.onionperf.*;
 import org.torproject.metrics.onionoo.util.FormattingUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -310,6 +312,7 @@ public class DocumentStore {
         || document instanceof HardwareInfoDocument
         || document instanceof WeightsDocument
         || document instanceof ClientsDocument
+        || document instanceof OnionperfStatus
         || document instanceof UptimeDocument) {
       try {
         documentString = objectMapper.writeValueAsString(document);
@@ -520,6 +523,7 @@ public class DocumentStore {
         || documentType.equals(WeightsDocument.class)
         || documentType.equals(HardwareInfoDocument.class)
         || documentType.equals(ClientsDocument.class)
+        || documentType.equals(OnionperfStatus.class)
         || documentType.equals(UptimeDocument.class)) {
       return this.retrieveParsedDocumentFile(documentType,
           documentString);
@@ -636,6 +640,12 @@ public class DocumentStore {
       String fingerprint) {
     File documentFile = null;
     if (fingerprint == null && !documentType.equals(UpdateStatus.class)
+        && !documentType.equals(OnionperfStatus.class)
+        && !documentType.equals(CircuitDocument.class)
+        && !documentType.equals(DownloadDocument.class)
+        && !documentType.equals(FailureDocument.class)
+        && !documentType.equals(LatencyDocument.class)
+        && !documentType.equals(ThroughputDocument.class)
         && !documentType.equals(UptimeStatus.class)) {
       logger.warn("Attempted to locate a document file of type {} without "
           + "providing a fingerprint.  Such a file does not exist.",
@@ -673,6 +683,9 @@ public class DocumentStore {
             fingerprint.substring(0, 1), fingerprint.substring(1, 2),
             fingerprint);
       }
+    } else if (documentType.equals(OnionperfStatus.class)) {
+      directory = this.statusDir;
+      fileName = "performance";
     } else if (documentType.equals(UpdateStatus.class)) {
       directory = this.outDir;
       fileName = "update";
@@ -694,6 +707,21 @@ public class DocumentStore {
     } else if (documentType.equals(UptimeDocument.class)) {
       directory = this.outDir;
       fileName = String.format("uptimes/%s", fingerprint);
+    } else if (documentType.equals(CircuitDocument.class)) {
+      directory = this.outDir;
+      fileName = "performance/circuit.csv";
+    } else if (documentType.equals(DownloadDocument.class)) {
+      directory = this.outDir;
+      fileName = "performance/download.csv";
+    } else if (documentType.equals(FailureDocument.class)) {
+      directory = this.outDir;
+      fileName = "performance/failure.csv";
+    } else if (documentType.equals(LatencyDocument.class)) {
+      directory = this.outDir;
+      fileName = "performance/latency.csv";
+    } else if (documentType.equals(ThroughputDocument.class)) {
+      directory = this.outDir;
+      fileName = "performance/throughput.csv";
     }
     if (directory != null && fileName != null) {
       documentFile = new File(directory, fileName);
@@ -790,6 +818,12 @@ public class DocumentStore {
     }
   }
 
+  static void writeStatistics(Path path, List<String> data) throws IOException {
+    path.toFile().getParentFile().mkdirs();
+    logger.info("Writing {} lines to {}.", data.size(), path.toFile().getAbsolutePath());
+    Files.write(path, data, StandardCharsets.UTF_8);
+  }
+
   private void writeSummaryDocuments() {
     if (this.outDir == null) {
       /* Can't write out/summary without knowing the path of out/. */
@@ -857,4 +891,5 @@ public class DocumentStore {
         FormattingUtils.formatBytes(retrievedBytes),
         FormattingUtils.formatDecimalNumber(removedFiles));
   }
+
 }
