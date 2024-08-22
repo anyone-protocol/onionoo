@@ -10,8 +10,12 @@ import org.torproject.metrics.onionoo.docs.OnionperfStatus;
 import org.torproject.metrics.onionoo.onionperf.Measurement;
 import org.torproject.metrics.onionoo.onionperf.TorperfResultConverter;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class OnionperfStatusUpdater implements DescriptorListener, StatusUpdater {
 
@@ -40,7 +44,10 @@ public class OnionperfStatusUpdater implements DescriptorListener, StatusUpdater
     @Override
     public void processDescriptor(Descriptor descriptor, boolean relay) {
         if (descriptor instanceof TorperfResult) {
-            this.processTorPerfResult((TorperfResult) descriptor);
+            long threshold = LocalDateTime.now().atOffset(ZoneOffset.UTC).minusDays(2).toEpochSecond();
+            if (!(((TorperfResult) descriptor).getStartMillis() / 1000 < threshold)) {
+                this.processTorPerfResult((TorperfResult) descriptor);
+            }
         }
     }
 
@@ -50,10 +57,25 @@ public class OnionperfStatusUpdater implements DescriptorListener, StatusUpdater
 
     @Override
     public void updateStatuses() {
-        logger.info("Updating Onionperf statuses. Size: {}", measurements.size());
+        logger.info("Updating Onionperf new measurements size: {}", measurements.size());
+        OnionperfStatus statusOld = documentStore.retrieve(OnionperfStatus.class, true);
+        if (statusOld != null) {
+            logger.info("OnionperfStatus old measurements: {}", statusOld.getMeasurements().size());
+            Long threshold = LocalDateTime.now().atOffset(ZoneOffset.UTC).minusDays(2).toEpochSecond();
+            measurements.addAll(filter(statusOld.getMeasurements(), threshold));
+            logger.info("OnionperfStatus merged measurements size: {}", measurements.size());
+        }
         OnionperfStatus status = new OnionperfStatus(measurements);
         documentStore.store(status);
+
+        logger.info("Measurements clearing");
         measurements.clear();
+    }
+
+    private Collection<? extends Measurement> filter(List<Measurement> measurements, Long threshold) {
+        return measurements.stream()
+                .filter(m -> m.getStart().toLocalDateTime().atZone(ZoneOffset.UTC).toEpochSecond() > threshold)
+                .collect(Collectors.toList());
     }
 
     @Override
