@@ -6,8 +6,8 @@ services:
     environment:
       COLLECTOR_HOST: host.docker.internal:9000
       COLLECTOR_PROTOCOL: "http://"
-      UPDATER_PERIOD: 5
-      UPDATER_OFFSET: 2
+      UPDATER_PERIOD: 2
+      UPDATER_OFFSET: 0
       BASE_DIR: "/srv/onionoo"
       LOGBASE: "data/logs"
       TYPE: jar
@@ -29,8 +29,8 @@ services:
     restart: always
     environment:
       ONIONOO_HOST: "http://host.docker.internal:8080"
-      INTERVAL_MINUTES: 5
+      INTERVAL_MINUTES: 2
       METRICS_FILE_PATH: "/srv/onionoo/data/out/network/metrics"
-      CRON_EXPRESSION: "*/5 * * * *"
+      CRON_EXPRESSION: "*/2 * * * *"
     volumes:
       - ./onionoo-data/:/srv/onionoo/data

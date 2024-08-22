@@ -141,6 +141,9 @@ public class DescriptorSource {
         DescriptorType.BRIDGESTRAP);
     this.readDescriptors(DescriptorType.BRIDGESTRAP,
         DescriptorHistory.BRIDGESTRAP_HISTORY, false);
+    logger.debug("Reading recent {} ...", DescriptorType.ONIONPERF);
+    this.readDescriptors(DescriptorType.ONIONPERF,
+        DescriptorHistory.ONIONPERF_HISTORY, false);
   }
 
   private void readDescriptors(DescriptorType descriptorType,
@@ -208,6 +211,9 @@ public class DescriptorSource {
           relay = false;
         } else if (annotation.startsWith("@type bridgestrap-stats 1.")) {
           descriptorType = DescriptorType.BRIDGESTRAP;
+          relay = false;
+        } else if (annotation.startsWith("@type onionperf")) {
+          descriptorType = DescriptorType.ONIONPERF;
           relay = false;
         }
       }

@@ -14,7 +14,8 @@ public enum DescriptorHistory {
   BRIDGE_EXTRAINFO_HISTORY("bridge-extrainfo-history"),
   BRIDGE_POOL_ASSIGNMENTS_HISTORY("bridge-pool-assignments-history"),
   BRIDGESTRAP_HISTORY("bridgestrap-history"),
-  ARCHIVED_HISTORY("archived-history");
+  ARCHIVED_HISTORY("archived-history"),
+  ONIONPERF_HISTORY("onionperf-history");
 
   private String fileName;
 
