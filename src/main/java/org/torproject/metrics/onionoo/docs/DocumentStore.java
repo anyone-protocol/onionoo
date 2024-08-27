@@ -561,7 +561,7 @@ public class DocumentStore {
       Class<T> documentType, String documentString) {
     T result = null;
     try {
-      if (!documentString.isEmpty() && !documentString.equals("{}")) {
+      if (documentString != null && !documentString.isEmpty() && !documentString.equals("{}")) {
         result = objectMapper.readValue(documentString, documentType);
       }
     } catch (Throwable e) {
