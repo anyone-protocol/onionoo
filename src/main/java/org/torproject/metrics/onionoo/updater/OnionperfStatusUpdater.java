@@ -65,8 +65,10 @@ public class OnionperfStatusUpdater implements DescriptorListener, StatusUpdater
             measurements.addAll(filter(statusOld.getMeasurements(), threshold));
             logger.info("OnionperfStatus merged measurements size: {}", measurements.size());
         }
-        OnionperfStatus status = new OnionperfStatus(measurements);
-        documentStore.store(status);
+        if (!measurements.isEmpty()) {
+            OnionperfStatus status = new OnionperfStatus(measurements);
+            documentStore.store(status);
+        }
 
         logger.info("Measurements clearing");
         measurements.clear();
