@@ -1,7 +1,10 @@
 package org.torproject.metrics.onionoo.docs;
 
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
 import java.util.List;
 
+@JsonNaming
 public class HardwareInfoDocument extends Document {
 
     private String id;
