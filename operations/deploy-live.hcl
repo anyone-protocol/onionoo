@@ -52,7 +52,7 @@ job "onionoo-live" {
       }
 
       config {
-        image   = "ghcr.io/ator-development/onionoo:DEPLOY_TAG"
+        image   = "ghcr.io/anyone-protocol/onionoo:DEPLOY_TAG"
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
@@ -85,7 +85,7 @@ job "onionoo-live" {
       }
 
       config {
-        image   = "ghcr.io/ator-development/onionoo:DEPLOY_TAG"
+        image   = "ghcr.io/anyone-protocol/onionoo:DEPLOY_TAG"
         ports   = ["http-port"]
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
@@ -133,8 +133,7 @@ job "onionoo-live" {
       }
 
       config {
-        image   = "ghcr.io/ator-development/onionoo-cron:DEPLOY_TAG"
-        force_pull = true
+        image   = "ghcr.io/anyone-protocol/onionoo-cron:DEPLOY_TAG"
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
