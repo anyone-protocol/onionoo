@@ -60,7 +60,7 @@ job "onionoo-live" {
 
       resources {
         cpu    = 1000
-        memory = 2000
+        memory = 1500
       }
 
       service {
@@ -93,8 +93,8 @@ job "onionoo-live" {
       }
 
       resources {
-        cpu    = 256
-        memory = 256
+        cpu    = 250
+        memory = 750
       }
 
       service {

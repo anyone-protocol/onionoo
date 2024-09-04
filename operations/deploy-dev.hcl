@@ -62,8 +62,8 @@ job "onionoo-dev" {
       }
 
       resources {
-        cpu    = 256
-        memory = 512
+        cpu    = 500
+        memory = 1000
       }
 
       service {
@@ -100,8 +100,8 @@ job "onionoo-dev" {
       }
 
       resources {
-        cpu    = 256
-        memory = 256
+        cpu    = 250
+        memory = 500
       }
 
       service {
@@ -156,8 +156,8 @@ job "onionoo-dev" {
       }
 
       resources {
-        cpu    = 256
-        memory = 256
+        cpu    = 128
+        memory = 128
       }
     }
   }
