@@ -52,7 +52,6 @@ job "onionoo-dev" {
 
       config {
         image   = "ghcr.io/anyone-protocol/onionoo:DEPLOY_TAG"
-        force_pull = true
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
