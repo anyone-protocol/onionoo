@@ -52,7 +52,6 @@ job "onionoo-dev" {
 
       config {
         image   = "ghcr.io/anyone-protocol/onionoo:DEPLOY_TAG"
-        force_pull = true
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
@@ -63,8 +62,8 @@ job "onionoo-dev" {
       }
 
       resources {
-        cpu    = 256
-        memory = 512
+        cpu    = 500
+        memory = 1000
       }
 
       service {
@@ -90,7 +89,6 @@ job "onionoo-dev" {
 
       config {
         image   = "ghcr.io/anyone-protocol/onionoo:DEPLOY_TAG"
-        force_pull = true
         ports   = ["http-port"]
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
@@ -102,8 +100,8 @@ job "onionoo-dev" {
       }
 
       resources {
-        cpu    = 256
-        memory = 256
+        cpu    = 250
+        memory = 500
       }
 
       service {
@@ -143,7 +141,6 @@ job "onionoo-dev" {
 
       config {
         image   = "ghcr.io/anyone-protocol/onionoo-cron:DEPLOY_TAG"
-        force_pull = true
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
@@ -159,8 +156,8 @@ job "onionoo-dev" {
       }
 
       resources {
-        cpu    = 256
-        memory = 256
+        cpu    = 128
+        memory = 128
       }
     }
   }
