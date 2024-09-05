@@ -23,7 +23,7 @@ runs:
         context: .
         file: ./docker/Dockerfile
         push: true
-        tags: ghcr.io/ator-development/onionoo:${{ inputs.docker-tag }}
+        tags: ghcr.io/anyone-protocol/onionoo:${{ inputs.docker-tag }}
 
     - name: Build and push Docker image of cron task
       uses: docker/build-push-action@v2
@@ -31,4 +31,4 @@ runs:
         context: ./metrics
         file: ./metrics/Dockerfile
         push: true
-        tags: ghcr.io/ator-development/onionoo-cron:${{ inputs.docker-tag }}
+        tags: ghcr.io/anyone-protocol/onionoo-cron:${{ inputs.docker-tag }}
