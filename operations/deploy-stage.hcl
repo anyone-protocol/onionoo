@@ -59,8 +59,8 @@ job "onionoo-stage" {
       }
 
       resources {
-        cpu    = 500
-        memory = 1000
+        cpu    = 512
+        memory = 768
       }
 
       service {
@@ -93,8 +93,8 @@ job "onionoo-stage" {
       }
 
       resources {
-        cpu    = 250
-        memory = 500
+        cpu    = 256
+        memory = 512
       }
 
       service {
