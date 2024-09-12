@@ -72,6 +72,7 @@ public class OnionperfStatusUpdater implements DescriptorListener, StatusUpdater
 
         logger.info("Measurements clearing");
         measurements.clear();
+        System.gc();
     }
 
     private Collection<? extends Measurement> filter(List<Measurement> measurements, Long threshold) {

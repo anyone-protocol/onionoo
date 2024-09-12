@@ -116,6 +116,7 @@ public class UptimeStatus extends Document {
   private void compressHistory(SortedSet<UptimeHistory> history) {
     SortedSet<UptimeHistory> uncompressedHistory = new TreeSet<>(history);
     history.clear();
+    System.gc();
     UptimeHistory lastInterval = null;
     for (UptimeHistory interval : uncompressedHistory) {
       if (lastInterval != null

@@ -615,6 +615,7 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
       }
     }
     this.declaredFamilies.clear();
+    System.gc();
   }
 
   /* Step 3: perform lookups and calculate path selection

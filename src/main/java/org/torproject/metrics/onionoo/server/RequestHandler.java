@@ -215,9 +215,11 @@ public class RequestHandler {
   private void filterByResourceType() {
     if (this.resourceType.equals("clients")) {
       this.filteredRelays.clear();
+      System.gc();
     }
     if (this.resourceType.equals("weights")) {
       this.filteredBridges.clear();
+      System.gc();
     }
   }
 
@@ -226,8 +228,10 @@ public class RequestHandler {
       /* Not filtering by type. */
     } else if (this.type.equals("relay")) {
       this.filteredBridges.clear();
+      System.gc();
     } else {
       this.filteredRelays.clear();
+      System.gc();
     }
   }
 
@@ -383,6 +387,7 @@ public class RequestHandler {
     }
     this.filteredRelays.clear();
     this.filteredBridges.clear();
+    System.gc();
     String fingerprint = this.fingerprint;
     SummaryDocument entry = this.documentStore.retrieve(
         SummaryDocument.class, true, fingerprint);
@@ -418,6 +423,7 @@ public class RequestHandler {
       }
     }
     this.filteredBridges.clear();
+    System.gc();
   }
 
   private void filterByAsNumber() {
@@ -439,6 +445,7 @@ public class RequestHandler {
     }
     this.filteredRelays = matchingRelays;
     this.filteredBridges.clear();
+    System.gc();
   }
 
   private void filterByAsName() {
@@ -461,6 +468,7 @@ public class RequestHandler {
       this.filteredRelays.remove(fingerprint);
     }
     this.filteredBridges.clear();
+    System.gc();
   }
 
   private void filterByFlag() {
@@ -471,6 +479,7 @@ public class RequestHandler {
     String flag = this.flag.toLowerCase();
     if (!this.nodeIndex.getRelaysByFlag().containsKey(flag)) {
       this.filteredRelays.clear();
+      System.gc();
     } else {
       Set<String> relaysWithFlag = this.nodeIndex.getRelaysByFlag().get(
           flag);
@@ -486,6 +495,7 @@ public class RequestHandler {
     }
     if (!this.nodeIndex.getBridgesByFlag().containsKey(flag)) {
       this.filteredBridges.clear();
+      System.gc();
     } else {
       Set<String> bridgesWithFlag = this.nodeIndex.getBridgesByFlag().get(
           flag);
@@ -593,6 +603,7 @@ public class RequestHandler {
       this.filteredRelays.remove(fingerprint);
     }
     this.filteredBridges.clear();
+    System.gc();
   }
 
   private void filterByVersion() {
@@ -670,6 +681,7 @@ public class RequestHandler {
       this.filteredRelays.remove(fingerprint);
     }
     this.filteredBridges.clear();
+    System.gc();
   }
 
   private void filterByRecommendedVersion() {
@@ -704,6 +716,7 @@ public class RequestHandler {
       return;
     }
     this.filteredRelays.clear();
+    System.gc();
     Set<String> keepBridges = new HashSet<>();
     for (Map.Entry<String, Set<String>> e
         : this.nodeIndex.getBridgesByTransport().entrySet()) {

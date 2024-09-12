@@ -89,6 +89,7 @@ public class PerformanceMetrics {
         writtenChars.clear();
         handleRequestMillis.clear();
         buildResponseMillis.clear();
+        System.gc();
         do {
           lastLoggedMillis += LOG_INTERVAL_MILLIS;
         } while (receivedRequestMillis - lastLoggedMillis

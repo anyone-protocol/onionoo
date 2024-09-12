@@ -72,6 +72,7 @@ public class ClientsStatus extends Document {
   public void compressHistory(long lastSeenMillis) {
     SortedSet<ClientsHistory> uncompressedHistory = new TreeSet<>(this.history);
     history.clear();
+    System.gc();
     ClientsHistory lastResponses = null;
     String lastMonthString = "1970-01";
     for (ClientsHistory responses : uncompressedHistory) {
