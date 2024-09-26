@@ -252,7 +252,6 @@ public class BandwidthStatus extends Document {
       long lastSeenMillis) {
     SortedMap<Long, long[]> uncompressedHistory = new TreeMap<>(history);
     history.clear();
-    System.gc();
     long lastStartMillis = 0L;
     long lastEndMillis = 0L;
     long lastBandwidth = 0L;

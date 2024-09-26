@@ -32,7 +32,6 @@ public class OnionperfDocumentWriter implements DocumentWriter {
         } else {
             logger.info("No onionperf status found");
         }
-        System.gc();
     }
 
     @Override

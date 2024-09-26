@@ -128,7 +128,6 @@ public class WeightsStatus extends Document {
         new TreeMap<>(histComparator);
     uncompressedHistory.putAll(this.history);
     history.clear();
-    System.gc();
     long lastStartMillis = 0L;
     long lastEndMillis = 0L;
     double[] lastWeights = null;

@@ -804,7 +804,6 @@ public class DocumentStore {
       writeToFile(summaryFile, documentString);
       this.lastModifiedNodeStatuses = summaryFile.lastModified();
       this.updatedNodeStatuses.clear();
-      System.gc();
       this.storedFiles++;
       this.storedBytes += documentString.length();
     } catch (IOException e) {
@@ -855,7 +854,6 @@ public class DocumentStore {
       writeToFile(summaryFile, documentString);
       this.lastModifiedSummaryDocuments = summaryFile.lastModified();
       this.updatedSummaryDocuments.clear();
-      System.gc();
       this.storedFiles++;
       this.storedBytes += documentString.length();
     } catch (IOException e) {

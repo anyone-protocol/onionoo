@@ -54,6 +54,5 @@ class MostFrequentString {
 
   void clear() {
     this.stringFrequencies.clear();
-    System.gc();
   }
 }
