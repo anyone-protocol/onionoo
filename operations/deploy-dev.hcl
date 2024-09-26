@@ -62,8 +62,8 @@ job "onionoo-dev" {
       }
 
       resources {
-        cpu    = 500
-        memory = 1000
+        cpu    = 512
+        memory = 768
       }
 
       service {
