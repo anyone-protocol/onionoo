@@ -59,8 +59,8 @@ job "onionoo-live" {
       }
 
       resources {
-        cpu    = 1000
-        memory = 1500
+        cpu    = 1024
+        memory = 2048
       }
 
       service {
@@ -93,8 +93,8 @@ job "onionoo-live" {
       }
 
       resources {
-        cpu    = 250
-        memory = 750
+        cpu    = 256
+        memory = 768
       }
 
       service {
