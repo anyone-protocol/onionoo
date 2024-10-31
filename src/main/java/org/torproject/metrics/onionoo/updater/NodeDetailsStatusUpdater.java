@@ -3,36 +3,18 @@
 
 package org.torproject.metrics.onionoo.updater;
 
-import org.torproject.descriptor.BridgeNetworkStatus;
-import org.torproject.descriptor.BridgePoolAssignment;
-import org.torproject.descriptor.BridgestrapStats;
-import org.torproject.descriptor.BridgestrapTestResult;
-import org.torproject.descriptor.Descriptor;
-import org.torproject.descriptor.ExitList;
-import org.torproject.descriptor.ExtraInfoDescriptor;
-import org.torproject.descriptor.NetworkStatusEntry;
-import org.torproject.descriptor.RelayNetworkStatusConsensus;
-import org.torproject.descriptor.ServerDescriptor;
-import org.torproject.metrics.onionoo.docs.DateTimeHelper;
-import org.torproject.metrics.onionoo.docs.DetailsStatus;
-import org.torproject.metrics.onionoo.docs.DocumentStore;
-import org.torproject.metrics.onionoo.docs.DocumentStoreFactory;
-import org.torproject.metrics.onionoo.docs.NodeStatus;
+import org.torproject.descriptor.*;
+import org.torproject.metrics.onionoo.docs.*;
+import org.torproject.metrics.onionoo.userstats.*;
 import org.torproject.metrics.onionoo.util.FormattingUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 /*
  * Status updater for both node and details statuses.
@@ -102,6 +84,12 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
 
   private int bridgestrapStatsProcessed = 0;
 
+  private static final long ONE_HOUR_MILLIS = 60L * 60L * 1000L;
+
+  private static final long ONE_DAY_MILLIS = 24L * ONE_HOUR_MILLIS;
+
+  private static final long ONE_WEEK_MILLIS = 7L * ONE_DAY_MILLIS;
+
   /** Initializes a new status updater, obtains references to all relevant
    * singleton instances, and registers as listener at the (singleton)
    * descriptor source. */
@@ -133,6 +121,8 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
         DescriptorType.BRIDGE_POOL_ASSIGNMENTS);
     this.descriptorSource.registerDescriptorListener(this,
         DescriptorType.BRIDGESTRAP);
+    this.descriptorSource.registerDescriptorListener(this,
+        DescriptorType.RELAY_EXTRA_INFOS);
   }
 
   /* Step 1: parse descriptors. */
@@ -148,15 +138,139 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
           (RelayNetworkStatusConsensus) descriptor);
     } else if (descriptor instanceof ServerDescriptor && !relay) {
       this.processBridgeServerDescriptor((ServerDescriptor) descriptor);
-    } else if (descriptor instanceof ExtraInfoDescriptor && !relay) {
-      this.processBridgeExtraInfoDescriptor(
-          (ExtraInfoDescriptor) descriptor);
+    } else if (descriptor instanceof ExtraInfoDescriptor) {
+      if (relay) {
+        this.processRelayExtraInfoDescriptor((ExtraInfoDescriptor) descriptor);
+      } else {
+        this.processBridgeExtraInfoDescriptor(
+                (ExtraInfoDescriptor) descriptor);
+      }
     } else if (descriptor instanceof BridgeNetworkStatus) {
       this.processBridgeNetworkStatus((BridgeNetworkStatus) descriptor);
     } else if (descriptor instanceof BridgePoolAssignment) {
       this.processBridgePoolAssignment((BridgePoolAssignment) descriptor);
     } else if (descriptor instanceof BridgestrapStats) {
       this.processBridgestrapStats((BridgestrapStats) descriptor);
+    }
+  }
+
+  private void processRelayExtraInfoDescriptor(ExtraInfoDescriptor descriptor) {
+    long publishedMillis = descriptor.getPublishedMillis();
+    String fingerprint = descriptor.getFingerprint()
+            .toUpperCase();
+    String nickname = descriptor.getNickname();
+    long dirreqStatsEndMillis = descriptor.getDirreqStatsEndMillis();
+    long dirreqStatsIntervalLengthMillis =
+            descriptor.getDirreqStatsIntervalLength() * 1000L;
+    SortedMap<String, Integer> responses = descriptor.getDirreqV3Resp();
+    SortedMap<String, Integer> requests = descriptor.getDirreqV3Reqs();
+    BandwidthHistory dirreqWriteHistory =
+            descriptor.getDirreqWriteHistory();
+    parseRelayDirreqV3Resp(fingerprint, nickname, publishedMillis,
+            dirreqStatsEndMillis, dirreqStatsIntervalLengthMillis, responses,
+            requests);
+    parseRelayDirreqWriteHistory(fingerprint, nickname, publishedMillis,
+            dirreqWriteHistory);
+  }
+
+  private void parseRelayDirreqV3Resp(String fingerprint,
+                                             String nickname, long publishedMillis, long dirreqStatsEndMillis,
+                                             long dirreqStatsIntervalLengthMillis,
+                                             SortedMap<String, Integer> responses,
+                                             SortedMap<String, Integer> requests) {
+    if (responses == null
+            || publishedMillis - dirreqStatsEndMillis > ONE_WEEK_MILLIS
+            || dirreqStatsIntervalLengthMillis != ONE_DAY_MILLIS) {
+      /* Cut off all observations that are one week older than
+       * the descriptor publication time, or we'll have to update
+       * weeks of aggregate values every hour. */
+      return;
+    }
+    long statsStartMillis = dirreqStatsEndMillis
+            - dirreqStatsIntervalLengthMillis;
+    long utcBreakMillis = (dirreqStatsEndMillis / ONE_DAY_MILLIS)
+            * ONE_DAY_MILLIS;
+    double resp = ((double) responses.get("ok")) - 4.0;
+    if (resp > 0.0) {
+      for (int i = 0; i < 2; i++) {
+        long fromMillis = i == 0 ? statsStartMillis : utcBreakMillis;
+        long toMillis = i == 0 ? utcBreakMillis : dirreqStatsEndMillis;
+        if (fromMillis >= toMillis) {
+          continue;
+        }
+        double intervalFraction = ((double) (toMillis - fromMillis))
+                / ((double) dirreqStatsIntervalLengthMillis);
+        double total = 0L;
+        SortedMap<String, Double> requestsCopy = new TreeMap<>();
+        if (null != requests) {
+          for (Map.Entry<String, Integer> e : requests.entrySet()) {
+            if (e.getValue() < 4.0) {
+              continue;
+            }
+            double frequency = ((double) e.getValue()) - 4.0;
+            requestsCopy.put(e.getKey(), frequency);
+            total += frequency;
+          }
+        }
+        /* If we're not told any requests, or at least none of them are greater
+         * than 4, put in a default that we'll attribute all responses to. */
+        if (requestsCopy.isEmpty()) {
+          requestsCopy.put("??", 4.0);
+          total = 4.0;
+        }
+        for (Map.Entry<String, Double> e : requestsCopy.entrySet()) {
+          String country = e.getKey();
+          double val = resp * intervalFraction * e.getValue() / total;
+          imported.add(new Imported(fingerprint, nickname, Node.RELAY,
+                  Metric.RESPONSES, country, "", "", new Timestamp(fromMillis), new Timestamp(toMillis), val)
+          );
+        }
+        imported.add(new Imported(fingerprint, nickname, Node.RELAY, Metric.RESPONSES,
+                "", "", "", new Timestamp(fromMillis), new Timestamp(toMillis), resp * intervalFraction));
+      }
+    }
+  }
+
+  private void parseRelayDirreqWriteHistory(String fingerprint,
+                                                   String nickname, long publishedMillis,
+                                                   BandwidthHistory dirreqWriteHistory) {
+    if (dirreqWriteHistory == null
+            || publishedMillis - dirreqWriteHistory.getHistoryEndMillis()
+            > ONE_WEEK_MILLIS) {
+      return;
+      /* Cut off all observations that are one week older than
+       * the descriptor publication time, or we'll have to update
+       * weeks of aggregate values every hour. */
+    }
+    long intervalLengthMillis =
+            dirreqWriteHistory.getIntervalLength() * 1000L;
+    for (Map.Entry<Long, Long> e
+            : dirreqWriteHistory.getBandwidthValues().entrySet()) {
+      long intervalEndMillis = e.getKey();
+      long intervalStartMillis =
+              intervalEndMillis - intervalLengthMillis;
+      for (int i = 0; i < 2; i++) {
+        long fromMillis = intervalStartMillis;
+        long toMillis = intervalEndMillis;
+        double writtenBytes = (double) e.getValue();
+        if (intervalStartMillis / ONE_DAY_MILLIS
+                < intervalEndMillis / ONE_DAY_MILLIS) {
+          long utcBreakMillis = (intervalEndMillis
+                  / ONE_DAY_MILLIS) * ONE_DAY_MILLIS;
+          if (i == 0) {
+            toMillis = utcBreakMillis;
+          } else if (i == 1) {
+            fromMillis = utcBreakMillis;
+          }
+          double intervalFraction = ((double) (toMillis - fromMillis))
+                  / ((double) intervalLengthMillis);
+          writtenBytes *= intervalFraction;
+        } else if (i == 1) {
+          break;
+        }
+        imported.add(new Imported(fingerprint, nickname, Node.RELAY, Metric.BYTES, "",
+                "", "", new Timestamp(fromMillis), new Timestamp(toMillis), writtenBytes));
+      }
     }
   }
 
@@ -256,6 +370,8 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
 
   private Map<String, Long> lastSeenMeasured = new HashMap<>();
 
+  private List<Imported> imported = new ArrayList<>();
+
   private void processRelayNetworkStatusConsensus(
       RelayNetworkStatusConsensus consensus) {
     long validAfterMillis = consensus.getValidAfterMillis();
@@ -313,6 +429,27 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
           this.lastSeenMeasured.put(fingerprint, validAfterMillis);
         }
       }
+
+      // user stats
+      String statsFingerprint = fingerprint.toUpperCase();
+      String statsNickname = entry.getNickname();
+      if (entry.getFlags().contains("Running")) {
+        imported.add(
+                new Imported(
+                    statsFingerprint,
+                    statsNickname,
+                    Node.RELAY,
+                    Metric.STATUS,
+                    "",
+                    "",
+                    "",
+                    new Timestamp(consensus.getValidAfterMillis()),
+                    new Timestamp(consensus.getFreshUntilMillis()),
+                    0.0
+                )
+            );
+      }
+
     }
     this.relayConsensusesProcessed++;
     if (this.relaysLastValidAfterMillis == validAfterMillis) {
@@ -1059,10 +1196,20 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
         detailsStatus.setVersionStatus(nodeStatus.getVersionStatus()
             .toString());
       }
-
       this.documentStore.store(detailsStatus, fingerprint);
       this.documentStore.store(nodeStatus, fingerprint);
     }
+    logger.error("Imported size: {}", imported.size());
+    List<Merged> merge = DataProcessor.merge(imported);
+    logger.error("Merged size: {}", merge.size());
+    List<Aggregated> aggregated = DataProcessor.aggregate(merge);
+    logger.error("Aggregated size: {}", aggregated.size());
+    logger.error("Aggregated: {}", aggregated);
+    List<Estimated> estimated = DataProcessor.estimate(aggregated);
+    logger.error("Estimated size: {}", estimated.size());
+    this.documentStore.store(new UserStatsStatus(estimated));
+    imported.clear();
+    logger.info("Updated user stats");
   }
 
   @Override
