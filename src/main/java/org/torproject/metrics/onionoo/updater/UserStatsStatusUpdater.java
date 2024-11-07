@@ -1,5 +1,6 @@
 package org.torproject.metrics.onionoo.updater;
 
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.torproject.descriptor.*;
@@ -9,6 +10,7 @@ import org.torproject.metrics.onionoo.docs.UserStatsStatus;
 import org.torproject.metrics.onionoo.userstats.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater {
 
@@ -22,6 +24,8 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
     private DocumentStore documentStore;
 
     private List<Imported> imported = new ArrayList<>();
+
+    private NewAggregator newAggregator = new NewAggregator();
 
     public UserStatsStatusUpdater() {
         this.descriptorSource = DescriptorSourceFactory.getDescriptorSource();
@@ -102,8 +106,8 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
                 } else if (i == 1) {
                     break;
                 }
-                insertIntoImported(fingerprint, nickname, "relay", "bytes", "",
-                        "", "", fromMillis, toMillis, writtenBytes);
+                insertIntoImported(fingerprint, nickname, "relay", "bytes", null,
+                        null, null, fromMillis, toMillis, writtenBytes);
             }
         }
     }
@@ -159,10 +163,10 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
                     String country = e.getKey();
                     double val = resp * intervalFraction * e.getValue() / total;
                     insertIntoImported(fingerprint, nickname, "relay",
-                            "responses", country, "", "", fromMillis, toMillis, val);
+                            "responses", country, null, null, fromMillis, toMillis, val);
                 }
                 insertIntoImported(fingerprint, nickname, "relay", "responses",
-                        "", "", "", fromMillis, toMillis, resp * intervalFraction);
+                        null, null, null, fromMillis, toMillis, resp * intervalFraction);
             }
         }
     }
@@ -177,7 +181,7 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
             String nickname = statusEntry.getNickname();
             if (statusEntry.getFlags().contains("Running")) {
                 insertIntoImported(fingerprint, nickname, "relay", "status",
-                        "", "", "", fromMillis, toMillis, 0.0);
+                        null, null, null, fromMillis, toMillis, 0.0);
             }
         }
     }
@@ -205,12 +209,17 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
     @Override
     public void updateStatuses() {
         logger.error("Imported size: {}", imported.size());
-        List<Merged> merge = DataProcessor.merge(imported);
-        logger.error("Merged size: {}", merge.size());
-        List<Aggregated> aggregated = DataProcessor.aggregate(merge);
-        logger.error("Aggregated size: {}", aggregated.size());
-        logger.error("Aggregated: {}", aggregated);
-        List<Estimated> estimated = DataProcessor.estimate(aggregated);
+//        List<Merged> merge = DataProcessor.merge(imported);
+        List<Merged> merge1 = Merger.mergeFirstTime(imported);
+//        logger.error("Merged size: {}", merge.size());
+        logger.error("Merged size1: {}", merge1.size());
+//        List<Aggregated> aggregated = DataProcessor.aggregate(merge);
+        List<Aggregated> aggregate = newAggregator.aggregate(merge1);
+//        logger.error("Aggregated size: {}", aggregated.size());
+        logger.error("Aggregated1 size: {}", aggregate.size());
+//        logger.error("Aggregated: {}", aggregated);
+        logger.error("Aggregated1: {}", aggregate);
+        List<Estimated> estimated = DataProcessor.estimate(aggregate);
         logger.error("Estimated size: {}", estimated.size());
         logger.error("Estimated: {}", estimated);
         this.documentStore.store(new UserStatsStatus(estimated));

@@ -1,8 +1,6 @@
 package org.torproject.metrics.onionoo.userstats;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -13,35 +11,60 @@ public class DataProcessor {
 
     // Method to merge imported data into merged data
     public static List<Merged> merge(List<Imported> importedList) {
+        int idCounter = 1;
         List<Merged> mergedList = new ArrayList<>();
 
-        // Group Imported entries by unique keys and process each group
-        Map<String, List<Imported>> groupedImports = importedList.stream().collect(
-                Collectors.groupingBy(imp -> String.join("-",
-                        imp.getFingerprint(), imp.getNickname(), imp.getNode(),
-                        imp.getMetric(), imp.getCountry(), imp.getTransport(), imp.getVersion()))
-        );
+        // Step 1: Group by unique fields (fingerprint, nickname, node, metric, country, transport, version)
+        Map<String, List<Imported>> groupedImported = importedList.stream().collect(Collectors.groupingBy(
+                imported -> String.join("-", imported.getFingerprint(), imported.getNickname(),
+                        imported.getNode(), imported.getMetric(),
+                        imported.getCountry(), imported.getTransport(), imported.getVersion())
+        ));
 
-        int idCounter = 1;
-        for (List<Imported> group : groupedImports.values()) {
-            Merged mergedEntry = new Merged(idCounter++,
-                    group.get(0).getFingerprint(), group.get(0).getNickname(), group.get(0).getNode(),
-                    group.get(0).getMetric(), group.get(0).getCountry(), group.get(0).getTransport(),
-                    group.get(0).getVersion(), group.get(0).getStatsStart(), group.get(0).getStatsEnd(), 0);
+        // Step 2: Process each group independently
+        for (List<Imported> group : groupedImported.values()) {
+            // Sort each group by startTime to ensure intervals are processed in sequence
+            group.sort(Comparator.comparing(Imported::getStatsStart));
 
-            // Merge intervals within each group
-            for (Imported imp : group) {
-                if (imp.getStatsStart() > mergedEntry.getStatsEnd()) {
-                    // If there’s a gap, create a new merged entry
-                    mergedEntry.setStatsEnd(imp.getStatsEnd());
-                    mergedEntry.setVal(mergedEntry.getVal() + imp.getVal());
+            // Initialize variables to track merging within the group
+            long lastStartTime = group.get(0).getStatsStart();
+            long lastEndTime = group.get(0).getStatsEnd();
+            double lastVal = group.get(0).getVal();
+
+            // Use first entry to initialize shared fields for Merged
+            String fingerprint = group.get(0).getFingerprint();
+            String nickname = group.get(0).getNickname();
+            String node = group.get(0).getNode();
+            String metric = group.get(0).getMetric();
+            String country = group.get(0).getCountry();
+            String transport = group.get(0).getTransport();
+            String version = group.get(0).getVersion();
+
+            // Merge intervals within the sorted group
+            for (int i = 1; i < group.size(); i++) {
+                Imported current = group.get(i);
+
+                if (current.getStatsStart() <= lastEndTime) {
+                    // Overlapping or adjacent interval, extend the end time and accumulate the value
+                    lastEndTime = Math.max(lastEndTime, current.getStatsEnd());
+                    lastVal += current.getVal();
                 } else {
-                    mergedEntry.setStatsEnd(Math.max(imp.getStatsEnd(), mergedEntry.getStatsEnd()));
-                    mergedEntry.setVal(mergedEntry.getVal() + imp.getVal());
+                    // No overlap, add the previous merged interval to mergedList
+                    mergedList.add(new Merged(idCounter++, fingerprint, nickname, node, metric, country,
+                            transport, version, lastStartTime, lastEndTime, lastVal));
+
+                    // Start a new interval
+                    lastStartTime = current.getStatsStart();
+                    lastEndTime = current.getStatsEnd();
+                    lastVal = current.getVal();
                 }
             }
-            mergedList.add(mergedEntry);
+
+            // Add the last merged interval of the group to mergedList
+            mergedList.add(new Merged(idCounter++, fingerprint, nickname, node, metric, country,
+                    transport, version, lastStartTime, lastEndTime, lastVal));
         }
+
         return mergedList;
     }
 
@@ -59,7 +82,7 @@ public class DataProcessor {
         );
 
         for (List<Merged> group : groupedMerges.values()) {
-            long date = group.get(0).getStatsStart();
+            LocalDate date = Instant.ofEpochMilli(group.get(0).getStatsStart()).atZone(ZoneOffset.UTC).toLocalDate();
             String node = group.get(0).getNode();
             String country = group.get(0).getCountry();
             String transport = group.get(0).getTransport();

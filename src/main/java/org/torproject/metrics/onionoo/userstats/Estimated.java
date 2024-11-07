@@ -1,8 +1,10 @@
 package org.torproject.metrics.onionoo.userstats;
 
+import java.time.LocalDate;
+
 public class Estimated {
 
-    private long date;
+    private LocalDate date;
     private String node;
     private String country;
     private String transport;
@@ -10,7 +12,7 @@ public class Estimated {
     private int frac;
     private int users;
 
-    public Estimated(long date, String node, String country, String transport, String version, int frac, int users) {
+    public Estimated(LocalDate date, String node, String country, String transport, String version, int frac, int users) {
         this.date = date;
         this.node = node;
         this.country = country;
@@ -20,11 +22,11 @@ public class Estimated {
         this.users = users;
     }
 
-    public long getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(long date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

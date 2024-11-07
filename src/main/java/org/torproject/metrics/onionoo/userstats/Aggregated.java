@@ -1,7 +1,9 @@
 package org.torproject.metrics.onionoo.userstats;
 
+import java.time.LocalDate;
+
 public class Aggregated {
-    private long date;
+    private LocalDate date;
     private String node;
     private String country;
     private String transport;
@@ -14,7 +16,7 @@ public class Aggregated {
     private double nh;
     private double nrh;
 
-    public Aggregated(long date,
+    public Aggregated(LocalDate date,
                       String node,
                       String country,
                       String transport,
@@ -40,11 +42,11 @@ public class Aggregated {
         this.nrh = nrh;
     }
 
-    public long getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(long date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
