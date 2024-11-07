@@ -1,8 +1,8 @@
 package org.torproject.metrics.onionoo.userstats;
 
-import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -14,13 +14,12 @@ public class DataProcessor {
     // Method to merge imported data into merged data
     public static List<Merged> merge(List<Imported> importedList) {
         List<Merged> mergedList = new ArrayList<>();
-        System.out.println(mergedList);
 
         // Group Imported entries by unique keys and process each group
         Map<String, List<Imported>> groupedImports = importedList.stream().collect(
                 Collectors.groupingBy(imp -> String.join("-",
-                        imp.getFingerprint(), imp.getNickname(), imp.getNode().name(),
-                        imp.getMetric().name(), imp.getCountry(), imp.getTransport(), imp.getVersion()))
+                        imp.getFingerprint(), imp.getNickname(), imp.getNode(),
+                        imp.getMetric(), imp.getCountry(), imp.getTransport(), imp.getVersion()))
         );
 
         int idCounter = 1;
@@ -32,12 +31,12 @@ public class DataProcessor {
 
             // Merge intervals within each group
             for (Imported imp : group) {
-                if (imp.getStatsStart().after(mergedEntry.getStatsEnd())) {
+                if (imp.getStatsStart() > mergedEntry.getStatsEnd()) {
                     // If there’s a gap, create a new merged entry
                     mergedEntry.setStatsEnd(imp.getStatsEnd());
                     mergedEntry.setVal(mergedEntry.getVal() + imp.getVal());
                 } else {
-                    mergedEntry.setStatsEnd(imp.getStatsEnd().after(mergedEntry.getStatsEnd()) ? imp.getStatsEnd() : mergedEntry.getStatsEnd());
+                    mergedEntry.setStatsEnd(Math.max(imp.getStatsEnd(), mergedEntry.getStatsEnd()));
                     mergedEntry.setVal(mergedEntry.getVal() + imp.getVal());
                 }
             }
@@ -52,13 +51,16 @@ public class DataProcessor {
         // Group merged entries by date and unique key attributes
         Map<String, List<Merged>> groupedMerges = mergedList.stream().collect(
                 Collectors.groupingBy(merge -> String.join("-",
-                        merge.getStatsStart().toLocalDateTime().toLocalDate().toString(), merge.getNode().name(),
+                        Instant.ofEpochMilli(merge.getStatsStart())
+                                .atZone(ZoneId.of("UTC"))
+                                .toLocalDateTime()
+                                .toLocalDate().toString(), merge.getNode(),
                         merge.getCountry(), merge.getTransport(), merge.getVersion()))
         );
 
         for (List<Merged> group : groupedMerges.values()) {
-            Timestamp date = group.get(0).getStatsStart();
-            Node node = group.get(0).getNode();
+            long date = group.get(0).getStatsStart();
+            String node = group.get(0).getNode();
             String country = group.get(0).getCountry();
             String transport = group.get(0).getTransport();
             String version = group.get(0).getVersion();
@@ -68,19 +70,19 @@ public class DataProcessor {
 
             // Sum values for each metric type
             for (Merged merged : group) {
-                if (merged.getMetric() == Metric.RESPONSES) {
+                if (merged.getMetric().equals("responses")) {
                     rrx += merged.getVal();
                     nrx += getDurationSeconds(merged.getStatsStart(), merged.getStatsEnd());
-                } else if (merged.getMetric() == Metric.BYTES) {
+                } else if (merged.getMetric().equals("bytes")) {
                     hh += merged.getVal();
                     nh += getDurationSeconds(merged.getStatsStart(), merged.getStatsEnd());
-                } else if (merged.getMetric() == Metric.STATUS) {
+                } else if (merged.getMetric().equals("status")) {
                     nn += getDurationSeconds(merged.getStatsStart(), merged.getStatsEnd());
                 }
-                if (merged.getMetric() == Metric.BYTES && rrx > 0) {
+                if (merged.getMetric().equals("bytes") && rrx > 0) {
                     hrh += Math.min(hh, rrx);
                 }
-                if (merged.getMetric() == Metric.RESPONSES && hh == 0) {
+                if (merged.getMetric().equals("responses") && hh == 0) {
                     nrh += nrx;
                 }
             }
@@ -100,7 +102,7 @@ public class DataProcessor {
                 double frac = (agg.getHrh() * agg.getNh() + agg.getHh() * agg.getNrh()) / (agg.getHh() * agg.getNn());
 
                 // Only include entries where frac is between 0.1 and 1.1
-                if (frac >= 0.1 && frac <= 1.1) {
+//                if (frac >= 0.1 && frac <= 1.1) {
                     // Round fraction to an integer percent
                     int fracPercent = (int) Math.round(frac * 100);
 
@@ -108,7 +110,7 @@ public class DataProcessor {
                     int users = (int) Math.round(agg.getRrx() / (frac * 10));
 
                     // Only include estimates older than yesterday
-                    if (agg.getDate().before(Timestamp.from(Instant.now().minusSeconds(3600)))) {
+//                    if (agg.getDate().isBefore(LocalDate.now().minusDays(1))) {
                         Estimated estimated = new Estimated(
                                 agg.getDate(),
                                 agg.getNode(),
@@ -119,8 +121,8 @@ public class DataProcessor {
                                 users
                         );
                         estimatedList.add(estimated);
-                    }
-                }
+//                    }
+//                }
 //            }
         }
 
@@ -135,8 +137,8 @@ public class DataProcessor {
     }
 
     // Helper function to calculate duration in seconds between start and end times
-    private static double getDurationSeconds(Timestamp start, Timestamp end) {
-        return Duration.between(start.toInstant(), end.toInstant()).getSeconds();
+    private static double getDurationSeconds(long start, long end) {
+        return Duration.between(Instant.ofEpochMilli(start), Instant.ofEpochMilli(end)).getSeconds();
     }
 
 }

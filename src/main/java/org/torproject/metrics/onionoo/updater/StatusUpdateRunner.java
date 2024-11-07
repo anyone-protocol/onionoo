@@ -31,7 +31,8 @@ public class StatusUpdateRunner {
     ClientsStatusUpdater csu = new ClientsStatusUpdater();
     UptimeStatusUpdater usu = new UptimeStatusUpdater();
     OnionperfStatusUpdater opsu = new OnionperfStatusUpdater();
-    this.statusUpdaters = new StatusUpdater[] { ndsu, bsu, wsu, csu, usu, opsu };
+    UserStatsStatusUpdater ussu = new UserStatsStatusUpdater();
+    this.statusUpdaters = new StatusUpdater[] { ndsu, bsu, wsu, csu, usu, opsu, ussu };
   }
 
   /** Lets each configured status updater update its status files. */

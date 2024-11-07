@@ -1,25 +1,23 @@
 package org.torproject.metrics.onionoo.userstats;
 
-import java.sql.Timestamp;
-
-public class Merged {
+public class Merged implements UserStats {
 
     private int id;
     private String fingerprint;
     private String nickname;
-    private Node node;
-    private Metric metric;
+    private String node;
+    private String metric;
     private String country;
     private String transport;
     private String version;
-    private Timestamp statsStart;
-    private Timestamp statsEnd;
+    private long statsStart;
+    private long statsEnd;
     private double val;
 
     public Merged() {
     }
 
-    public Merged(int id, String fingerprint, String nickname, Node node, Metric metric, String country, String transport, String version, Timestamp statsStart, Timestamp statsEnd, double val) {
+    public Merged(int id, String fingerprint, String nickname, String node, String metric, String country, String transport, String version, long statsStart, long statsEnd, double val) {
         this.id = id;
         this.fingerprint = fingerprint;
         this.nickname = nickname;
@@ -57,19 +55,19 @@ public class Merged {
         this.nickname = nickname;
     }
 
-    public Node getNode() {
+    public String getNode() {
         return node;
     }
 
-    public void setNode(Node node) {
+    public void setNode(String node) {
         this.node = node;
     }
 
-    public Metric getMetric() {
+    public String getMetric() {
         return metric;
     }
 
-    public void setMetric(Metric metric) {
+    public void setMetric(String metric) {
         this.metric = metric;
     }
 
@@ -97,19 +95,19 @@ public class Merged {
         this.version = version;
     }
 
-    public Timestamp getStatsStart() {
+    public long getStatsStart() {
         return statsStart;
     }
 
-    public void setStatsStart(Timestamp statsStart) {
+    public void setStatsStart(long statsStart) {
         this.statsStart = statsStart;
     }
 
-    public Timestamp getStatsEnd() {
+    public long getStatsEnd() {
         return statsEnd;
     }
 
-    public void setStatsEnd(Timestamp statsEnd) {
+    public void setStatsEnd(long statsEnd) {
         this.statsEnd = statsEnd;
     }
 

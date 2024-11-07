@@ -1,18 +1,16 @@
 package org.torproject.metrics.onionoo.userstats;
 
-import java.sql.Timestamp;
-
 public class Estimated {
 
-    private Timestamp date;
-    private Node node;
+    private long date;
+    private String node;
     private String country;
     private String transport;
     private String version;
     private int frac;
     private int users;
 
-    public Estimated(Timestamp date, Node node, String country, String transport, String version, int frac, int users) {
+    public Estimated(long date, String node, String country, String transport, String version, int frac, int users) {
         this.date = date;
         this.node = node;
         this.country = country;
@@ -22,19 +20,19 @@ public class Estimated {
         this.users = users;
     }
 
-    public Timestamp getDate() {
+    public long getDate() {
         return date;
     }
 
-    public void setDate(Timestamp date) {
+    public void setDate(long date) {
         this.date = date;
     }
 
-    public Node getNode() {
+    public String getNode() {
         return node;
     }
 
-    public void setNode(Node node) {
+    public void setNode(String node) {
         this.node = node;
     }
 

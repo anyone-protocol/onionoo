@@ -1,10 +1,8 @@
 package org.torproject.metrics.onionoo.userstats;
 
-import java.sql.Timestamp;
-
 public class Aggregated {
-    private Timestamp date;
-    private Node node;
+    private long date;
+    private String node;
     private String country;
     private String transport;
     private String version;
@@ -16,7 +14,18 @@ public class Aggregated {
     private double nh;
     private double nrh;
 
-    public Aggregated(Timestamp date, Node node, String country, String transport, String version, double rrx, double nrx, double hh, double nn, double hrh, double nh, double nrh) {
+    public Aggregated(long date,
+                      String node,
+                      String country,
+                      String transport,
+                      String version,
+                      double rrx,
+                      double nrx,
+                      double hh,
+                      double nn,
+                      double hrh,
+                      double nh,
+                      double nrh) {
         this.date = date;
         this.node = node;
         this.country = country;
@@ -31,19 +40,19 @@ public class Aggregated {
         this.nrh = nrh;
     }
 
-    public Timestamp getDate() {
+    public long getDate() {
         return date;
     }
 
-    public void setDate(Timestamp date) {
+    public void setDate(long date) {
         this.date = date;
     }
 
-    public Node getNode() {
+    public String getNode() {
         return node;
     }
 
-    public void setNode(Node node) {
+    public void setNode(String node) {
         this.node = node;
     }
 
