@@ -3,6 +3,12 @@ job "onionoo-dev" {
   type        = "service"
   namespace   = "ator-network"
 
+  update {
+    max_parallel      = 1
+    healthy_deadline  = "15m"
+    progress_deadline = "20m"
+  }
+
   group "onionoo-dev-group" {
     count = 1
 
@@ -52,6 +58,7 @@ job "onionoo-dev" {
 
       config {
         image   = "ghcr.io/anyone-protocol/onionoo:DEPLOY_TAG"
+        image_pull_timeout = "15m"
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
@@ -89,6 +96,7 @@ job "onionoo-dev" {
 
       config {
         image   = "ghcr.io/anyone-protocol/onionoo:DEPLOY_TAG"
+        image_pull_timeout = "15m"
         ports   = ["http-port"]
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
@@ -141,6 +149,7 @@ job "onionoo-dev" {
 
       config {
         image   = "ghcr.io/anyone-protocol/onionoo-cron:DEPLOY_TAG"
+        image_pull_timeout = "15m"
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
