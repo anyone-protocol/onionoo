@@ -5,8 +5,7 @@ public class Merged implements UserStats {
     private int id;
     private String fingerprint;
     private String nickname;
-    private String node;
-    private String metric;
+    private Metric metric;
     private String country;
     private String transport;
     private String version;
@@ -17,11 +16,10 @@ public class Merged implements UserStats {
     public Merged() {
     }
 
-    public Merged(int id, String fingerprint, String nickname, String node, String metric, String country, String transport, String version, long statsStart, long statsEnd, double val) {
+    public Merged(int id, String fingerprint, String nickname, Metric metric, String country, String transport, String version, long statsStart, long statsEnd, double val) {
         this.id = id;
         this.fingerprint = fingerprint;
         this.nickname = nickname;
-        this.node = node;
         this.metric = metric;
         this.country = country;
         this.transport = transport;
@@ -55,19 +53,11 @@ public class Merged implements UserStats {
         this.nickname = nickname;
     }
 
-    public String getNode() {
-        return node;
-    }
-
-    public void setNode(String node) {
-        this.node = node;
-    }
-
-    public String getMetric() {
+    public Metric getMetric() {
         return metric;
     }
 
-    public void setMetric(String metric) {
+    public void setMetric(Metric metric) {
         this.metric = metric;
     }
 
@@ -125,7 +115,6 @@ public class Merged implements UserStats {
                 "id=" + id +
                 ", fingerprint='" + fingerprint + '\'' +
                 ", nickname='" + nickname + '\'' +
-                ", node=" + node +
                 ", metric=" + metric +
                 ", country='" + country + '\'' +
                 ", transport='" + transport + '\'' +

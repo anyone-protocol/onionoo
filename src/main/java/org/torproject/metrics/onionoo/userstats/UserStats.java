@@ -1,13 +1,10 @@
 package org.torproject.metrics.onionoo.userstats;
 
-import java.sql.Timestamp;
-
 public interface UserStats {
 
     String getFingerprint();
     String getNickname();
-    String getNode();
-    String getMetric();
+    Metric getMetric();
     String getCountry();
     String getTransport();
     String getVersion();

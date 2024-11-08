@@ -6,7 +6,7 @@ import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class NewAggregator {
+public class Aggregator {
 
     public List<Aggregated> aggregate(List<Merged> merged) {
 
@@ -20,7 +20,7 @@ public class NewAggregator {
         List<Aggregated> aggregatedList = new ArrayList<>();
 
         Collection<Aggregated> first = updateTemp.values().stream()
-                .filter(ut -> "responses".equals(ut.getMetric()))
+                .filter(ut -> ut.getMetric() == Metric.RESPONSES)
                 .collect(
                         Collectors.groupingBy(UpdateTemp::key,
                                 Collectors.collectingAndThen(Collectors.toList(), this::aggregateToAggregated)
@@ -34,7 +34,7 @@ public class NewAggregator {
                 .collect(Collectors.toList());
 
         Map<LocalDate, Aggregated> collect = noDimension.stream()
-                .filter(nd -> "bytes".equals(nd.getMetric()))
+                .filter(nd -> nd.getMetric() == Metric.BYTES)
                 .collect(Collectors.groupingBy(
                                 UpdateTemp::getDate,
                                 Collectors.collectingAndThen(Collectors.toList(), this::aggregateToBytes)
@@ -50,7 +50,7 @@ public class NewAggregator {
         });
 
         Map<LocalDate, Double> status = noDimension.stream()
-                .filter(nd -> "status".equals(nd.getMetric()))
+                .filter(nd -> nd.getMetric() == Metric.STATUS)
                 .collect(Collectors.groupingBy(UpdateTemp::getDate, Collectors.summingDouble(UpdateTemp::getSeconds)));
 
         aggregatedList.forEach(a -> {
@@ -92,7 +92,7 @@ public class NewAggregator {
     }
 
     private String groupKey(Merged m) {
-        return m.getFingerprint() + "-" + m.getNickname() + "-" + m.getNode() + "-" + m.getMetric() + "-"
+        return m.getFingerprint() + "-" + m.getNickname() + "-" + m.getMetric() + "-"
                 + m.getCountry() + "-" + m.getTransport() + "-" + m.getVersion() + "-" + epochToLocalDate(m.getStatsStart());
     }
 
@@ -112,7 +112,7 @@ public class NewAggregator {
         long totalSeconds = list.stream().mapToLong(m -> (m.getStatsEnd() - m.getStatsStart()) / 1000).sum();
         double totalVal = list.stream().mapToDouble(Merged::getVal).sum();
 
-        return new UpdateTemp(first.getFingerprint(), first.getNickname(), first.getNode(), first.getMetric(),
+        return new UpdateTemp(first.getFingerprint(), first.getNickname(), first.getMetric(),
                 first.getCountry(), first.getTransport(), first.getVersion(),
                 epochToLocalDate(first.getStatsStart()), totalVal, totalSeconds);
     }
@@ -122,7 +122,7 @@ public class NewAggregator {
         double rrx = list.stream().mapToDouble(UpdateTemp::getVal).sum();
         long nrx = list.stream().mapToLong(UpdateTemp::getSeconds).sum();
 
-        return new Aggregated(first.getDate(), first.getNode(), first.getCountry(), first.getTransport(),
+        return new Aggregated(first.getDate(), first.getCountry(), first.getTransport(),
                 first.getVersion(), rrx, nrx, 0, 0, 0, 0, 0);
     }
 
@@ -131,14 +131,14 @@ public class NewAggregator {
         double hh = list.stream().mapToDouble(UpdateTemp::getVal).sum();
         long nh = list.stream().mapToLong(UpdateTemp::getSeconds).sum();
 
-        return new Aggregated(first.getDate(), first.getNode(), first.getCountry(), first.getTransport(),
+        return new Aggregated(first.getDate(), first.getCountry(), first.getTransport(),
                 first.getVersion(), 0, 0, hh, 0, 0, nh, 0);
     }
 
     private Aggregated filterBoth(List<UpdateTemp> list) {
         UpdateTemp ut = list.get(0);
-        Optional<UpdateTemp> bytes = list.stream().filter(it -> "bytes".equals(it.getMetric()) && it.getSeconds() > 0).findFirst();
-        Optional<UpdateTemp> responses = list.stream().filter(it -> "responses".equals(it.getMetric())).findFirst();
+        Optional<UpdateTemp> bytes = list.stream().filter(it -> it.getMetric() == Metric.BYTES && it.getSeconds() > 0).findFirst();
+        Optional<UpdateTemp> responses = list.stream().filter(it -> it.getMetric() == Metric.RESPONSES).findFirst();
 
         if (bytes.isPresent() && responses.isPresent()) {
             UpdateTemp b = bytes.get();
@@ -146,7 +146,7 @@ public class NewAggregator {
 
             double hrh = (Math.min(b.getSeconds(), r.getSeconds()) * b.getVal()) / b.getSeconds();
 
-            return new Aggregated(ut.getDate(), ut.getNode(), ut.getCountry(), ut.getTransport(), ut.getVersion(),
+            return new Aggregated(ut.getDate(), ut.getCountry(), ut.getTransport(), ut.getVersion(),
             0, 0, 0, 0, hrh, 0, 0);
         } else {
             return null;
@@ -155,9 +155,8 @@ public class NewAggregator {
     }
 
     private Aggregated filterBothLeft(List<UpdateTemp> list) {
-        UpdateTemp ut = list.get(0);
-        Optional<UpdateTemp> bytes = list.stream().filter(it -> "bytes".equals(it.getMetric())).findFirst();
-        Optional<UpdateTemp> responses = list.stream().filter(it -> "responses".equals(it.getMetric())).findFirst();
+        Optional<UpdateTemp> bytes = list.stream().filter(it -> it.getMetric() == Metric.BYTES).findFirst();
+        Optional<UpdateTemp> responses = list.stream().filter(it -> it.getMetric() == Metric.RESPONSES).findFirst();
 
         if (responses.isPresent() && bytes.isPresent() && bytes.get().getSeconds() > 0) {
             return null;
@@ -166,7 +165,7 @@ public class NewAggregator {
                 UpdateTemp r = responses.get();
                 long bytesSeconds = 0;
                 double nrh = Math.max(0, r.getSeconds() - bytesSeconds);
-                return new Aggregated(r.getDate(), r.getNode(), r.getCountry(), r.getTransport(), r.getVersion(),
+                return new Aggregated(r.getDate(), r.getCountry(), r.getTransport(), r.getVersion(),
                         0, 0, 0, 0, 0, 0, nrh);
             } else {
                 return null;

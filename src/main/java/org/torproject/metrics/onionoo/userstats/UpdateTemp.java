@@ -5,8 +5,7 @@ import java.time.LocalDate;
 public class UpdateTemp {
     private String fingerprint;
     private String nickname;
-    private String node;
-    private String metric;
+    private Metric metric;
     private String country;
     private String transport;
     private String version;
@@ -14,11 +13,10 @@ public class UpdateTemp {
     private double val;
     private long seconds;
 
-    public UpdateTemp(String fingerprint, String nickname, String node, String metric, String country,
+    public UpdateTemp(String fingerprint, String nickname, Metric metric, String country,
                       String transport, String version, LocalDate date, double val, long seconds) {
         this.fingerprint = fingerprint;
         this.nickname = nickname;
-        this.node = node;
         this.metric = metric;
         this.country = country;
         this.transport = transport;
@@ -44,19 +42,11 @@ public class UpdateTemp {
         this.nickname = nickname;
     }
 
-    public String getNode() {
-        return node;
-    }
-
-    public void setNode(String node) {
-        this.node = node;
-    }
-
-    public String getMetric() {
+    public Metric getMetric() {
         return metric;
     }
 
-    public void setMetric(String metric) {
+    public void setMetric(Metric metric) {
         this.metric = metric;
     }
 
@@ -109,14 +99,14 @@ public class UpdateTemp {
     }
 
     public String getGroupKey() {
-        return fingerprint + "-" + nickname + "-" + node + "-" + metric + "-" + country + "-" + transport + "-" + version + "-" + date;
+        return fingerprint + "-" + nickname + "-" + metric + "-" + country + "-" + transport + "-" + version + "-" + date;
     }
 
     public String key() {
-        return date + "-" + node + "-" + country + "-" + transport + "-" + version;
+        return date + "-" + country + "-" + transport + "-" + version;
     }
 
     public String anotherKey() {
-        return date + "-" + fingerprint + "-" + nickname + "-" + node;
+        return date + "-" + fingerprint + "-" + nickname;
     }
 }

@@ -5,16 +5,14 @@ import java.time.LocalDate;
 public class Estimated {
 
     private LocalDate date;
-    private String node;
     private String country;
     private String transport;
     private String version;
     private int frac;
     private int users;
 
-    public Estimated(LocalDate date, String node, String country, String transport, String version, int frac, int users) {
+    public Estimated(LocalDate date, String country, String transport, String version, int frac, int users) {
         this.date = date;
-        this.node = node;
         this.country = country;
         this.transport = transport;
         this.version = version;
@@ -28,14 +26,6 @@ public class Estimated {
 
     public void setDate(LocalDate date) {
         this.date = date;
-    }
-
-    public String getNode() {
-        return node;
-    }
-
-    public void setNode(String node) {
-        this.node = node;
     }
 
     public String getCountry() {

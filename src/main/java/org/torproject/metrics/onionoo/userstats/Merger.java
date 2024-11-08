@@ -12,8 +12,7 @@ public class Merger {
         // Step 1: Group by unique fields (fingerprint, nickname, node, metric, country, transport, version)
         Map<String, List<Imported>> groupedImported = importedList.stream().collect(Collectors.groupingBy(
                 imported -> String.join("-", imported.getFingerprint(), imported.getNickname(),
-                        imported.getNode(), imported.getMetric(),
-                        imported.getCountry(), imported.getTransport(), imported.getVersion())
+                        imported.getMetric().name(), imported.getCountry(), imported.getTransport(), imported.getVersion())
         ));
 
         // Step 2: Process each group independently
@@ -29,8 +28,7 @@ public class Merger {
             // Use first entry to initialize shared fields for Merged
             String fingerprint = group.get(0).getFingerprint();
             String nickname = group.get(0).getNickname();
-            String node = group.get(0).getNode();
-            String metric = group.get(0).getMetric();
+            Metric metric = group.get(0).getMetric();
             String country = group.get(0).getCountry();
             String transport = group.get(0).getTransport();
             String version = group.get(0).getVersion();
@@ -45,7 +43,7 @@ public class Merger {
                     lastVal += current.getVal();
                 } else {
                     // No overlap, add the previous merged interval to mergedList
-                    mergedList.add(new Merged(idCounter++, fingerprint, nickname, node, metric, country,
+                    mergedList.add(new Merged(idCounter++, fingerprint, nickname, metric, country,
                             transport, version, lastStartTime, lastEndTime, lastVal));
 
                     // Start a new interval
@@ -56,7 +54,7 @@ public class Merger {
             }
 
             // Add the last merged interval of the group to mergedList
-            mergedList.add(new Merged(idCounter++, fingerprint, nickname, node, metric, country,
+            mergedList.add(new Merged(idCounter++, fingerprint, nickname, metric, country,
                     transport, version, lastStartTime, lastEndTime, lastVal));
         }
 

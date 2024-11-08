@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 public class Aggregated {
     private LocalDate date;
-    private String node;
     private String country;
     private String transport;
     private String version;
@@ -17,7 +16,6 @@ public class Aggregated {
     private double nrh;
 
     public Aggregated(LocalDate date,
-                      String node,
                       String country,
                       String transport,
                       String version,
@@ -29,7 +27,6 @@ public class Aggregated {
                       double nh,
                       double nrh) {
         this.date = date;
-        this.node = node;
         this.country = country;
         this.transport = transport;
         this.version = version;
@@ -48,14 +45,6 @@ public class Aggregated {
 
     public void setDate(LocalDate date) {
         this.date = date;
-    }
-
-    public String getNode() {
-        return node;
-    }
-
-    public void setNode(String node) {
-        this.node = node;
     }
 
     public String getCountry() {
@@ -142,7 +131,6 @@ public class Aggregated {
     public String toString() {
         return "Aggregated{" +
                 "date=" + date +
-                ", node=" + node +
                 ", country='" + country + '\'' +
                 ", transport='" + transport + '\'' +
                 ", version='" + version + '\'' +

@@ -1,6 +1,5 @@
 package org.torproject.metrics.onionoo.updater;
 
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.torproject.descriptor.*;
@@ -10,7 +9,6 @@ import org.torproject.metrics.onionoo.docs.UserStatsStatus;
 import org.torproject.metrics.onionoo.userstats.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater {
 
@@ -25,7 +23,7 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
 
     private List<Imported> imported = new ArrayList<>();
 
-    private NewAggregator newAggregator = new NewAggregator();
+    private Aggregator newAggregator = new Aggregator();
 
     public UserStatsStatusUpdater() {
         this.descriptorSource = DescriptorSourceFactory.getDescriptorSource();
@@ -106,7 +104,7 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
                 } else if (i == 1) {
                     break;
                 }
-                insertIntoImported(fingerprint, nickname, "relay", "bytes", null,
+                insertIntoImported(fingerprint, nickname, Metric.BYTES, null,
                         null, null, fromMillis, toMillis, writtenBytes);
             }
         }
@@ -162,10 +160,10 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
                 for (Map.Entry<String, Double> e : requestsCopy.entrySet()) {
                     String country = e.getKey();
                     double val = resp * intervalFraction * e.getValue() / total;
-                    insertIntoImported(fingerprint, nickname, "relay",
-                            "responses", country, null, null, fromMillis, toMillis, val);
+                    insertIntoImported(fingerprint, nickname,
+                            Metric.RESPONSES, country, null, null, fromMillis, toMillis, val);
                 }
-                insertIntoImported(fingerprint, nickname, "relay", "responses",
+                insertIntoImported(fingerprint, nickname, Metric.RESPONSES,
                         null, null, null, fromMillis, toMillis, resp * intervalFraction);
             }
         }
@@ -180,14 +178,14 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
                     .toUpperCase();
             String nickname = statusEntry.getNickname();
             if (statusEntry.getFlags().contains("Running")) {
-                insertIntoImported(fingerprint, nickname, "relay", "status",
+                insertIntoImported(fingerprint, nickname,Metric.STATUS,
                         null, null, null, fromMillis, toMillis, 0.0);
             }
         }
     }
 
-    void insertIntoImported(String fingerprint, String nickname, String node,
-                            String metric, String country, String transport, String version,
+    void insertIntoImported(String fingerprint, String nickname,
+                            Metric metric, String country, String transport, String version,
                             long fromMillis, long toMillis, double val) {
         if (fromMillis > toMillis) {
             return;
@@ -195,7 +193,6 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
         imported.add(new Imported(
                 fingerprint,
                 nickname,
-                node,
                 metric,
                 country,
                 transport,
