@@ -313,6 +313,7 @@ public class DocumentStore {
         || document instanceof WeightsDocument
         || document instanceof ClientsDocument
         || document instanceof OnionperfStatus
+        || document instanceof UserStatsStatus
         || document instanceof UptimeDocument) {
       try {
         documentString = objectMapper.writeValueAsString(document);
@@ -643,6 +644,7 @@ public class DocumentStore {
     File documentFile = null;
     if (fingerprint == null && !documentType.equals(UpdateStatus.class)
         && !documentType.equals(OnionperfStatus.class)
+        && !documentType.equals(UserStatsStatus.class)
         && !documentType.equals(CircuitDocument.class)
         && !documentType.equals(DownloadDocument.class)
         && !documentType.equals(FailureDocument.class)
@@ -688,6 +690,9 @@ public class DocumentStore {
     } else if (documentType.equals(OnionperfStatus.class)) {
       directory = this.statusDir;
       fileName = "performance";
+    } else if (documentType.equals(UserStatsStatus.class)) {
+      directory = this.statusDir;
+      fileName = "userstats";
     } else if (documentType.equals(UpdateStatus.class)) {
       directory = this.outDir;
       fileName = "update";
