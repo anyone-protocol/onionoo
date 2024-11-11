@@ -7,20 +7,16 @@ public class UpdateTemp {
     private String nickname;
     private Metric metric;
     private String country;
-    private String transport;
-    private String version;
     private LocalDate date;
     private double val;
-    private long seconds;
+    private double seconds;
 
     public UpdateTemp(String fingerprint, String nickname, Metric metric, String country,
-                      String transport, String version, LocalDate date, double val, long seconds) {
+                      LocalDate date, double val, double seconds) {
         this.fingerprint = fingerprint;
         this.nickname = nickname;
         this.metric = metric;
         this.country = country;
-        this.transport = transport;
-        this.version = version;
         this.date = date;
         this.val = val;
         this.seconds = seconds;
@@ -58,22 +54,6 @@ public class UpdateTemp {
         this.country = country;
     }
 
-    public String getTransport() {
-        return transport;
-    }
-
-    public void setTransport(String transport) {
-        this.transport = transport;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
     public LocalDate getDate() {
         return date;
     }
@@ -90,20 +70,20 @@ public class UpdateTemp {
         this.val = val;
     }
 
-    public long getSeconds() {
+    public double getSeconds() {
         return seconds;
     }
 
-    public void setSeconds(long seconds) {
+    public void setSeconds(double seconds) {
         this.seconds = seconds;
     }
 
     public String getGroupKey() {
-        return fingerprint + "-" + nickname + "-" + metric + "-" + country + "-" + transport + "-" + version + "-" + date;
+        return fingerprint + "-" + nickname + "-" + metric + "-" + country + "-" + date;
     }
 
     public String key() {
-        return date + "-" + country + "-" + transport + "-" + version;
+        return date + "-" + country;
     }
 
     public String anotherKey() {

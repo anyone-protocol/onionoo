@@ -5,8 +5,6 @@ import java.time.LocalDate;
 public class Aggregated {
     private LocalDate date;
     private String country;
-    private String transport;
-    private String version;
     private double rrx;
     private double nrx;
     private double hh;
@@ -17,8 +15,6 @@ public class Aggregated {
 
     public Aggregated(LocalDate date,
                       String country,
-                      String transport,
-                      String version,
                       double rrx,
                       double nrx,
                       double hh,
@@ -28,8 +24,6 @@ public class Aggregated {
                       double nrh) {
         this.date = date;
         this.country = country;
-        this.transport = transport;
-        this.version = version;
         this.rrx = rrx;
         this.nrx = nrx;
         this.hh = hh;
@@ -53,22 +47,6 @@ public class Aggregated {
 
     public void setCountry(String country) {
         this.country = country;
-    }
-
-    public String getTransport() {
-        return transport;
-    }
-
-    public void setTransport(String transport) {
-        this.transport = transport;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
     }
 
     public double getRrx() {
@@ -132,8 +110,6 @@ public class Aggregated {
         return "Aggregated{" +
                 "date=" + date +
                 ", country='" + country + '\'' +
-                ", transport='" + transport + '\'' +
-                ", version='" + version + '\'' +
                 ", rrx=" + rrx +
                 ", nrx=" + nrx +
                 ", hh=" + hh +

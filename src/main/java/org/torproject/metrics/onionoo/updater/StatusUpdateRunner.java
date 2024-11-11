@@ -24,15 +24,17 @@ public class StatusUpdateRunner {
   public StatusUpdateRunner() {
     this.ls = new LookupService(new File("geoip"));
     this.rdnr = new ReverseDomainNameResolver();
-    NodeDetailsStatusUpdater ndsu = new NodeDetailsStatusUpdater(
-        this.rdnr, this.ls);
-    BandwidthStatusUpdater bsu = new BandwidthStatusUpdater();
-    WeightsStatusUpdater wsu = new WeightsStatusUpdater();
-    ClientsStatusUpdater csu = new ClientsStatusUpdater();
-    UptimeStatusUpdater usu = new UptimeStatusUpdater();
-    OnionperfStatusUpdater opsu = new OnionperfStatusUpdater();
+//    NodeDetailsStatusUpdater ndsu = new NodeDetailsStatusUpdater(
+//        this.rdnr, this.ls);
+//    BandwidthStatusUpdater bsu = new BandwidthStatusUpdater();
+//    WeightsStatusUpdater wsu = new WeightsStatusUpdater();
+//    ClientsStatusUpdater csu = new ClientsStatusUpdater();
+//    UptimeStatusUpdater usu = new UptimeStatusUpdater();
+//    OnionperfStatusUpdater opsu = new OnionperfStatusUpdater();
     UserStatsStatusUpdater ussu = new UserStatsStatusUpdater();
-    this.statusUpdaters = new StatusUpdater[] { ndsu, bsu, wsu, csu, usu, opsu, ussu };
+    this.statusUpdaters = new StatusUpdater[] {
+//            ndsu, bsu, wsu, csu, usu, opsu,
+            ussu };
   }
 
   /** Lets each configured status updater update its status files. */
@@ -53,7 +55,7 @@ public class StatusUpdateRunner {
       }
     }
     logger.info("GeoIP lookup service\n{}", this.ls.getStatsString());
-    logger.info("Reverse domain name resolver\n{}", this.rdnr.getStatsString());
+//    logger.info("Reverse domain name resolver\n{}", this.rdnr.getStatsString());
   }
 }
 

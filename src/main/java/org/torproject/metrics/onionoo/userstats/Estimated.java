@@ -6,16 +6,12 @@ public class Estimated {
 
     private LocalDate date;
     private String country;
-    private String transport;
-    private String version;
     private int frac;
     private int users;
 
-    public Estimated(LocalDate date, String country, String transport, String version, int frac, int users) {
+    public Estimated(LocalDate date, String country, int frac, int users) {
         this.date = date;
         this.country = country;
-        this.transport = transport;
-        this.version = version;
         this.frac = frac;
         this.users = users;
     }
@@ -34,22 +30,6 @@ public class Estimated {
 
     public void setCountry(String country) {
         this.country = country;
-    }
-
-    public String getTransport() {
-        return transport;
-    }
-
-    public void setTransport(String transport) {
-        this.transport = transport;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
     }
 
     public int getFrac() {

@@ -12,12 +12,12 @@ public class DataProcessor {
         List<Estimated> estimatedList = new ArrayList<>();
 
         for (Aggregated agg : aggregatedList) {
-//            if (agg.getHh() > 0 && agg.getNn() > 0) {
+            if (agg.getHh() > 0 && agg.getNn() > 0) {
                 // Calculate the fraction for estimation
                 double frac = (agg.getHrh() * agg.getNh() + agg.getHh() * agg.getNrh()) / (agg.getHh() * agg.getNn());
 
                 // Only include entries where frac is between 0.1 and 1.1
-//                if (frac >= 0.1 && frac <= 1.1) {
+                if (frac >= 0.1 && frac <= 1.1) {
                     // Round fraction to an integer percent
                     int fracPercent = (int) Math.round(frac * 100);
 
@@ -29,22 +29,18 @@ public class DataProcessor {
                         Estimated estimated = new Estimated(
                                 agg.getDate(),
                                 agg.getCountry(),
-                                agg.getTransport(),
-                                agg.getVersion(),
                                 fracPercent,
                                 users
                         );
                         estimatedList.add(estimated);
 //                    }
-//                }
-//            }
+                }
+            }
         }
 
-        // Sort results by date, node, version, transport, and country (similar to SQL ORDER BY clause)
+        // Sort results by date, node and country (similar to SQL ORDER BY clause)
         estimatedList.sort(Comparator.comparing(Estimated::getDate)
-                .thenComparing(Estimated::getVersion)
-                .thenComparing(Estimated::getTransport)
-                .thenComparing(Estimated::getCountry));
+                .thenComparing(Estimated::getCountry, Comparator.nullsLast(Comparator.naturalOrder())));
 
         return estimatedList;
     }

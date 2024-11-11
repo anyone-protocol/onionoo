@@ -6,8 +6,6 @@ public class Imported implements UserStats {
     private String nickname;
     private Metric metric;
     private String country;
-    private String transport;
-    private String version;
     private long statsStart;
     private long statsEnd;
     private double val;
@@ -15,13 +13,17 @@ public class Imported implements UserStats {
     public Imported() {
     }
 
-    public Imported(String fingerprint, String nickname, Metric metric, String country, String transport, String version, long statsStart, long statsEnd, double val) {
+    public Imported(String fingerprint,
+                    String nickname,
+                    Metric metric,
+                    String country,
+                    long statsStart,
+                    long statsEnd,
+                    double val) {
         this.fingerprint = fingerprint;
         this.nickname = nickname;
         this.metric = metric;
         this.country = country;
-        this.transport = transport;
-        this.version = version;
         this.statsStart = statsStart;
         this.statsEnd = statsEnd;
         this.val = val;
@@ -59,22 +61,6 @@ public class Imported implements UserStats {
         this.country = country;
     }
 
-    public String getTransport() {
-        return transport;
-    }
-
-    public void setTransport(String transport) {
-        this.transport = transport;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
     public long getStatsStart() {
         return statsStart;
     }
@@ -106,8 +92,6 @@ public class Imported implements UserStats {
                 ", nickname='" + nickname + '\'' +
                 ", metric=" + metric +
                 ", country='" + country + '\'' +
-                ", transport='" + transport + '\'' +
-                ", version='" + version + '\'' +
                 ", statsStart=" + statsStart +
                 ", statsEnd=" + statsEnd +
                 ", val=" + val +

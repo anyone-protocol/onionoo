@@ -18,12 +18,12 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
     private static final long ONE_DAY_MILLIS = 24L * ONE_HOUR_MILLIS;
     private static final long ONE_WEEK_MILLIS = 7L * ONE_DAY_MILLIS;
 
-    private DescriptorSource descriptorSource;
-    private DocumentStore documentStore;
+    private final DescriptorSource descriptorSource;
+    private final DocumentStore documentStore;
 
-    private List<Imported> imported = new ArrayList<>();
+    private final Aggregator newAggregator = new Aggregator();
 
-    private Aggregator newAggregator = new Aggregator();
+    private final List<Imported> imported = new ArrayList<>();
 
     public UserStatsStatusUpdater() {
         this.descriptorSource = DescriptorSourceFactory.getDescriptorSource();
@@ -43,27 +43,19 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
         } else if (descriptor instanceof RelayNetworkStatusConsensus) {
             parseRelayNetworkStatusConsensus((RelayNetworkStatusConsensus) descriptor);
         }
-
-
     }
 
     private void parseRelayExtraInfoDescriptor(ExtraInfoDescriptor descriptor) {
         long publishedMillis = descriptor.getPublishedMillis();
-        String fingerprint = descriptor.getFingerprint()
-                .toUpperCase();
+        String fingerprint = descriptor.getFingerprint().toUpperCase();
         String nickname = descriptor.getNickname();
         long dirreqStatsEndMillis = descriptor.getDirreqStatsEndMillis();
-        long dirreqStatsIntervalLengthMillis =
-                descriptor.getDirreqStatsIntervalLength() * 1000L;
+        long dirreqStatsIntervalLengthMillis = descriptor.getDirreqStatsIntervalLength() * 1000L;
         SortedMap<String, Integer> responses = descriptor.getDirreqV3Resp();
         SortedMap<String, Integer> requests = descriptor.getDirreqV3Reqs();
-        BandwidthHistory dirreqWriteHistory =
-                descriptor.getDirreqWriteHistory();
-        parseRelayDirreqV3Resp(fingerprint, nickname, publishedMillis,
-                dirreqStatsEndMillis, dirreqStatsIntervalLengthMillis, responses,
-                requests);
-        parseRelayDirreqWriteHistory(fingerprint, nickname, publishedMillis,
-                dirreqWriteHistory);
+        BandwidthHistory dirreqWriteHistory = descriptor.getDirreqWriteHistory();
+        parseRelayDirreqV3Resp(fingerprint, nickname, publishedMillis, dirreqStatsEndMillis, dirreqStatsIntervalLengthMillis, responses, requests);
+        parseRelayDirreqWriteHistory(fingerprint, nickname, publishedMillis, dirreqWriteHistory);
     }
 
     private void parseRelayDirreqWriteHistory(String fingerprint,
@@ -104,8 +96,7 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
                 } else if (i == 1) {
                     break;
                 }
-                insertIntoImported(fingerprint, nickname, Metric.BYTES, null,
-                        null, null, fromMillis, toMillis, writtenBytes);
+                insertIntoImported(fingerprint, nickname, Metric.BYTES, null, fromMillis, toMillis, writtenBytes);
             }
         }
     }
@@ -161,10 +152,10 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
                     String country = e.getKey();
                     double val = resp * intervalFraction * e.getValue() / total;
                     insertIntoImported(fingerprint, nickname,
-                            Metric.RESPONSES, country, null, null, fromMillis, toMillis, val);
+                            Metric.RESPONSES, country, fromMillis, toMillis, val);
                 }
                 insertIntoImported(fingerprint, nickname, Metric.RESPONSES,
-                        null, null, null, fromMillis, toMillis, resp * intervalFraction);
+                        null, fromMillis, toMillis, resp * intervalFraction);
             }
         }
     }
@@ -178,14 +169,14 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
                     .toUpperCase();
             String nickname = statusEntry.getNickname();
             if (statusEntry.getFlags().contains("Running")) {
-                insertIntoImported(fingerprint, nickname,Metric.STATUS,
-                        null, null, null, fromMillis, toMillis, 0.0);
+                insertIntoImported(fingerprint, nickname, Metric.STATUS,
+                        null, fromMillis, toMillis, 0.0);
             }
         }
     }
 
     void insertIntoImported(String fingerprint, String nickname,
-                            Metric metric, String country, String transport, String version,
+                            Metric metric, String country,
                             long fromMillis, long toMillis, double val) {
         if (fromMillis > toMillis) {
             return;
@@ -195,8 +186,6 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
                 nickname,
                 metric,
                 country,
-                transport,
-                version,
                 fromMillis,
                 toMillis,
                 Math.round(val * 10.0) / 10.0
@@ -206,12 +195,10 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
     @Override
     public void updateStatuses() {
         logger.error("Imported size: {}", imported.size());
-//        List<Merged> merge = DataProcessor.merge(imported);
-        List<Merged> merge1 = Merger.mergeFirstTime(imported);
-//        logger.error("Merged size: {}", merge.size());
-        logger.error("Merged size1: {}", merge1.size());
+        List<Merged> merge = Merger.mergeFirstTime(imported);
+        logger.error("Merged size: {}", merge.size());
 //        List<Aggregated> aggregated = DataProcessor.aggregate(merge);
-        List<Aggregated> aggregate = newAggregator.aggregate(merge1);
+        List<Aggregated> aggregate = newAggregator.aggregate(merge);
 //        logger.error("Aggregated size: {}", aggregated.size());
         logger.error("Aggregated1 size: {}", aggregate.size());
 //        logger.error("Aggregated: {}", aggregated);
