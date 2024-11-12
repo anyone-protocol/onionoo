@@ -29,8 +29,9 @@ public class BandwidthStatusUpdater implements DescriptorListener,
   private void registerDescriptorListeners() {
     this.descriptorSource.registerDescriptorListener(this,
         DescriptorType.RELAY_EXTRA_INFOS);
-    this.descriptorSource.registerDescriptorListener(this,
-        DescriptorType.BRIDGE_EXTRA_INFOS);
+    // disable useless modules
+//    this.descriptorSource.registerDescriptorListener(this,
+//        DescriptorType.BRIDGE_EXTRA_INFOS);
   }
 
   @Override

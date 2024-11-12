@@ -40,8 +40,9 @@ public class UptimeStatusUpdater implements DescriptorListener,
   private void registerDescriptorListeners() {
     this.descriptorSource.registerDescriptorListener(this,
         DescriptorType.RELAY_CONSENSUSES);
-    this.descriptorSource.registerDescriptorListener(this,
-        DescriptorType.BRIDGE_STATUSES);
+    // disable useless modules
+//    this.descriptorSource.registerDescriptorListener(this,
+//        DescriptorType.BRIDGE_STATUSES);
   }
 
   @Override

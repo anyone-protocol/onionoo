@@ -121,18 +121,19 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
         DescriptorType.RELAY_CONSENSUSES);
     this.descriptorSource.registerDescriptorListener(this,
         DescriptorType.RELAY_SERVER_DESCRIPTORS);
-    this.descriptorSource.registerDescriptorListener(this,
-        DescriptorType.BRIDGE_STATUSES);
-    this.descriptorSource.registerDescriptorListener(this,
-        DescriptorType.BRIDGE_SERVER_DESCRIPTORS);
-    this.descriptorSource.registerDescriptorListener(this,
-        DescriptorType.BRIDGE_EXTRA_INFOS);
-    this.descriptorSource.registerDescriptorListener(this,
-        DescriptorType.EXIT_LISTS);
-    this.descriptorSource.registerDescriptorListener(this,
-        DescriptorType.BRIDGE_POOL_ASSIGNMENTS);
-    this.descriptorSource.registerDescriptorListener(this,
-        DescriptorType.BRIDGESTRAP);
+    // disable useless modules
+//    this.descriptorSource.registerDescriptorListener(this,
+//        DescriptorType.BRIDGE_STATUSES);
+//    this.descriptorSource.registerDescriptorListener(this,
+//        DescriptorType.BRIDGE_SERVER_DESCRIPTORS);
+//    this.descriptorSource.registerDescriptorListener(this,
+//        DescriptorType.BRIDGE_EXTRA_INFOS);
+//    this.descriptorSource.registerDescriptorListener(this,
+//        DescriptorType.EXIT_LISTS);
+//    this.descriptorSource.registerDescriptorListener(this,
+//        DescriptorType.BRIDGE_POOL_ASSIGNMENTS);
+//    this.descriptorSource.registerDescriptorListener(this,
+//        DescriptorType.BRIDGESTRAP);
   }
 
   /* Step 1: parse descriptors. */
