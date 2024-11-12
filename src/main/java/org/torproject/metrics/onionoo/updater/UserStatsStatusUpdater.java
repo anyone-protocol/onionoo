@@ -194,18 +194,14 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
 
     @Override
     public void updateStatuses() {
-        logger.error("Imported size: {}", imported.size());
+        logger.warn("Imported size: {}", imported.size());
         List<Merged> merge = Merger.mergeFirstTime(imported);
-        logger.error("Merged size: {}", merge.size());
-//        List<Aggregated> aggregated = DataProcessor.aggregate(merge);
+        logger.warn("Merged size: {}", merge.size());
         List<Aggregated> aggregate = newAggregator.aggregate(merge);
-//        logger.error("Aggregated size: {}", aggregated.size());
-        logger.error("Aggregated1 size: {}", aggregate.size());
-//        logger.error("Aggregated: {}", aggregated);
-        logger.error("Aggregated1: {}", aggregate);
+        logger.warn("Aggregated size: {}", aggregate.size());
         List<Estimated> estimated = DataProcessor.estimate(aggregate);
-        logger.error("Estimated size: {}", estimated.size());
-        logger.error("Estimated: {}", estimated);
+        logger.warn("Estimated size: {}", estimated.size());
+        logger.warn("Estimated: {}", estimated);
         this.documentStore.store(new UserStatsStatus(estimated));
         imported.clear();
         logger.info("Updated user stats");
