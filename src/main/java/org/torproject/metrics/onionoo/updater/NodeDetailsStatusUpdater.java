@@ -149,8 +149,8 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
     } else if (descriptor instanceof ServerDescriptor && !relay) {
       this.processBridgeServerDescriptor((ServerDescriptor) descriptor);
     } else if (descriptor instanceof ExtraInfoDescriptor && !relay) {
-      this.processBridgeExtraInfoDescriptor(
-          (ExtraInfoDescriptor) descriptor);
+        this.processBridgeExtraInfoDescriptor(
+                (ExtraInfoDescriptor) descriptor);
     } else if (descriptor instanceof BridgeNetworkStatus) {
       this.processBridgeNetworkStatus((BridgeNetworkStatus) descriptor);
     } else if (descriptor instanceof BridgePoolAssignment) {
@@ -1059,10 +1059,10 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
         detailsStatus.setVersionStatus(nodeStatus.getVersionStatus()
             .toString());
       }
-
       this.documentStore.store(detailsStatus, fingerprint);
       this.documentStore.store(nodeStatus, fingerprint);
     }
+
   }
 
   @Override
