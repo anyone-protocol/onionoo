@@ -28,11 +28,15 @@ public class StatusUpdateRunner {
         this.rdnr, this.ls);
     BandwidthStatusUpdater bsu = new BandwidthStatusUpdater();
     WeightsStatusUpdater wsu = new WeightsStatusUpdater();
-    ClientsStatusUpdater csu = new ClientsStatusUpdater();
     UptimeStatusUpdater usu = new UptimeStatusUpdater();
     OnionperfStatusUpdater opsu = new OnionperfStatusUpdater();
-    UserStatsStatusUpdater ussu = new UserStatsStatusUpdater();
-    this.statusUpdaters = new StatusUpdater[] { ndsu, bsu, wsu, csu, usu, opsu, ussu };
+    // disable useless modules
+//    ClientsStatusUpdater csu = new ClientsStatusUpdater();
+//    UserStatsStatusUpdater ussu = new UserStatsStatusUpdater();
+    this.statusUpdaters = new StatusUpdater[] {
+            ndsu, bsu, wsu, usu, opsu
+//          , csu, ussu
+    };
   }
 
   /** Lets each configured status updater update its status files. */
