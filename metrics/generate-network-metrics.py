@@ -108,6 +108,48 @@ def filter_latest_date(data):
     filtered_data = [row for row in data if row['date'] == latest_date]
     return filtered_data
 
+def parse_estimated_users_count(json_file_path):
+    # Check if the file exists
+    if not os.path.exists(json_file_path):
+        return None
+
+    # Read and parse the JSON file
+    with open(json_file_path, 'r') as file:
+        data = json.load(file)
+
+    # Extract the "estimated" section
+    estimated_data = data.get("estimated", [])
+    if not estimated_data:
+        return None
+
+    # Find the latest date across all records
+    latest_date = None
+    for record in estimated_data:
+        date_info = record["date"]
+        current_date = datetime(
+            year=date_info["year"],
+            month=date_info["monthValue"],
+            day=date_info["dayOfMonth"]
+        )
+        if latest_date is None or current_date > latest_date:
+            latest_date = current_date
+
+    # Filter records that match the latest date
+    metrics = {}
+    for record in estimated_data:
+        date_info = record["date"]
+        current_date = datetime(
+            year=date_info["year"],
+            month=date_info["monthValue"],
+            day=date_info["dayOfMonth"]
+        )
+        if current_date == latest_date:
+            country = record["country"]
+            users = record["users"]
+            metrics[country] = users
+
+    return metrics
+
 def throughput_generate_prometheus_metrics(data, registry):
     op_throughput_mbps = Gauge("op_throughput_mbps", "OnionPerf throughput Mbps", ['source', 'server', 'percentile'], registry=registry)
 
@@ -165,8 +207,15 @@ def circuit_generate_prometheus_metrics(data, registry):
             value = row[percentile]
             op_circuit_millis.labels(source=source, position=position, percentile=percentile).set(value)
 
-        # main
+def userstats_generate_prometheus_metrics(data, registry):
+    if data:
+        op_userstats_count = Gauge("total_number_of_users", "Number of users", ['country'], registry=registry)
 
+        for country, users in data.items():
+            op_userstats_count.labels(country=country).set(users)
+
+
+        # main
 if __name__ == '__main__':
 
     onionoo_host = os.getenv('ONIONOO_HOST')
@@ -469,11 +518,7 @@ if __name__ == '__main__':
             offline_bandwidth_rate += bandwidth_rate
 
     # OnionPerf
-
-
     registry = CollectorRegistry()
-
-
 
     network_relays = Gauge('total_relays', 'Current number of relays on the network', ['status'], registry=registry)
     network_relays.labels(status='all').set(len(total_relays))
@@ -633,6 +678,10 @@ if __name__ == '__main__':
     circuit_parsed_data = circuit_parse_csv(circuit_file_path)
     circuit_latest_data = filter_latest_date(circuit_parsed_data)
     circuit_generate_prometheus_metrics(circuit_latest_data, registry)
+
+    estimated_users_path = '/srv/onionoo/data/status/userstats'
+    estimated_parsed_data = parse_estimated_users_count(estimated_users_path)
+    userstats_generate_prometheus_metrics(estimated_parsed_data, registry)
 
     file_path = os.getenv('METRICS_FILE_PATH', '/srv/onionoo/data/out/network/metrics')
     write_to_textfile(file_path, registry)
