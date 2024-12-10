@@ -10,9 +10,6 @@ public class Imported implements UserStats {
     private long statsEnd;
     private double val;
 
-    public Imported() {
-    }
-
     public Imported(String fingerprint,
                     String nickname,
                     Metric metric,
@@ -96,5 +93,9 @@ public class Imported implements UserStats {
                 ", statsEnd=" + statsEnd +
                 ", val=" + val +
                 '}';
+    }
+
+    public String getKey() {
+        return String.join("-", fingerprint, nickname, metric.name(), country);
     }
 }
