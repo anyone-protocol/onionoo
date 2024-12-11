@@ -4,6 +4,7 @@
 package org.torproject.metrics.onionoo.docs;
 
 import org.torproject.metrics.onionoo.docs.onionperf.*;
+import org.torproject.metrics.onionoo.docs.userstats.MergedStatus;
 import org.torproject.metrics.onionoo.util.FormattingUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -313,6 +314,7 @@ public class DocumentStore {
         || document instanceof WeightsDocument
         || document instanceof ClientsDocument
         || document instanceof OnionperfStatus
+        || document instanceof MergedStatus
         || document instanceof UserStatsStatus
         || document instanceof UptimeDocument) {
       try {
@@ -525,6 +527,7 @@ public class DocumentStore {
         || documentType.equals(HardwareInfoDocument.class)
         || documentType.equals(ClientsDocument.class)
         || documentType.equals(OnionperfStatus.class)
+        || documentType.equals(MergedStatus.class)
         || documentType.equals(UptimeDocument.class)) {
       return this.retrieveParsedDocumentFile(documentType,
           documentString);
@@ -644,6 +647,7 @@ public class DocumentStore {
     File documentFile = null;
     if (fingerprint == null && !documentType.equals(UpdateStatus.class)
         && !documentType.equals(OnionperfStatus.class)
+        && !documentType.equals(MergedStatus.class)
         && !documentType.equals(UserStatsStatus.class)
         && !documentType.equals(CircuitDocument.class)
         && !documentType.equals(DownloadDocument.class)
@@ -690,6 +694,9 @@ public class DocumentStore {
     } else if (documentType.equals(OnionperfStatus.class)) {
       directory = this.statusDir;
       fileName = "performance";
+    } else if (documentType.equals(MergedStatus.class)) {
+      directory = this.statusDir;
+      fileName = "merged";
     } else if (documentType.equals(UserStatsStatus.class)) {
       directory = this.statusDir;
       fileName = "userstats";

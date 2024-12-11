@@ -6,6 +6,7 @@ import org.torproject.descriptor.*;
 import org.torproject.metrics.onionoo.docs.DocumentStore;
 import org.torproject.metrics.onionoo.docs.DocumentStoreFactory;
 import org.torproject.metrics.onionoo.docs.UserStatsStatus;
+import org.torproject.metrics.onionoo.docs.userstats.MergedStatus;
 import org.torproject.metrics.onionoo.userstats.*;
 
 import java.util.*;
@@ -21,9 +22,9 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
     private final DescriptorSource descriptorSource;
     private final DocumentStore documentStore;
 
-    private final Aggregator newAggregator = new Aggregator();
+    private final DataProcessor dataProcessor = new DataProcessor();
 
-    private final List<Imported> imported = new ArrayList<>();
+    private final Set<Imported> imported = new HashSet<>();
 
     public UserStatsStatusUpdater() {
         this.descriptorSource = DescriptorSourceFactory.getDescriptorSource();
@@ -87,7 +88,7 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
                             / ONE_DAY_MILLIS) * ONE_DAY_MILLIS;
                     if (i == 0) {
                         toMillis = utcBreakMillis;
-                    } else if (i == 1) {
+                    } else {
                         fromMillis = utcBreakMillis;
                     }
                     double intervalFraction = ((double) (toMillis - fromMillis))
@@ -96,11 +97,12 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
                 } else if (i == 1) {
                     break;
                 }
-                insertIntoImported(fingerprint, nickname, Metric.BYTES, null, fromMillis, toMillis, writtenBytes);
+                insertIntoImported(fingerprint, nickname,  Metric.BYTES, null, fromMillis, toMillis, writtenBytes);
             }
         }
     }
 
+    // todo - reviewed
     private void parseRelayDirreqV3Resp(String fingerprint,
                                         String nickname,
                                         long publishedMillis,
@@ -151,11 +153,9 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
                 for (Map.Entry<String, Double> e : requestsCopy.entrySet()) {
                     String country = e.getKey();
                     double val = resp * intervalFraction * e.getValue() / total;
-                    insertIntoImported(fingerprint, nickname,
-                            Metric.RESPONSES, country, fromMillis, toMillis, val);
+                    insertIntoImported(fingerprint, nickname, Metric.RESPONSES, country, fromMillis, toMillis, val);
                 }
-                insertIntoImported(fingerprint, nickname, Metric.RESPONSES,
-                        null, fromMillis, toMillis, resp * intervalFraction);
+                insertIntoImported(fingerprint, nickname, Metric.RESPONSES, null, fromMillis, toMillis, resp * intervalFraction);
             }
         }
     }
@@ -163,48 +163,59 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
     private void parseRelayNetworkStatusConsensus(RelayNetworkStatusConsensus consensus) {
         long fromMillis = consensus.getValidAfterMillis();
         long toMillis = consensus.getFreshUntilMillis();
-        for (NetworkStatusEntry statusEntry
-                : consensus.getStatusEntries().values()) {
-            String fingerprint = statusEntry.getFingerprint()
-                    .toUpperCase();
+        for (NetworkStatusEntry statusEntry : consensus.getStatusEntries().values()) {
+            String fingerprint = statusEntry.getFingerprint().toUpperCase();
             String nickname = statusEntry.getNickname();
             if (statusEntry.getFlags().contains("Running")) {
-                insertIntoImported(fingerprint, nickname, Metric.STATUS,
-                        null, fromMillis, toMillis, 0.0);
+                insertIntoImported(fingerprint, nickname, Metric.STATUS, null, fromMillis, toMillis, 0.0);
             }
         }
     }
 
-    void insertIntoImported(String fingerprint, String nickname,
-                            Metric metric, String country,
-                            long fromMillis, long toMillis, double val) {
+    void insertIntoImported(String fingerprint,
+                            String nickname,
+                            Metric metric,
+                            String country,
+                            long fromMillis,
+                            long toMillis,
+                            double val) {
         if (fromMillis > toMillis) {
             return;
         }
-        imported.add(new Imported(
-                fingerprint,
-                nickname,
-                metric,
-                country,
-                fromMillis,
-                toMillis,
-                Math.round(val * 10.0) / 10.0
-        ));
+        imported.add(
+                new Imported(fingerprint, nickname, metric, country, fromMillis, toMillis, Math.round(val * 10.0) / 10.0)
+        );
     }
 
     @Override
     public void updateStatuses() {
-        logger.warn("Imported size: {}", imported.size());
-        List<Merged> merge = Merger.mergeFirstTime(imported);
-        logger.warn("Merged size: {}", merge.size());
-        List<Aggregated> aggregate = newAggregator.aggregate(merge);
+        logger.info("Imported size: {}", imported.size());
+        MergedStatus statusOld = documentStore.retrieve(MergedStatus.class, true);
+
+        if (statusOld != null) {
+            logger.info("Old merged size: {}", statusOld.getMerged().size());
+        } else {
+            logger.info("Old merged size: 0");
+        }
+
+        List<Merged> merged = statusOld == null ? new ArrayList<>() : statusOld.getMerged();
+
+
+        List<Merged> merge = dataProcessor.merge(merged, new ArrayList<>(imported));
+
+        logger.info("New merged size: {}", merge.size());
+
+        if (!merge.isEmpty()) {
+            MergedStatus newMerge = new MergedStatus(merge);
+            documentStore.store(newMerge);
+        }
+
+        List<Aggregated> aggregate = dataProcessor.aggregate(merge);
         logger.warn("Aggregated size: {}", aggregate.size());
-        List<Estimated> estimated = DataProcessor.estimate(aggregate);
+        List<Estimated> estimated = dataProcessor.estimate(aggregate);
         logger.warn("Estimated size: {}", estimated.size());
-        logger.warn("Estimated: {}", estimated);
         this.documentStore.store(new UserStatsStatus(estimated));
         imported.clear();
-        logger.info("Updated user stats");
     }
 
     @Override

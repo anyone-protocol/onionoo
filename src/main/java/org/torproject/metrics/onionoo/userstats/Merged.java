@@ -2,7 +2,7 @@ package org.torproject.metrics.onionoo.userstats;
 
 public class Merged implements UserStats {
 
-    private int id;
+    private long id;
     private String fingerprint;
     private String nickname;
     private Metric metric;
@@ -14,7 +14,7 @@ public class Merged implements UserStats {
     public Merged() {
     }
 
-    public Merged(int id,
+    public Merged(long id,
                   String fingerprint,
                   String nickname,
                   Metric metric,
@@ -32,11 +32,11 @@ public class Merged implements UserStats {
         this.val = val;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

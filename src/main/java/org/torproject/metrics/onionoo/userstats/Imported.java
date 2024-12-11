@@ -1,5 +1,7 @@
 package org.torproject.metrics.onionoo.userstats;
 
+import java.util.Objects;
+
 public class Imported implements UserStats {
 
     private String fingerprint;
@@ -9,9 +11,6 @@ public class Imported implements UserStats {
     private long statsStart;
     private long statsEnd;
     private double val;
-
-    public Imported() {
-    }
 
     public Imported(String fingerprint,
                     String nickname,
@@ -96,5 +95,22 @@ public class Imported implements UserStats {
                 ", statsEnd=" + statsEnd +
                 ", val=" + val +
                 '}';
+    }
+
+    public String getKey() {
+        return String.join("-", fingerprint, nickname, metric.name(), country);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Imported imported = (Imported) o;
+        return statsStart == imported.statsStart && statsEnd == imported.statsEnd && Double.compare(imported.val, val) == 0 && Objects.equals(fingerprint, imported.fingerprint) && Objects.equals(nickname, imported.nickname) && metric == imported.metric && Objects.equals(country, imported.country);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fingerprint, nickname, metric, country, statsStart, statsEnd, val);
     }
 }

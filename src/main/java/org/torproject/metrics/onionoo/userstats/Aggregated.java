@@ -2,6 +2,7 @@ package org.torproject.metrics.onionoo.userstats;
 
 import java.time.LocalDate;
 
+// todo - reviewed
 public class Aggregated {
     private LocalDate date;
     private String country;
@@ -119,4 +120,5 @@ public class Aggregated {
                 ", nrh=" + nrh +
                 '}';
     }
+
 }
