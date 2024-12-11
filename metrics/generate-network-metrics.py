@@ -125,24 +125,14 @@ def parse_estimated_users_count(json_file_path):
     # Find the latest date across all records
     latest_date = None
     for record in estimated_data:
-        date_info = record["date"]
-        current_date = datetime(
-            year=date_info["year"],
-            month=date_info["monthValue"],
-            day=date_info["dayOfMonth"]
-        )
+        current_date = datetime.strptime(record["date"], "%Y-%m-%d")
         if latest_date is None or current_date > latest_date:
             latest_date = current_date
 
     # Filter records that match the latest date
     metrics = {}
     for record in estimated_data:
-        date_info = record["date"]
-        current_date = datetime(
-            year=date_info["year"],
-            month=date_info["monthValue"],
-            day=date_info["dayOfMonth"]
-        )
+        current_date = datetime.strptime(record["date"], "%Y-%m-%d")
         if current_date == latest_date:
             country = record["country"]
             users = record["users"]

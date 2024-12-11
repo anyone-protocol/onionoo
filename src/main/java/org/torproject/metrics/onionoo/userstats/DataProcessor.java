@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,19 +34,19 @@ public class DataProcessor {
 
         long idCounter = mergedMap.isEmpty() ? 1 : mergedMap.keySet().stream().max(Long::compareTo).get() + 1;
 
-        LocalDate threeDaysAgo = toLocalDate(Instant.now().toEpochMilli()).minusDays(3);
+        LocalDate weekAgo = toLocalDate(Instant.now().toEpochMilli()).minusDays(7);
 
         Set<LocalDate> distinctDates = importedList.stream()
                 .map(imported -> toLocalDate(imported.getStatsStart()))
-                .filter(date -> date.isAfter(threeDaysAgo))
+                .filter(date -> date.isAfter(weekAgo))
                 .collect(Collectors.toSet());
 
         importedList = importedList.stream()
-                .filter(imported -> toLocalDate(imported.getStatsStart()).isAfter(threeDaysAgo))
+                .filter(imported -> toLocalDate(imported.getStatsStart()).isAfter(weekAgo))
                 .collect(Collectors.toList());
 
         Map<String, List<Merged>> mergedGroup = mergedList.stream()
-                .filter(merged -> toLocalDate(merged.getStatsStart()).isAfter(threeDaysAgo))
+                .filter(merged -> toLocalDate(merged.getStatsStart()).isAfter(weekAgo))
                 .filter(merged -> distinctDates.contains(toLocalDate(merged.getStatsStart())))
                 .collect(Collectors.groupingBy(m ->
                         String.join("-", m.getFingerprint(), m.getNickname(), m.getMetric().name(), m.getCountry()))
@@ -346,6 +347,12 @@ public class DataProcessor {
 
     public List<Aggregated> aggregate(List<Merged> merged) {
 
+        //  -- Create a new temporary table containing all relevant information
+        //  -- needed to update the aggregated table.  In this table, we sum up all
+        //  -- observations of a given type by reporting node.  This query is
+        //  -- (temporarily) materialized, because we need to combine its entries
+        //  -- multiple times in various ways.  A (non-materialized) view would have
+        //  -- meant to re-compute this query multiple times.
         Map<String, UpdateTemp> updateTemp = merged.stream().collect(
                 Collectors.groupingBy(
                         this::groupKey,
@@ -353,13 +360,10 @@ public class DataProcessor {
                 )
         );
 
-        List<Aggregated> aggregated = new ArrayList<>();
-
         /*
-         *  -- Insert partly empty results for all existing combinations of date,
-         *   -- node ('relay' or 'bridge'), country, transport, and version.  Only
+         *  -- Insert partly empty results for all existing combinations of date and country.  Only
          *   -- the rrx and nrx fields will contain number and seconds of reported
-         *   -- responses for the given combination of date, node, etc., while the
+         *   -- responses for the given combination of date, etc., while the
          *   -- other fields will be updated below.
          *   INSERT INTO aggregated (date, node, country, transport, version, rrx,
          *       nrx)
@@ -375,7 +379,7 @@ public class DataProcessor {
                                 Collectors.collectingAndThen(Collectors.toList(), this::aggregateToAggregated)
                         )
                 ).values();
-        aggregated.addAll(responses);
+        List<Aggregated> aggregated = new ArrayList<>(responses);
 
         /*
          *   -- Create another temporary table with only those entries that aren't
@@ -446,14 +450,34 @@ public class DataProcessor {
         });
 
         /*
-         *
+         *  -- Update results based on nodes reporting both bytes and responses.
+         *   UPDATE aggregated
+         *     SET hrh = aggregated_bytes_responses.hrh
+         *     FROM (
+         *       SELECT bytes.date, bytes.node,
+         *              SUM((LEAST(bytes.seconds, responses.seconds)
+         *                  * bytes.val) / bytes.seconds) AS hrh
+         *       FROM update_no_dimensions_temp_name bytes
+         *       LEFT JOIN update_no_dimensions_temp_name responses
+         *       ON bytes.date = responses.date
+         *       AND bytes.fingerprint = responses.fingerprint
+         *       AND bytes.nickname = responses.nickname
+         *       AND bytes.node = responses.node
+         *       WHERE bytes.metric = 'bytes'
+         *       AND responses.metric = 'responses'
+         *       AND bytes.seconds > 0
+         *       GROUP BY bytes.date, bytes.node
+         *     ) aggregated_bytes_responses
+         *     WHERE aggregated.date = aggregated_bytes_responses.date
+         *     AND aggregated.node = aggregated_bytes_responses.node;
          */
         Map<LocalDate, Double> hrh = noDimension.stream()
                 .collect(Collectors.groupingBy(UpdateTemp::anotherKey))
                 .entrySet().stream()
-                .map(entry -> filterBoth(entry.getValue()))
+                .map(entry -> aggregateHrh(entry.getValue()))
                 .filter(Objects::nonNull)
                 .collect(Collectors.groupingBy(Aggregated::getDate, Collectors.summingDouble(Aggregated::getHrh)));
+
         aggregated.forEach(a -> {
             Double aDouble = hrh.get(a.getDate());
             if (aDouble != null) {
@@ -461,7 +485,7 @@ public class DataProcessor {
             }
         });
 
-        /**
+        /*
          *   -- Update results based on nodes reporting responses but no bytes.
          *   UPDATE aggregated
          *     SET nrh = aggregated_responses_bytes.nrh
@@ -485,7 +509,7 @@ public class DataProcessor {
         Map<LocalDate, Double> nrh = noDimension.stream()
                 .collect(Collectors.groupingBy(UpdateTemp::anotherKey))
                 .entrySet().stream()
-                .map(entry -> filterBothLeft(entry.getValue()))
+                .map(entry -> aggregateNrh(entry.getValue()))
                 .filter(Objects::nonNull)
                 .collect(Collectors.groupingBy(Aggregated::getDate, Collectors.summingDouble(Aggregated::getNrh)));
 
@@ -503,6 +527,7 @@ public class DataProcessor {
         return String.join("-", m.getFingerprint(), m.getNickname(), m.getMetric().name(), m.getCountry(), toLocalDate(m.getStatsStart()).toString());
     }
 
+    // done
     private UpdateTemp aggregateToUpdateTemp(List<Merged> list) {
         Merged first = list.get(0);
         double totalSeconds = list.stream().mapToDouble(m -> (m.getStatsEnd() - m.getStatsStart()) / 1000.0).sum();
@@ -512,6 +537,7 @@ public class DataProcessor {
                 toLocalDate(first.getStatsStart()), totalVal, totalSeconds);
     }
 
+    // done
     private Aggregated aggregateToAggregated(List<UpdateTemp> list) {
         UpdateTemp first = list.get(0);
         //  -- Total number of reported responses, possibly broken down by country,
@@ -527,6 +553,7 @@ public class DataProcessor {
         return new Aggregated(first.getDate(), first.getCountry(), rrx, nrx, 0, 0, 0, 0, 0);
     }
 
+    // done
     private Aggregated aggregateToBytes(List<UpdateTemp> list) {
         UpdateTemp first = list.get(0);
         // -- Total number of reported bytes.  See h(H) in the tech report.
@@ -537,7 +564,8 @@ public class DataProcessor {
         return new Aggregated(first.getDate(), first.getCountry(), 0, 0, hh, 0, 0, nh, 0);
     }
 
-    private Aggregated filterBoth(List<UpdateTemp> list) {
+    // done
+    private Aggregated aggregateHrh(List<UpdateTemp> list) {
         UpdateTemp ut = list.get(0);
         Optional<UpdateTemp> bytes = list.stream().filter(it -> it.getMetric() == Metric.BYTES && it.getSeconds() > 0).findFirst();
         Optional<UpdateTemp> responses = list.stream().filter(it -> it.getMetric() == Metric.RESPONSES).findFirst();
@@ -556,9 +584,10 @@ public class DataProcessor {
 
     }
 
-    private Aggregated filterBothLeft(List<UpdateTemp> list) {
-        Optional<UpdateTemp> bytes = list.stream().filter(it -> it.getMetric() == Metric.BYTES).findFirst();
+    // done
+    private Aggregated aggregateNrh(List<UpdateTemp> list) {
         Optional<UpdateTemp> responses = list.stream().filter(it -> it.getMetric() == Metric.RESPONSES).findFirst();
+        Optional<UpdateTemp> bytes = list.stream().filter(it -> it.getMetric() == Metric.BYTES).findFirst();
 
         if (responses.isPresent()) {
             UpdateTemp r = responses.get();
@@ -573,20 +602,23 @@ public class DataProcessor {
 
     // estimate
 
+    // -- User-friendly view on the aggregated table that implements the
+    // -- algorithm proposed in Tor Tech Report 2012-10-001.  This view returns
+    // -- user number estimates for both relay and bridge staistics, possibly
+    // -- broken down by country or transport or version.
     public List<Estimated> estimate(List<Aggregated> aggregatedList) {
         List<Estimated> estimatedList = new ArrayList<>();
 
         Instant now = Instant.now().minus(Duration.ofHours(3)); // shift to allow all the metrics come
-
         LocalDate target = toLocalDate(now.toEpochMilli());
 
         for (Aggregated agg : aggregatedList) {
-            if (agg.getHh() > 0 && agg.getNn() > 0) {
+            if (agg.getHh() * agg.getNn() > 0.0) {
                 // Calculate the fraction for estimation
                 double frac = (agg.getHrh() * agg.getNh() + agg.getHh() * agg.getNrh()) / (agg.getHh() * agg.getNn());
 
                 // Only include entries where frac is between 0.1 and 1.1
-                if (frac >= 0.1 && frac <= 1.1) {
+//                if (frac >= 0.1 && frac <= 1.1) {
                     // Round fraction to an integer percent
                     int fracPercent = (int) Math.round(frac * 100);
 
@@ -596,14 +628,14 @@ public class DataProcessor {
                     // Only include estimates older than today
                     if (agg.getDate().isBefore(target)) {
                         Estimated estimated = new Estimated(
-                                agg.getDate(),
+                                agg.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE),
                                 agg.getCountry(),
                                 fracPercent,
                                 users
                         );
                         estimatedList.add(estimated);
                     }
-                }
+//                }
             }
         }
 

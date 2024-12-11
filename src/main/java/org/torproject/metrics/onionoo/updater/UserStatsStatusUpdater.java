@@ -24,7 +24,7 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
 
     private final DataProcessor dataProcessor = new DataProcessor();
 
-    private final List<Imported> imported = new ArrayList<>();
+    private final Set<Imported> imported = new HashSet<>();
 
     public UserStatsStatusUpdater() {
         this.descriptorSource = DescriptorSourceFactory.getDescriptorSource();
@@ -200,7 +200,8 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
 
         List<Merged> merged = statusOld == null ? new ArrayList<>() : statusOld.getMerged();
 
-        List<Merged> merge = dataProcessor.merge(merged, imported);
+
+        List<Merged> merge = dataProcessor.merge(merged, new ArrayList<>(imported));
 
         logger.info("New merged size: {}", merge.size());
 
