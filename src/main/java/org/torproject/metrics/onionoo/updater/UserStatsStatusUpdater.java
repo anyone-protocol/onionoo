@@ -211,9 +211,9 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
         }
 
         List<Aggregated> aggregate = dataProcessor.aggregate(merge);
-        logger.warn("Aggregated size: {}", aggregate.size());
+        logger.info("Aggregated size: {}", aggregate.size());
         List<Estimated> estimated = dataProcessor.estimate(aggregate);
-        logger.warn("Estimated size: {}", estimated.size());
+        logger.info("Estimated size: {}", estimated.size());
         this.documentStore.store(new UserStatsStatus(estimated));
         imported.clear();
     }

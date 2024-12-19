@@ -117,30 +117,32 @@ public class DescriptorSource {
     logger.debug("Reading recent {} ...", DescriptorType.RELAY_EXTRA_INFOS);
     this.readDescriptors(DescriptorType.RELAY_EXTRA_INFOS,
         DescriptorHistory.RELAY_EXTRAINFO_HISTORY, true);
-    logger.debug("Reading recent {} ...", DescriptorType.EXIT_LISTS);
-    this.readDescriptors(DescriptorType.EXIT_LISTS,
-        DescriptorHistory.EXIT_LIST_HISTORY, true);
+    // disable useless modules
+//    logger.debug("Reading recent {} ...", DescriptorType.EXIT_LISTS);
+//    this.readDescriptors(DescriptorType.EXIT_LISTS,
+//        DescriptorHistory.EXIT_LIST_HISTORY, true);
     logger.debug("Reading recent {} ...", DescriptorType.RELAY_CONSENSUSES);
     this.readDescriptors(DescriptorType.RELAY_CONSENSUSES,
         DescriptorHistory.RELAY_CONSENSUS_HISTORY, true);
-    logger.debug("Reading recent {} ...",
-        DescriptorType.BRIDGE_SERVER_DESCRIPTORS);
-    this.readDescriptors(DescriptorType.BRIDGE_SERVER_DESCRIPTORS,
-        DescriptorHistory.BRIDGE_SERVER_HISTORY, false);
-    logger.debug("Reading recent {} ...", DescriptorType.BRIDGE_EXTRA_INFOS);
-    this.readDescriptors(DescriptorType.BRIDGE_EXTRA_INFOS,
-        DescriptorHistory.BRIDGE_EXTRAINFO_HISTORY, false);
-    logger.debug("Reading recent {} ...", DescriptorType.BRIDGE_STATUSES);
-    this.readDescriptors(DescriptorType.BRIDGE_STATUSES,
-        DescriptorHistory.BRIDGE_STATUS_HISTORY, false);
-    logger.debug("Reading recent {} ...",
-        DescriptorType.BRIDGE_POOL_ASSIGNMENTS);
-    this.readDescriptors(DescriptorType.BRIDGE_POOL_ASSIGNMENTS,
-        DescriptorHistory.BRIDGE_POOL_ASSIGNMENTS_HISTORY, false);
-    logger.debug("Reading recent {} ...",
-        DescriptorType.BRIDGESTRAP);
-    this.readDescriptors(DescriptorType.BRIDGESTRAP,
-        DescriptorHistory.BRIDGESTRAP_HISTORY, false);
+    // disable useless modules
+//    logger.debug("Reading recent {} ...",
+//        DescriptorType.BRIDGE_SERVER_DESCRIPTORS);
+//    this.readDescriptors(DescriptorType.BRIDGE_SERVER_DESCRIPTORS,
+//        DescriptorHistory.BRIDGE_SERVER_HISTORY, false);
+//    logger.debug("Reading recent {} ...", DescriptorType.BRIDGE_EXTRA_INFOS);
+//    this.readDescriptors(DescriptorType.BRIDGE_EXTRA_INFOS,
+//        DescriptorHistory.BRIDGE_EXTRAINFO_HISTORY, false);
+//    logger.debug("Reading recent {} ...", DescriptorType.BRIDGE_STATUSES);
+//    this.readDescriptors(DescriptorType.BRIDGE_STATUSES,
+//        DescriptorHistory.BRIDGE_STATUS_HISTORY, false);
+//    logger.debug("Reading recent {} ...",
+//        DescriptorType.BRIDGE_POOL_ASSIGNMENTS);
+//    this.readDescriptors(DescriptorType.BRIDGE_POOL_ASSIGNMENTS,
+//        DescriptorHistory.BRIDGE_POOL_ASSIGNMENTS_HISTORY, false);
+//    logger.debug("Reading recent {} ...",
+//        DescriptorType.BRIDGESTRAP);
+//    this.readDescriptors(DescriptorType.BRIDGESTRAP,
+//        DescriptorHistory.BRIDGESTRAP_HISTORY, false);
     logger.debug("Reading recent {} ...", DescriptorType.ONIONPERF);
     this.readDescriptors(DescriptorType.ONIONPERF,
         DescriptorHistory.ONIONPERF_HISTORY, false);
