@@ -206,8 +206,8 @@ def userstats_generate_prometheus_metrics(data, frac, registry):
         op_userstats_count = Gauge("total_number_of_users", "Number of users", ['country'], registry=registry)
         op_userstats_fraction = Gauge("total_number_of_users_fraction", "Fraction for user metrics", registry=registry)
 
-        for country, metrics in data.items():
-            op_userstats_count.labels(country=country).set(metrics["users"])
+        for country, users in data.items():
+            op_userstats_count.labels(country=country).set(users)
 
         op_userstats_fraction.set(frac)
 
