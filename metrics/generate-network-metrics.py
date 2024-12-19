@@ -135,8 +135,11 @@ def parse_estimated_users_count(json_file_path):
         current_date = datetime.strptime(record["date"], "%Y-%m-%d")
         if current_date == latest_date:
             country = record["country"]
-            users = record["users"]
-            metrics[country] = users
+
+            metrics[country] = {
+                "users": record["users"],
+                "frac": record["frac"]
+            }
 
     return metrics
 
@@ -200,10 +203,11 @@ def circuit_generate_prometheus_metrics(data, registry):
 def userstats_generate_prometheus_metrics(data, registry):
     if data:
         op_userstats_count = Gauge("total_number_of_users", "Number of users", ['country'], registry=registry)
+        op_userstats_fraction = Gauge("total_number_of_users_fraction", "Fraction for user metrics", ['country'], registry=registry)
 
-        for country, users in data.items():
-            op_userstats_count.labels(country=country).set(users)
-
+        for country, metrics in data.items():
+            op_userstats_count.labels(country=country).set(metrics["users"])
+            op_userstats_fraction.labels(country=country).set(metrics["frac"])
 
         # main
 if __name__ == '__main__':
