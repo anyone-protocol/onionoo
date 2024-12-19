@@ -337,7 +337,7 @@ public class DocumentStore {
     }
     try {
       if (documentString.length() > ONE_MIBIBYTE) {
-        logger.warn("Attempting to store very large document file: path='{}', "
+        logger.info("Attempting to store very large document file: path='{}', "
             + "bytes={}", documentFile.getAbsolutePath(),
             documentString.length());
       }
@@ -495,7 +495,7 @@ public class DocumentStore {
       return null;
     }
     if (documentString.length() > ONE_MIBIBYTE) {
-      logger.warn("Retrieved very large document file: path='{}', bytes={}",
+      logger.info("Retrieved very large document file: path='{}', bytes={}",
           documentFile.getAbsolutePath(), documentString.length());
     }
     T result = null;

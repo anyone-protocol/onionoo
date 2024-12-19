@@ -54,8 +54,9 @@ public class ClientsStatusUpdater implements DescriptorListener,
   }
 
   private void registerDescriptorListeners() {
-    this.descriptorSource.registerDescriptorListener(this,
-        DescriptorType.BRIDGE_EXTRA_INFOS);
+    // disable useless module
+//    this.descriptorSource.registerDescriptorListener(this,
+//        DescriptorType.BRIDGE_EXTRA_INFOS);
   }
 
   @Override

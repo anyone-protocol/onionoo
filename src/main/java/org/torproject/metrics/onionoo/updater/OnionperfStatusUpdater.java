@@ -40,11 +40,14 @@ public class OnionperfStatusUpdater implements DescriptorListener, StatusUpdater
     }
 
     private List<Measurement> measurements = new ArrayList<>();
+    private Long threshold = null;
 
     @Override
     public void processDescriptor(Descriptor descriptor, boolean relay) {
         if (descriptor instanceof TorperfResult) {
-            long threshold = LocalDateTime.now().atOffset(ZoneOffset.UTC).minusDays(2).toEpochSecond();
+            if (threshold == null) {
+                threshold = LocalDateTime.now().atOffset(ZoneOffset.UTC).minusDays(2).toEpochSecond();
+            }
             if (!(((TorperfResult) descriptor).getStartMillis() / 1000 < threshold)) {
                 this.processTorPerfResult((TorperfResult) descriptor);
             }
@@ -57,11 +60,13 @@ public class OnionperfStatusUpdater implements DescriptorListener, StatusUpdater
 
     @Override
     public void updateStatuses() {
+        if (threshold == null) {
+            threshold = LocalDateTime.now().atOffset(ZoneOffset.UTC).minusDays(2).toEpochSecond();
+        }
         logger.info("Updating Onionperf new measurements size: {}", measurements.size());
         OnionperfStatus statusOld = documentStore.retrieve(OnionperfStatus.class, true);
         if (statusOld != null) {
             logger.info("OnionperfStatus old measurements: {}", statusOld.getMeasurements().size());
-            Long threshold = LocalDateTime.now().atOffset(ZoneOffset.UTC).minusDays(2).toEpochSecond();
             measurements.addAll(filter(statusOld.getMeasurements(), threshold));
             logger.info("OnionperfStatus merged measurements size: {}", measurements.size());
         }
@@ -72,6 +77,7 @@ public class OnionperfStatusUpdater implements DescriptorListener, StatusUpdater
 
         logger.info("Measurements clearing");
         measurements.clear();
+        threshold = null;
     }
 
     private Collection<? extends Measurement> filter(List<Measurement> measurements, Long threshold) {

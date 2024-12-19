@@ -31,7 +31,7 @@ public class StatusUpdateRunner {
     UptimeStatusUpdater usu = new UptimeStatusUpdater();
     OnionperfStatusUpdater opsu = new OnionperfStatusUpdater();
     // disable useless modules
-    ClientsStatusUpdater csu = new ClientsStatusUpdater();
+//    ClientsStatusUpdater csu = new ClientsStatusUpdater();
     UserStatsStatusUpdater ussu = new UserStatsStatusUpdater();
     this.statusUpdaters = new StatusUpdater[] {
             ndsu, bsu, wsu, usu, opsu,
