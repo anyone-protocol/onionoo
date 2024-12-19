@@ -124,10 +124,12 @@ def parse_estimated_users_count(json_file_path):
 
     # Find the latest date across all records
     latest_date = None
+    frac_value = None
     for record in estimated_data:
         current_date = datetime.strptime(record["date"], "%Y-%m-%d")
         if latest_date is None or current_date > latest_date:
             latest_date = current_date
+            frac_value = record["frac"]
 
     # Filter records that match the latest date
     metrics = {}
@@ -138,7 +140,8 @@ def parse_estimated_users_count(json_file_path):
             users = record["users"]
             metrics[country] = users
 
-    return metrics
+    return metrics, frac_value
+
 
 def throughput_generate_prometheus_metrics(data, registry):
     op_throughput_mbps = Gauge("op_throughput_mbps", "OnionPerf throughput Mbps", ['source', 'server', 'percentile'], registry=registry)
@@ -197,13 +200,16 @@ def circuit_generate_prometheus_metrics(data, registry):
             value = row[percentile]
             op_circuit_millis.labels(source=source, position=position, percentile=percentile).set(value)
 
-def userstats_generate_prometheus_metrics(data, registry):
+
+def userstats_generate_prometheus_metrics(data, frac, registry):
     if data:
         op_userstats_count = Gauge("total_number_of_users", "Number of users", ['country'], registry=registry)
+        op_userstats_fraction = Gauge("total_number_of_users_fraction", "Fraction for user metrics", registry=registry)
 
         for country, users in data.items():
             op_userstats_count.labels(country=country).set(users)
 
+        op_userstats_fraction.set(frac)
 
         # main
 if __name__ == '__main__':
@@ -670,8 +676,8 @@ if __name__ == '__main__':
     circuit_generate_prometheus_metrics(circuit_latest_data, registry)
 
     estimated_users_path = '/srv/onionoo/data/status/userstats'
-    estimated_parsed_data = parse_estimated_users_count(estimated_users_path)
-    userstats_generate_prometheus_metrics(estimated_parsed_data, registry)
+    estimated_parsed_data, frac_data = parse_estimated_users_count(estimated_users_path)
+    userstats_generate_prometheus_metrics(estimated_parsed_data, frac_data, registry)
 
     file_path = os.getenv('METRICS_FILE_PATH', '/srv/onionoo/data/out/network/metrics')
     write_to_textfile(file_path, registry)
