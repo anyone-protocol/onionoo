@@ -67,7 +67,7 @@ job "onionoo-live" {
 
       resources {
         cpu    = 1024
-        memory = 6144
+        memory = 8192
       }
 
       service {
