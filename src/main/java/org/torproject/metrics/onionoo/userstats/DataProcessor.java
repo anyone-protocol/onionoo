@@ -351,7 +351,6 @@ public class DataProcessor {
     // aggregate
 
     public List<Aggregated> aggregate(List<Merged> merged) {
-        logger.info("Aggregating. Creating temporary table.");
         //  -- Create a new temporary table containing all relevant information
         //  -- needed to update the aggregated table.  In this table, we sum up all
         //  -- observations of a given type by reporting node.  This query is
@@ -364,7 +363,7 @@ public class DataProcessor {
                         Collectors.collectingAndThen(Collectors.toList(), this::aggregateToUpdateTemp)
                 )
         );
-        logger.info("Aggregated. Inserting into temporary table.");
+
         /*
          *  -- Insert partly empty results for all existing combinations of date and country.  Only
          *   -- the rrx and nrx fields will contain number and seconds of reported
@@ -385,7 +384,7 @@ public class DataProcessor {
                         )
                 ).values();
         List<Aggregated> aggregated = new ArrayList<>(responses);
-        logger.info("Aggregated. Create another table.");
+
         /*
          *   -- Create another temporary table with only those entries that aren't
          *   -- broken down by any dimension.  This table is much smaller, so the
@@ -399,7 +398,7 @@ public class DataProcessor {
         List<UpdateTemp> noDimension = updateTemp.values().stream()
                 .filter(ut -> ut.getCountry() == null)
                 .collect(Collectors.toList());
-        logger.info("Aggregated. Update results in the aggregated table.");
+
         /*
          *   -- Update results in the aggregated table by setting aggregates based
          *   -- on reported directory bytes.  These aggregates are only based on
@@ -430,7 +429,7 @@ public class DataProcessor {
                 a.setNh(b.getNh());
             }
         });
-        logger.info("Aggregated. Update results based on nodes being contained.");
+
         /*
          *   -- Update results based on nodes being contained in the network status.
          *   UPDATE aggregated
@@ -453,7 +452,7 @@ public class DataProcessor {
                 a.setNn(aDouble);
             }
         });
-        logger.info("Aggregated. Update results based on nodes reporting both bytes.");
+
         /*
          *  -- Update results based on nodes reporting both bytes and responses.
          *   UPDATE aggregated
@@ -489,7 +488,7 @@ public class DataProcessor {
                 a.setHrh(aDouble);
             }
         });
-        logger.info("Aggregated. Update results based on nodes reporting responses but no bytes.");
+
         /*
          *   -- Update results based on nodes reporting responses but no bytes.
          *   UPDATE aggregated
@@ -517,7 +516,7 @@ public class DataProcessor {
                 .map(entry -> aggregateNrh(entry.getValue()))
                 .filter(Objects::nonNull)
                 .collect(Collectors.groupingBy(Aggregated::getDate, Collectors.summingDouble(Aggregated::getNrh)));
-        logger.info("Aggregated. Finalizing.");
+
         aggregated.forEach(a -> {
             Double aDouble = nrh.get(a.getDate());
             if (aDouble != null) {
