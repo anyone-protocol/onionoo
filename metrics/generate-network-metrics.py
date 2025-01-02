@@ -253,14 +253,6 @@ if __name__ == '__main__':
     online_as_relays = {}
     offline_as_relays = {}
 
-    total_contact_string_relays = {}
-    online_contact_string_relays = {}
-    offline_contact_string_relays = {}
-
-    total_nickname_prefix_relays = {}
-    online_nickname_prefix_relays = {}
-    offline_nickname_prefix_relays = {}
-
     total_countries_relays = {}
     online_countries_relays = {}
     offline_countries_relays = {}
@@ -296,25 +288,6 @@ if __name__ == '__main__':
         version = "None"
         nickname = relay.get('nickname')
         contact = "None"
-
-        if len(nickname) > 4:
-            prefix = nickname[:5]
-            if total_nickname_prefix_relays.get(prefix):
-                total_nickname_prefix_relays[prefix] += 1
-            else:
-                total_nickname_prefix_relays[prefix] = 1
-        else:
-            if total_nickname_prefix_relays.get(nickname):
-                total_nickname_prefix_relays[nickname] += 1
-            else:
-                total_nickname_prefix_relays[nickname] = 1
-
-        if relay.get('contact'):
-            contact = relay.get('contact')
-        if total_contact_string_relays.get(contact):
-            total_contact_string_relays[contact] += 1
-        else:
-            total_contact_string_relays[contact] = 1
 
         if relay.get('version'):
             version = "{}".format(re.sub('\W+', '_', relay.get('version')))
@@ -378,25 +351,6 @@ if __name__ == '__main__':
             online_relays.append(relay)
             contact = "None"
 
-            if len(nickname) > 4:
-                prefix = nickname[:5]
-                if online_nickname_prefix_relays.get(prefix):
-                    online_nickname_prefix_relays[prefix] += 1
-                else:
-                    online_nickname_prefix_relays[prefix] = 1
-            else:
-                if online_nickname_prefix_relays.get(nickname):
-                    online_nickname_prefix_relays[nickname] += 1
-                else:
-                    online_nickname_prefix_relays[nickname] = 1
-
-            if relay.get('contact'):
-                contact = relay.get('contact')
-            if online_contact_string_relays.get(contact):
-                online_contact_string_relays[contact] += 1
-            else:
-                online_contact_string_relays[contact] = 1
-
             if relay.get('recommended_version') == False:
                 online_eol_relays.append(relay)
 
@@ -449,25 +403,6 @@ if __name__ == '__main__':
         else:
             offline_relays.append(relay)
             contact = "None"
-
-            if len(nickname) > 4:
-                prefix = nickname[:5]
-                if offline_nickname_prefix_relays.get(prefix):
-                    offline_nickname_prefix_relays[prefix] += 1
-                else:
-                    offline_nickname_prefix_relays[prefix] = 1
-            else:
-                if offline_nickname_prefix_relays.get(nickname):
-                    offline_nickname_prefix_relays[nickname] += 1
-                else:
-                    offline_nickname_prefix_relays[nickname] = 1
-
-            if relay.get('contact'):
-                contact = relay.get('contact')
-            if offline_contact_string_relays.get(contact):
-                offline_contact_string_relays[contact] += 1
-            else:
-                offline_contact_string_relays[contact] = 1
 
             if relay.get('recommended_version') == False:
                 offline_eol_relays.append(relay)
@@ -571,22 +506,6 @@ if __name__ == '__main__':
         network_tor_as_relays.labels(status='online', autonomous_system=autonomous_system).set(online_as_relays[autonomous_system])
     for autonomous_system in offline_as_relays.keys():
         network_tor_as_relays.labels(status='offline', autonomous_system=autonomous_system).set(offline_as_relays[autonomous_system])
-
-    network_tor_nickname_prefix_relays = Gauge("total_network_tor_nickname_prefix_relays", "Current number of relays sharing the same nickname prefix", ['status', 'nickname_prefix'], registry=registry)
-    for nickname_prefix in total_nickname_prefix_relays.keys():
-        network_tor_nickname_prefix_relays.labels(status='all', nickname_prefix=nickname_prefix).set(total_nickname_prefix_relays[nickname_prefix])
-    for nickname_prefix in online_nickname_prefix_relays.keys():
-        network_tor_nickname_prefix_relays.labels(status='online', nickname_prefix=nickname_prefix).set(online_nickname_prefix_relays[nickname_prefix])
-    for nickname_prefix in offline_nickname_prefix_relays.keys():
-        network_tor_nickname_prefix_relays.labels(status='offline', nickname_prefix=nickname_prefix).set(offline_nickname_prefix_relays[nickname_prefix])
-
-    network_tor_contact_string_relays = Gauge("total_network_tor_contact_string_relays", "Current number of relays sharing the same contact string", ['status', 'contact_string'], registry=registry)
-    for contact_string in total_contact_string_relays.keys():
-        network_tor_contact_string_relays.labels(status='all', contact_string=contact_string).set(total_contact_string_relays[contact_string])
-    for contact_string in online_contact_string_relays.keys():
-        network_tor_contact_string_relays.labels(status='online', contact_string=contact_string).set(online_contact_string_relays[contact_string])
-    for contact_string in offline_contact_string_relays.keys():
-        network_tor_contact_string_relays.labels(status='offline', contact_string=contact_string).set(offline_contact_string_relays[contact_string])
 
     network_observed_bandwidth = Gauge('total_observed_bandwidth', 'Current total observed bandwidth on the network', ['status'], registry=registry)
     network_observed_bandwidth.labels(status='all').set(total_observed_bandwidth)

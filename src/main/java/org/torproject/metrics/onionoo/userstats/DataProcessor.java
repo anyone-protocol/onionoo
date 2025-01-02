@@ -1,5 +1,8 @@
 package org.torproject.metrics.onionoo.userstats;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -9,6 +12,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class DataProcessor {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataProcessor.class);
 
     private static final long DEFAULT = -1L; // todo - read for merged
 
@@ -346,7 +351,6 @@ public class DataProcessor {
     // aggregate
 
     public List<Aggregated> aggregate(List<Merged> merged) {
-
         //  -- Create a new temporary table containing all relevant information
         //  -- needed to update the aggregated table.  In this table, we sum up all
         //  -- observations of a given type by reporting node.  This query is

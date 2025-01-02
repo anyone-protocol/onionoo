@@ -206,10 +206,12 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
         logger.info("New merged size: {}", merge.size());
 
         if (!merge.isEmpty()) {
+            logger.info("New merged is not empty, persist to disk");
             MergedStatus newMerge = new MergedStatus(merge);
             documentStore.store(newMerge);
         }
 
+        logger.info("Start aggregation based on merged data");
         List<Aggregated> aggregate = dataProcessor.aggregate(merge);
         logger.info("Aggregated size: {}", aggregate.size());
         List<Estimated> estimated = dataProcessor.estimate(aggregate);
