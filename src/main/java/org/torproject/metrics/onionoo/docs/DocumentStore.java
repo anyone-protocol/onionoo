@@ -314,7 +314,6 @@ public class DocumentStore {
         || document instanceof WeightsDocument
         || document instanceof ClientsDocument
         || document instanceof OnionperfStatus
-        || document instanceof MergedStatus
         || document instanceof UserStatsStatus
         || document instanceof UptimeDocument) {
       try {
@@ -328,6 +327,7 @@ public class DocumentStore {
         || document instanceof WeightsStatus
         || document instanceof ClientsStatus
         || document instanceof UptimeStatus
+        || document instanceof MergedStatus
         || document instanceof UpdateStatus) {
       documentString = document.toDocumentString();
     } else {
@@ -527,7 +527,6 @@ public class DocumentStore {
         || documentType.equals(HardwareInfoDocument.class)
         || documentType.equals(ClientsDocument.class)
         || documentType.equals(OnionperfStatus.class)
-        || documentType.equals(MergedStatus.class)
         || documentType.equals(UptimeDocument.class)) {
       return this.retrieveParsedDocumentFile(documentType,
           documentString);
@@ -535,6 +534,7 @@ public class DocumentStore {
         || documentType.equals(WeightsStatus.class)
         || documentType.equals(ClientsStatus.class)
         || documentType.equals(UptimeStatus.class)
+        || documentType.equals(MergedStatus.class)
         || documentType.equals(UpdateStatus.class)) {
       return this.retrieveParsedStatusFile(documentType, documentString);
     } else {
