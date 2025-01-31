@@ -554,7 +554,6 @@ if __name__ == '__main__':
             middle_index = len(bandwidth_per_flag[flag]) // 2
             median_bandwidth_per_flag.labels(status='all', flag=flag).set(bandwidth_per_flag[flag][middle_index])
     for flag in online_bandwidth_per_flag.keys():
-    for flag in online_bandwidth_per_flag.keys():
         if flag and flag.isalpha() and len(online_bandwidth_per_flag[flag]) > 0:
             online_bandwidth_per_flag[flag].sort()
             middle_index = len(online_bandwidth_per_flag[flag]) // 2
