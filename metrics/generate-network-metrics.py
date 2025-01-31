@@ -173,11 +173,12 @@ def failure_generate_prometheus_metrics(data, registry):
     for row in data:
         source = row['source']
         server = row['server']
-        op_requests_all_count.labels(source=source, server=server).set(row['requests'])
+        requests = row['requests'] if row['requests'] > 0 else 1  # Avoid division by zero
+        op_requests_all_count.labels(source=source, server=server).set(requests)
         op_requests_failure_count.labels(source=source, server=server).set(row['failure'])
         op_requests_timeout_count.labels(source=source, server=server).set(row['timeout'])
-        op_requests_failure_percentage.labels(source=source, server=server).set(row['failure'] / row['requests'] * 100)
-        op_requests_timeout_percentage.labels(source=source, server=server).set(row['timeout'] / row['requests'] * 100)
+        op_requests_failure_percentage.labels(source=source, server=server).set((row['failure'] / requests) * 100)
+        op_requests_timeout_percentage.labels(source=source, server=server).set((row['timeout'] / requests) * 100)
 
 def download_generate_prometheus_metrics(data, registry):
     op_download_sec = Gauge("op_download_sec", "OnionPerf download sec", ['source', 'server', 'filesize', 'percentile'], registry=registry)
@@ -513,11 +514,11 @@ if __name__ == '__main__':
     network_observed_bandwidth.labels(status='offline').set(offline_observed_bandwidth)
 
     network_bandwidth_rate = Gauge('average_bandwidth_rate', 'Current average bandwidth rate on the network', ['status'], registry=registry)
-    average_bandwidth_rate = total_relays == 0 and 0 or total_bandwidth_rate / len(total_relays)
+    network_bandwidth_rate.labels(status='all').set(0 if len(total_relays) == 0 else total_bandwidth_rate / len(total_relays))
     network_bandwidth_rate.labels(status='all').set(average_bandwidth_rate)
-    average_bandwidth_rate_online = online_relays == 0 and 0 or online_bandwidth_rate / len(online_relays)
+    network_bandwidth_rate.labels(status='online').set(0 if len(online_relays) == 0 else online_bandwidth_rate / len(online_relays))
     network_bandwidth_rate.labels(status='online').set(average_bandwidth_rate_online)
-    average_bandwidth_rate_offline = offline_relays == 0 and 0 or offline_bandwidth_rate / len(offline_relays)
+    network_bandwidth_rate.labels(status='offline').set(0 if len(offline_relays) == 0 else offline_bandwidth_rate / len(offline_relays))
     network_bandwidth_rate.labels(status='offline').set(average_bandwidth_rate_offline)
 
     online_measured_count = Gauge('total_online_measured_count', 'Current total online measured relays', registry=registry)
@@ -527,40 +528,41 @@ if __name__ == '__main__':
     online_unmeasured_count.set(total_online_unmeasured)
 
     online_measured_ratio = Gauge('total_online_measured_ratio', 'Current total online measured ratio', registry=registry)
-    online_measured_ratio.set(total_online_measured / total_online_unmeasured)
-
+    online_measured_ratio.set(0 if total_online_unmeasured == 0 else total_online_measured / total_online_unmeasured)
+    
     online_measured_percentage = Gauge('total_online_measured_percentage', 'Current total online measured percentage', registry=registry)
-    online_measured_percentage.set(total_online_measured / len(online_relays) * 100)
+    online_measured_percentage.set(0 if len(online_relays) == 0 else total_online_measured / len(online_relays) * 100)
 
     countries_average_observed_bandwidth = Gauge('countries_average_observed_bandwidth', 'Average observed bandwidth per country', ['status','country'], registry=registry)
     for country in total_countries_bandwidth.keys():
-        if country is not None and country.isalpha():
-            average_countries_bandwidth = total_countries_bandwidth[country] / total_countries_relays[country]
-            countries_average_observed_bandwidth.labels(status='all', country=country).set(average_countries_bandwidth)
+        if country and country.isalpha():
+            count = total_countries_relays.get(country, 0)
+            countries_average_observed_bandwidth.labels(status='all', country=country).set(0 if count == 0 else total_countries_bandwidth[country] / count)
     for country in online_countries_relays.keys():
-        if country is not None and country.isalpha():
-            average_online_countries_bandwidth = online_countries_bandwidth[country] / online_countries_relays[country]
-            countries_average_observed_bandwidth.labels(status='online', country=country).set(average_online_countries_bandwidth)
+        if country and country.isalpha():
+            count = online_countries_relays.get(country, 0)
+            countries_average_observed_bandwidth.labels(status='online', country=country).set(0 if count == 0 else online_countries_bandwidth[country] / count)
     for country in offline_countries_relays.keys():
-        if country is not None and country.isalpha():
-            average_offline_countries_bandwidth = offline_countries_bandwidth[country] / offline_countries_relays[country]
-            countries_average_observed_bandwidth.labels(status='offline', country=country).set(average_offline_countries_bandwidth)
+        if country and country.isalpha():
+            count = offline_countries_relays.get(country, 0)
+            countries_average_observed_bandwidth.labels(status='offline', country=country).set(0 if count == 0 else offline_countries_bandwidth[country] / count)
 
     median_bandwidth_per_flag = Gauge('median_bandwidth_per_flag', 'Median bandwidth per flag', ['status', 'flag'], registry=registry)
     for flag in bandwidth_per_flag.keys():
-        if flag is not None and flag.isalpha():
+        if flag and flag.isalpha() and len(bandwidth_per_flag[flag]) > 0:
             bandwidth_per_flag[flag].sort()
-            middle_index = int(len(bandwidth_per_flag[flag])/2)
+            middle_index = len(bandwidth_per_flag[flag]) // 2
             median_bandwidth_per_flag.labels(status='all', flag=flag).set(bandwidth_per_flag[flag][middle_index])
     for flag in online_bandwidth_per_flag.keys():
-        if flag is not None and flag.isalpha():
+    for flag in online_bandwidth_per_flag.keys():
+        if flag and flag.isalpha() and len(online_bandwidth_per_flag[flag]) > 0:
             online_bandwidth_per_flag[flag].sort()
-            middle_index = int(len(online_bandwidth_per_flag[flag])/2)
+            middle_index = len(online_bandwidth_per_flag[flag]) // 2
             median_bandwidth_per_flag.labels(status='online', flag=flag).set(online_bandwidth_per_flag[flag][middle_index])
     for flag in offline_bandwidth_per_flag.keys():
-        if flag is not None and flag.isalpha():
+        if flag and flag.isalpha() and len(offline_bandwidth_per_flag[flag]) > 0:
             offline_bandwidth_per_flag[flag].sort()
-            middle_index = int(len(offline_bandwidth_per_flag[flag])/2)
+            middle_index = len(offline_bandwidth_per_flag[flag]) // 2
             median_bandwidth_per_flag.labels(status='offline', flag=flag).set(offline_bandwidth_per_flag[flag][middle_index])
 
     network_consensus_is_fresh = Gauge('network_consensus_is_fresh', 'Current network consensus freshness', registry=registry)
