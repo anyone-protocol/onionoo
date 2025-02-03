@@ -514,7 +514,7 @@ if __name__ == '__main__':
     network_observed_bandwidth.labels(status='offline').set(offline_observed_bandwidth)
 
     network_bandwidth_rate = Gauge('average_bandwidth_rate', 'Current average bandwidth rate on the network', ['status'], registry=registry)
-    network_bandwidth_rate.labels(status='all').set(0 if len(total_relays) == 0 else total_bandwidth_rate / len(total_relays))
+    average_bandwidth_rate = 0 if len(total_relays) == 0 else total_bandwidth_rate / len(total_relays))
     network_bandwidth_rate.labels(status='all').set(average_bandwidth_rate)
     network_bandwidth_rate.labels(status='online').set(0 if len(online_relays) == 0 else online_bandwidth_rate / len(online_relays))
     network_bandwidth_rate.labels(status='online').set(average_bandwidth_rate_online)
