@@ -67,7 +67,7 @@ job "onionoo-stage" {
 
       resources {
         cpu    = 512
-        memory = 768
+        memory = 2048
       }
 
       service {
