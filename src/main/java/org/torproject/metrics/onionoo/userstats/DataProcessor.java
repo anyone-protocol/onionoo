@@ -39,19 +39,19 @@ public class DataProcessor {
 
         long idCounter = mergedMap.isEmpty() ? 1 : mergedMap.keySet().stream().max(Long::compareTo).get() + 1;
 
-        LocalDate threeDaysAgo = toLocalDate(Instant.now().toEpochMilli()).minusDays(3);
+        LocalDate fiveDaysAgo = toLocalDate(Instant.now().toEpochMilli()).minusDays(5);
 
         Set<LocalDate> distinctDates = importedList.stream()
                 .map(imported -> toLocalDate(imported.getStatsStart()))
-                .filter(date -> date.isAfter(threeDaysAgo))
+                .filter(date -> date.isAfter(fiveDaysAgo))
                 .collect(Collectors.toSet());
 
         importedList = importedList.stream()
-                .filter(imported -> toLocalDate(imported.getStatsStart()).isAfter(threeDaysAgo))
+                .filter(imported -> toLocalDate(imported.getStatsStart()).isAfter(fiveDaysAgo))
                 .collect(Collectors.toList());
 
         Map<String, List<Merged>> mergedGroup = mergedList.stream()
-                .filter(merged -> toLocalDate(merged.getStatsStart()).isAfter(threeDaysAgo))
+                .filter(merged -> toLocalDate(merged.getStatsStart()).isAfter(fiveDaysAgo))
                 .filter(merged -> distinctDates.contains(toLocalDate(merged.getStatsStart())))
                 .collect(Collectors.groupingBy(m ->
                         String.join("-", m.getFingerprint(), m.getNickname(), m.getMetric().name(), m.getCountry()))
@@ -317,7 +317,11 @@ public class DataProcessor {
         mergedGroup.clear();
         mergedList.clear();
 
-        return new ArrayList<>(mergedMap.values());
+        // cleanup old entries
+        Collection<Merged> values = mergedMap.values();
+        values.removeIf(m -> toLocalDate(m.getStatsStart()).isBefore(fiveDaysAgo));
+
+        return new ArrayList<>(values);
     }
 
     private Merged findAdjacentOrOverlapping(List<Merged> mergedPart, Imported imported) {
