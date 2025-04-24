@@ -39,19 +39,19 @@ public class DataProcessor {
 
         long idCounter = mergedMap.isEmpty() ? 1 : mergedMap.keySet().stream().max(Long::compareTo).get() + 1;
 
-        LocalDate weekAgo = toLocalDate(Instant.now().toEpochMilli()).minusDays(7);
+        LocalDate threeDaysAgo = toLocalDate(Instant.now().toEpochMilli()).minusDays(3);
 
         Set<LocalDate> distinctDates = importedList.stream()
                 .map(imported -> toLocalDate(imported.getStatsStart()))
-                .filter(date -> date.isAfter(weekAgo))
+                .filter(date -> date.isAfter(threeDaysAgo))
                 .collect(Collectors.toSet());
 
         importedList = importedList.stream()
-                .filter(imported -> toLocalDate(imported.getStatsStart()).isAfter(weekAgo))
+                .filter(imported -> toLocalDate(imported.getStatsStart()).isAfter(threeDaysAgo))
                 .collect(Collectors.toList());
 
         Map<String, List<Merged>> mergedGroup = mergedList.stream()
-                .filter(merged -> toLocalDate(merged.getStatsStart()).isAfter(weekAgo))
+                .filter(merged -> toLocalDate(merged.getStatsStart()).isAfter(threeDaysAgo))
                 .filter(merged -> distinctDates.contains(toLocalDate(merged.getStatsStart())))
                 .collect(Collectors.groupingBy(m ->
                         String.join("-", m.getFingerprint(), m.getNickname(), m.getMetric().name(), m.getCountry()))
