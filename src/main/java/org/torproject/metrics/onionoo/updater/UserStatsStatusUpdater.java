@@ -200,10 +200,15 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
 
         List<Merged> merged = statusOld == null ? new ArrayList<>() : statusOld.getMerged();
 
-
         List<Merged> merge = dataProcessor.merge(merged, new ArrayList<>(imported));
 
         logger.info("New merged size: {}", merge.size());
+
+        // try to clean up memory
+        imported.clear();
+        merged.clear();
+        statusOld = null;
+        System.gc();
 
         if (!merge.isEmpty()) {
             logger.info("New merged is not empty, persist to disk");
@@ -213,11 +218,12 @@ public class UserStatsStatusUpdater implements DescriptorListener, StatusUpdater
 
         logger.info("Start aggregation based on merged data");
         List<Aggregated> aggregate = dataProcessor.aggregate(merge);
+        merge.clear();
         logger.info("Aggregated size: {}", aggregate.size());
         List<Estimated> estimated = dataProcessor.estimate(aggregate);
+        aggregate.clear();
         logger.info("Estimated size: {}", estimated.size());
         this.documentStore.store(new UserStatsStatus(estimated));
-        imported.clear();
     }
 
     @Override
