@@ -13,3 +13,4 @@ src/test/test.iml
 /docker/onionoo-data
 
 data
+.vscode/
