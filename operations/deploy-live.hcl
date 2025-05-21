@@ -1,7 +1,7 @@
 job "onionoo-live" {
   datacenters = ["ator-fin"]
   type        = "service"
-  namespace   = "ator-network"
+  namespace   = "live-network"
 
   update {
     max_parallel      = 1
@@ -47,7 +47,7 @@ job "onionoo-live" {
             UPDATER_PERIOD="5"
             UPDATER_OFFSET="0"
             EOH
-        destination = "secrets/file.env"
+        destination = "local/config.env"
         env         = true
       }
 
