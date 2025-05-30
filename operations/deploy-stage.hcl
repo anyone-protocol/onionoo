@@ -3,6 +3,11 @@ job "onionoo-stage" {
   type        = "service"
   namespace   = "stage-network"
 
+  constraint {
+    attribute = "${meta.pool}"
+    value = "stage"
+  }
+
   update {
     max_parallel      = 1
     healthy_deadline  = "15m"
@@ -21,15 +26,28 @@ job "onionoo-stage" {
     network {
       mode = "bridge"
       port "http-port" {
-        static = 9190
         to     = 8080
         host_network = "wireguard"
       }
     }
 
-    ephemeral_disk {
-      migrate = true
-      sticky  = true
+    service {
+      name = "onionoo-war-stage"
+      port = "http-port"
+      tags = ["logging"]
+      check {
+        name     = "Onionoo web server check"
+        type     = "http"
+        port     = "http-port"
+        path     = "/"
+        interval = "10s"
+        timeout  = "10s"
+        address_mode = "alloc"
+        check_restart {
+          limit = 10
+          grace = "30s"
+        }
+      }
     }
 
     task "onionoo-jar-stage-task" {
@@ -103,24 +121,6 @@ job "onionoo-stage" {
       resources {
         cpu    = 256
         memory = 512
-      }
-
-      service {
-        name = "onionoo-war-stage"
-        port = "http-port"
-        tags = ["logging"]
-        check {
-          name     = "Onionoo web server check"
-          type     = "http"
-          port     = "http-port"
-          path     = "/"
-          interval = "10s"
-          timeout  = "10s"
-          check_restart {
-            limit = 10
-            grace = "30s"
-          }
-        }
       }
     }
 

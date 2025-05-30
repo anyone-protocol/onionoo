@@ -3,6 +3,11 @@ job "onionoo-live" {
   type        = "service"
   namespace   = "live-network"
 
+  constraint {
+    attribute = "${meta.pool}"
+    value = "live-network"
+  }
+
   update {
     max_parallel      = 1
     healthy_deadline  = "15m"
@@ -21,15 +26,28 @@ job "onionoo-live" {
     network {
       mode = "bridge"
       port "http-port" {
-        static = 9290
         to     = 8080
         host_network = "wireguard"
       }
     }
 
-    ephemeral_disk {
-      migrate = true
-      sticky  = true
+    service {
+      name = "onionoo-war-live"
+      port = "http-port"
+      tags = ["logging"]
+      check {
+        name     = "Onionoo web server check"
+        type     = "http"
+        port     = "http-port"
+        path     = "/"
+        interval = "10s"
+        timeout  = "10s"
+        address_mode = "alloc"
+        check_restart {
+          limit = 10
+          grace = "30s"
+        }
+      }
     }
 
     task "onionoo-jar-live-task" {
@@ -66,8 +84,8 @@ job "onionoo-live" {
       }
 
       resources {
-        cpu    = 1024
-        memory = 12288
+        cpu    = 4096
+        memory = 16384
       }
 
       service {
@@ -101,26 +119,8 @@ job "onionoo-live" {
       }
 
       resources {
-        cpu    = 256
-        memory = 2048
-      }
-
-      service {
-        name = "onionoo-war-live"
-        port = "http-port"
-        tags = ["logging"]
-        check {
-          name     = "Onionoo web server check"
-          type     = "http"
-          port     = "http-port"
-          path     = "/"
-          interval = "10s"
-          timeout  = "10s"
-          check_restart {
-            limit = 10
-            grace = "30s"
-          }
-        }
+        cpu    = 2048
+        memory = 4096
       }
     }
 
