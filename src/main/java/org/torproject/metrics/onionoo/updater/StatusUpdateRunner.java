@@ -22,7 +22,12 @@ public class StatusUpdateRunner {
   /** Instantiates a new status update runner with newly created instances
    * of all known status updater implementations. */
   public StatusUpdateRunner() {
-    this.ls = new LookupService(new File("geoip"));
+    String apiServiceUrl = System.getenv("API_SERVICE_URL");
+    if (apiServiceUrl == null) {
+      apiServiceUrl = System.getProperty("api.service.url");
+    }
+    
+    this.ls = new LookupService(new File("geoip"), apiServiceUrl);
     this.rdnr = new ReverseDomainNameResolver();
     NodeDetailsStatusUpdater ndsu = new NodeDetailsStatusUpdater(
         this.rdnr, this.ls);
@@ -59,6 +64,13 @@ public class StatusUpdateRunner {
     }
     logger.info("GeoIP lookup service\n{}", this.ls.getStatsString());
     logger.info("Reverse domain name resolver\n{}", this.rdnr.getStatsString());
+  }
+
+  /** Updates geolocation data from the API service. Should be called by cron job. */
+  public void updateGeolocationData() {
+    if (this.ls != null) {
+      this.ls.updateGeolocationData();
+    }
   }
 }
 

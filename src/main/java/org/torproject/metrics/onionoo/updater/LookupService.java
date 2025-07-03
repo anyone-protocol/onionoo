@@ -30,13 +30,14 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-// TODO: GeoIP feature is currently working with outdated data, without ASN and only for IPv4 addresses.
+// TODO: GeoIP feature updated to use API service for fingerprint-based lookups, fallback to file-based for IPv4 addresses.
 public class LookupService {
 
   private static final Logger logger = LoggerFactory.getLogger(
       LookupService.class);
 
   private final File geoipDir;
+  private final ApiGeoLocationService apiGeoLocationService;
 
   private GeoipFile geoip;
 
@@ -49,7 +50,13 @@ public class LookupService {
   private boolean hasAllFiles = false;
 
   public LookupService(File geoipDir) {
+    this(geoipDir, null);
+  }
+
+  public LookupService(File geoipDir, String apiBaseUrl) {
     this.geoipDir = geoipDir;
+    this.apiGeoLocationService = apiBaseUrl != null ? 
+        new ApiGeoLocationService(apiBaseUrl) : null;
     this.findRequiredCsvFiles();
   }
 
@@ -164,6 +171,43 @@ public class LookupService {
     return lookupResults;
   }
 
+  /** Looks up geolocation for relay fingerprints using the API service.
+   * Returns all lookup results. */
+  public SortedMap<String, LookupResult> lookupByFingerprint(
+      SortedSet<String> fingerprints) {
+
+    SortedMap<String, LookupResult> lookupResults = new TreeMap<>();
+
+    if (apiGeoLocationService == null) {
+      logger.warn("API geolocation service not configured, skipping fingerprint lookups");
+      return lookupResults;
+    }
+
+    /* Obtain geolocation data from API service for each fingerprint. */
+    for (String fingerprint : fingerprints) {
+      ApiGeoLocationService.GeolocationData geoData = 
+          apiGeoLocationService.getGeolocationData(fingerprint);
+      
+      if (geoData != null) {
+        LookupResult lookupResult = new LookupResult();
+        lookupResult.setLatitude((float) geoData.getLatitude());
+        lookupResult.setLongitude((float) geoData.getLongitude());
+        
+        // Try to derive country code from coordinates using existing logic if available
+        // For now, we'll leave country fields empty as the API doesn't provide them directly
+        
+        lookupResults.put(fingerprint, lookupResult);
+        this.addressesResolvedByApi++;
+      }
+    }
+
+    /* Keep statistics. */
+    this.addressesLookedUpByApi += fingerprints.size();
+    this.addressesResolvedByApiTotal += lookupResults.size();
+
+    return lookupResults;
+  }
+
   private BufferedReader createBufferedReaderFromUtf8File(File utf8File)
       throws FileNotFoundException {
     return this.createBufferedReaderFromFile(utf8File,
@@ -186,18 +230,52 @@ public class LookupService {
 
   private int addressesAsnResolved = 0;
 
+  // New statistics for API-based lookups
+  private int addressesLookedUpByApi = 0;
+
+  private int addressesResolvedByApi = 0;
+
+  private int addressesResolvedByApiTotal = 0;
+
+  /** Updates geolocation data from the API service. Should be called by cron job. */
+  public void updateGeolocationData() {
+    if (apiGeoLocationService != null) {
+      try {
+        apiGeoLocationService.updateGeolocationData();
+        logger.info("Successfully updated geolocation data from API service");
+      } catch (Exception e) {
+        logger.error("Failed to update geolocation data from API service", e);
+      }
+    } else {
+      logger.warn("API geolocation service not configured, cannot update data");
+    }
+  }
+
   /** Returns a string with the number of addresses looked up and
    * resolved. */
   public String getStatsString() {
-    return String.format(
-        "    %s addresses looked up\n"
+    StringBuilder stats = new StringBuilder();
+    stats.append(String.format(
+        "    %s addresses looked up (file-based)\n"
         + "    %s addresses resolved (any)\n"
         + "    %s addresses resolved (country)\n"
         + "    %s addresses resolved (ASN)\n",
         FormattingUtils.formatDecimalNumber(addressesLookedUp),
         FormattingUtils.formatDecimalNumber(addressesResolved),
         FormattingUtils.formatDecimalNumber(addressesCountryResolved),
-        FormattingUtils.formatDecimalNumber(addressesAsnResolved));
+        FormattingUtils.formatDecimalNumber(addressesAsnResolved)));
+    
+    if (apiGeoLocationService != null) {
+      stats.append(String.format(
+          "    %s fingerprints looked up (API-based)\n"
+          + "    %s fingerprints resolved (API-based)\n"
+          + "    API service stats:\n%s",
+          FormattingUtils.formatDecimalNumber(addressesLookedUpByApi),
+          FormattingUtils.formatDecimalNumber(addressesResolvedByApiTotal),
+          apiGeoLocationService.getStatsString()));
+    }
+    
+    return stats.toString();
   }
 }
 

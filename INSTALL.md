@@ -261,3 +261,187 @@ should be updated once per month.
 Onionoo might run into issues from time to time, but fortunately there are no
 known issues that operators would have to be aware of.
 
+
+## Running with Docker
+
+For easier deployment and management, Onionoo can be run using Docker. This approach eliminates the need to manually install Java and manage dependencies on the host system.
+
+### Prerequisites
+
+- Docker and Docker Compose installed on your host system
+- At least 200G disk space and 8G RAM (same as the standard installation)
+
+### Docker Architecture
+
+The Docker setup provides a containerized version of both Onionoo components:
+
+- **onionoo-jar**: Background updater service (JAR file)
+- **onionoo-war**: Web application service (WAR file) 
+- **onionoo-cron**: Optional cron service for additional scheduling
+
+### Building the Docker Image
+
+From the onionoo project root directory:
+
+```bash
+docker build -f docker/Dockerfile -t onionoo .
+```
+
+This will:
+- Build the Onionoo JAR and WAR files from source
+- Download required dependencies
+- Set up the proper directory structure
+- Create a ready-to-run container image
+
+### Running with Docker Compose
+
+The easiest way to run Onionoo is using the provided Docker Compose configuration:
+
+```bash
+cd docker
+docker-compose up -d
+```
+
+This starts:
+- **onionoo-jar**: Data collector running continuously
+- **onionoo-war**: Web server accessible at http://localhost:8080
+
+### Configuration Options
+
+You can customize the deployment by modifying environment variables in `docker/docker-compose.yml`:
+
+#### JAR Service Configuration:
+- `COLLECTOR_HOST`: Tor descriptor source (default: `host.docker.internal:9000`)
+- `COLLECTOR_PROTOCOL`: Protocol for collector (default: `http://`)
+- `UPDATER_PERIOD`: Update interval in minutes (default: `2`)
+- `UPDATER_OFFSET`: Offset for updates in minutes (default: `0`)
+
+#### WAR Service Configuration:
+- `BASE_DIR`: Working directory (default: `/srv/onionoo`)
+- `LOGBASE`: Log directory path (default: `data/logs`)
+
+### Data Persistence
+
+The Docker setup uses a volume mount for data persistence:
+- Host directory: `./onionoo-data/`
+- Container directory: `/srv/onionoo/data`
+
+This ensures your Onionoo data survives container restarts and upgrades.
+
+### Monitoring Docker Services
+
+Check service status:
+```bash
+docker-compose ps
+```
+
+View logs:
+```bash
+# All services
+docker-compose logs
+
+# Specific service
+docker-compose logs onionoo-jar
+docker-compose logs onionoo-war
+```
+
+Follow logs in real-time:
+```bash
+docker-compose logs -f onionoo-jar
+```
+
+### Docker Service Management
+
+Start services:
+```bash
+docker-compose up -d
+```
+
+Stop services:
+```bash
+docker-compose down
+```
+
+Restart a specific service:
+```bash
+docker-compose restart onionoo-jar
+```
+
+Update to new version:
+```bash
+# Rebuild image with latest code
+docker build -f docker/Dockerfile -t onionoo .
+
+# Restart services with new image
+docker-compose down
+docker-compose up -d
+```
+
+### Accessing the Service
+
+Once running, the Onionoo web interface is available at:
+- **Main Interface**: http://localhost:8080/
+- **Protocol Documentation**: http://localhost:8080/protocol.html
+- **API Endpoints**: http://localhost:8080/summary, http://localhost:8080/details, etc.
+
+### Docker-Specific Maintenance
+
+#### Backing up Docker Data
+```bash
+# Backup the data volume
+tar -czf onionoo-backup-$(date +%Y%m%d).tar.gz onionoo-data/
+```
+
+#### Updating GeoIP Data
+The GeoIP data should be updated monthly. With Docker:
+
+```bash
+# Stop services
+docker-compose down
+
+# Update GeoIP files in the data directory
+# Download and extract new GeoIP data to onionoo-data/geoip/
+
+# Restart services
+docker-compose up -d
+```
+
+#### Resource Limits
+For production deployments, consider adding resource limits to the docker-compose.yml:
+
+```yaml
+services:
+  onionoo-jar:
+    # ...existing configuration...
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+  onionoo-war:
+    # ...existing configuration...
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+```
+
+### Troubleshooting Docker Deployment
+
+**Container won't start:**
+- Check logs: `docker-compose logs <service-name>`
+- Verify disk space and memory availability
+- Ensure port 8080 isn't already in use
+
+**Data not persisting:**
+- Verify volume mount in docker-compose.yml
+- Check permissions on host directory
+
+**Can't access web interface:**
+- Confirm port mapping in docker-compose.yml
+- Check if container is running: `docker-compose ps`
+- Verify firewall settings
+

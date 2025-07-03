@@ -1,7 +1,7 @@
 version: '2.2'
 services:
   onionoo-jar:
-    image: onionoo
+    image: ghcr.io/anyone-protocol/onionoo:f3ca5cb7575c07511dddacda7838bbdce5f848a6
     restart: always
     environment:
       COLLECTOR_HOST: host.docker.internal:9000
@@ -11,10 +11,11 @@ services:
       BASE_DIR: "/srv/onionoo"
       LOGBASE: "data/logs"
       TYPE: jar
+      API_SERVICE_URL: "http://host.docker.internal:3000"
     volumes:
       - ./onionoo-data/:/srv/onionoo/data
   onionoo-war:
-    image: onionoo
+    image: ghcr.io/anyone-protocol/onionoo:f3ca5cb7575c07511dddacda7838bbdce5f848a6
     restart: always
     environment:
       BASE_DIR: "/srv/onionoo"
@@ -25,7 +26,7 @@ services:
     volumes:
       - ./onionoo-data/:/srv/onionoo/data
   onionoo-cron:
-    image: onionoo-cron
+    image: ghcr.io/anyone-protocol/onionoo-cron:f3ca5cb7575c07511dddacda7838bbdce5f848a6
     restart: always
     environment:
       ONIONOO_HOST: "http://host.docker.internal:8080"

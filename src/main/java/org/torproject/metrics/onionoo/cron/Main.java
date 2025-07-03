@@ -181,6 +181,8 @@ public class Main implements Runnable {
     if (this.downloadOnly || this.writeOnly) {
       return;
     }
+    logger.info("Updating geolocation data from API service.");
+    this.sur.updateGeolocationData();
     logger.info("Reading descriptors.");
     this.dso.readDescriptors();
     logger.info("Updating internal status files.");
