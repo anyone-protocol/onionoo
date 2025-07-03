@@ -189,15 +189,12 @@ public class LookupService {
           apiGeoLocationService.getGeolocationData(fingerprint);
       
       if (geoData != null) {
-        LookupResult lookupResult = new LookupResult();
-        lookupResult.setLatitude((float) geoData.getLatitude());
-        lookupResult.setLongitude((float) geoData.getLongitude());
+        LookupResult lookupResult = ApiGeoLocationService.toLookupResult(geoData);
         
-        // Try to derive country code from coordinates using existing logic if available
-        // For now, we'll leave country fields empty as the API doesn't provide them directly
-        
-        lookupResults.put(fingerprint, lookupResult);
-        this.addressesResolvedByApi++;
+        if (lookupResult != null) {
+          lookupResults.put(fingerprint, lookupResult);
+          this.addressesResolvedByApi++;
+        }
       }
     }
 

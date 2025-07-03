@@ -1,17 +1,17 @@
 # Onionoo API Service Integration
 
-This document describes the integration of the Onionoo project with the ATOR API service for geo IP data lookups.
+This document describes the integration of the Onionoo project with the Anyone-Protocol API service for geo IP data lookups.
 
 ## Overview
 
-The Onionoo project has been updated to fetch geolocation data from the ATOR API service instead of relying solely on local geo IP files. This provides more accurate and up-to-date geolocation information for relay fingerprints.
+The Onionoo project has been updated to fetch geolocation data from the Anyone-Protocol API service instead of relying solely on local geo IP files. This provides more accurate and up-to-date geolocation information for relay fingerprints.
 
 ## Changes Made
 
 ### 1. New API Geolocation Service
 
 - **File**: `src/main/java/org/torproject/metrics/onionoo/updater/ApiGeoLocationService.java`
-- **Purpose**: Handles communication with the ATOR API service to fetch fingerprint-based geolocation data
+- **Purpose**: Handles communication with the Anyone-Protocol API service to fetch fingerprint-based geolocation data
 - **Features**: 
   - Fetches data from `/fingerprint-map/` endpoint
   - Caches data for 1 hour to reduce API calls
@@ -54,7 +54,7 @@ The Onionoo project has been updated to fetch geolocation data from the ATOR API
 
 ### Environment Variable
 
-Set the `API_SERVICE_URL` environment variable to point to your ATOR API service:
+Set the `API_SERVICE_URL` environment variable to point to your Anyone-Protocol API service:
 
 ```bash
 export API_SERVICE_URL="https://api.ec.anyone.tech"
@@ -112,10 +112,31 @@ The system remains fully backward compatible:
 
 ## Monitoring
 
-Check the application logs for:
-- API cache update success/failure messages
-- Lookup statistics showing API vs IP-based resolution counts
-- Cache freshness warnings if the API becomes unavailable
+The API service integration includes comprehensive monitoring capabilities:
+
+### Cache Health Monitoring
+- **Cache Duration**: 1 hour (considered fresh)
+- **Warning Threshold**: 70 minutes (getting stale)
+- **Critical Threshold**: 2 hours (service degradation)
+
+### Statistics and Logging
+- Cache size (number of fingerprints)
+- Cache age with status (FRESH/STALE/WARNING/CRITICAL)
+- Last update timestamp
+- Detailed error logging for different cache states
+
+### Update Schedule
+- **Onionoo Updates**: Every 60 minutes (configurable)
+- **MaxMind Database Updates**: Weekly (recommended)
+- **Cache Refresh**: Automatic during Onionoo update cycles
+
+### Health Checks
+Monitor the following for service health:
+- Cache age and status in application logs
+- API service response time and availability
+- MaxMind database freshness (should be updated weekly)
+
+For detailed monitoring setup and troubleshooting, see `GEOLOCATION_MONITORING.md`.
 
 ## Future Enhancements
 
