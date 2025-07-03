@@ -56,7 +56,7 @@ job "onionoo-stage" {
       template {
         data = <<-EOH
         BASE_DIR="/srv/onionoo"
-        LOGBASE="data/logs"
+        LOGBASE="{{ env `NOMAD_ALLOC_DIR` }}/logs"
         TYPE="jar"
         {{- range service "collector-stage" }}
         COLLECTOR_HOST="{{ .Address }}:{{ .Port }}"
@@ -81,9 +81,6 @@ job "onionoo-stage" {
       config {
         image   = "ghcr.io/anyone-protocol/onionoo:DEPLOY_TAG"
         image_pull_timeout = "15m"
-        volumes = [
-          "${NOMAD_ALLOC_DIR}/logs/:/srv/onionoo/data/logs"
-        ]
       }
 
       resources {
@@ -102,7 +99,7 @@ job "onionoo-stage" {
 
       env {
         BASE_DIR = "/srv/onionoo"
-        LOGBASE  = "data/logs"
+        LOGBASE  = "${NOMAD_ALLOC_DIR}/logs"
         TYPE     = "war"
       }
 
@@ -116,9 +113,6 @@ job "onionoo-stage" {
         image   = "ghcr.io/anyone-protocol/onionoo:DEPLOY_TAG"
         image_pull_timeout = "15m"
         ports   = ["http-port"]
-        volumes = [
-          "${NOMAD_ALLOC_DIR}/logs/:/srv/onionoo/data/logs"
-        ]
       }
 
       resources {
@@ -140,9 +134,6 @@ job "onionoo-stage" {
       config {
         image   = "ghcr.io/anyone-protocol/onionoo-cron:DEPLOY_TAG"
         image_pull_timeout = "15m"
-        volumes = [
-          "${NOMAD_ALLOC_DIR}/logs/:/srv/onionoo/data/logs"
-        ]
       }
 
       volume_mount {
