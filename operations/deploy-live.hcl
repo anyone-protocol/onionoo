@@ -64,6 +64,9 @@ job "onionoo-live" {
             COLLECTOR_PROTOCOL="http://"
             UPDATER_PERIOD="5"
             UPDATER_OFFSET="0"
+            {{- range service "api-service-live" }}
+            API_SERVICE_URL="http://{{ .Address }}:{{ .Port }}"
+            {{ end -}}
             EOH
         destination = "local/config.env"
         env         = true

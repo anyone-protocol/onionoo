@@ -635,25 +635,48 @@ public class NodeDetailsStatusUpdater implements DescriptorListener,
   private SortedMap<String, LookupResult> geoIpLookupResults = new TreeMap<>();
 
   private void lookUpCitiesAndASes() {
+    // First, try fingerprint-based lookups using the API service
+    SortedSet<String> fingerprints = new TreeSet<>(this.currentRelays);
+    SortedMap<String, LookupResult> fingerprintLookupResults = 
+        this.lookupService.lookupByFingerprint(fingerprints);
+    
+    // Add results from fingerprint lookups
+    this.geoIpLookupResults.putAll(fingerprintLookupResults);
+    
+    // For fingerprints not found via API, fall back to IP-based lookups
     SortedSet<String> addressStrings = new TreeSet<>();
     for (String fingerprint : this.currentRelays) {
-      NodeStatus nodeStatus = this.knownNodes.get(fingerprint);
-      addressStrings.add(nodeStatus.getAddress());
-    }
-    if (addressStrings.isEmpty()) {
-      logger.error("No relay IP addresses to resolve to cities or ASN.");
-      return;
-    }
-    SortedMap<String, LookupResult> lookupResults =
-        this.lookupService.lookup(addressStrings);
-    for (String fingerprint : this.currentRelays) {
-      NodeStatus nodeStatus = this.knownNodes.get(fingerprint);
-      LookupResult lookupResult = lookupResults.get(
-          nodeStatus.getAddress());
-      if (lookupResult != null) {
-        this.geoIpLookupResults.put(fingerprint, lookupResult);
+      if (!fingerprintLookupResults.containsKey(fingerprint)) {
+        NodeStatus nodeStatus = this.knownNodes.get(fingerprint);
+        addressStrings.add(nodeStatus.getAddress());
       }
     }
+    
+    if (!addressStrings.isEmpty()) {
+      SortedMap<String, LookupResult> ipLookupResults =
+          this.lookupService.lookup(addressStrings);
+      
+      // Add results from IP-based lookups for fingerprints not found via API
+      for (String fingerprint : this.currentRelays) {
+        if (!fingerprintLookupResults.containsKey(fingerprint)) {
+          NodeStatus nodeStatus = this.knownNodes.get(fingerprint);
+          LookupResult lookupResult = ipLookupResults.get(nodeStatus.getAddress());
+          if (lookupResult != null) {
+            this.geoIpLookupResults.put(fingerprint, lookupResult);
+          }
+        }
+      }
+    }
+    
+    if (fingerprints.isEmpty() && addressStrings.isEmpty()) {
+      logger.error("No relay fingerprints or IP addresses to resolve to cities or ASN.");
+      return;
+    }
+    
+    logger.info("Resolved geolocation for {} relays ({} via API, {} via IP lookup)", 
+        this.geoIpLookupResults.size(), 
+        fingerprintLookupResults.size(),
+        this.geoIpLookupResults.size() - fingerprintLookupResults.size());
   }
 
   private SortedMap<String, Float> consensusWeightFractions = new TreeMap<>();
