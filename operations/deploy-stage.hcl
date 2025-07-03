@@ -58,9 +58,9 @@ job "onionoo-stage" {
             BASE_DIR="/srv/onionoo"
             LOGBASE="data/logs"
             TYPE="jar"
-	      {{- range service "collector-stage" }}
-  	        COLLECTOR_HOST="{{ .Address }}:{{ .Port }}"
-	      {{ end -}}
+        {{- range service "collector-stage" }}
+            COLLECTOR_HOST="{{ .Address }}:{{ .Port }}"
+        {{ end -}}
             COLLECTOR_PROTOCOL="http://"
             UPDATER_PERIOD="5"
             UPDATER_OFFSET="0"
@@ -128,16 +128,10 @@ job "onionoo-stage" {
       driver = "docker"
 
       env {
-        ONIONOO_HOST      = "http://127.0.0.1:8080"
-        INTERVAL_MINUTES  = "60"
-        METRICS_FILE_PATH = "/srv/onionoo/data/out/network/metrics"
         CRON_EXPRESSION = "*/5 * * * *"
-      }
-
-      volume_mount {
-        volume      = "onionoo-data"
-        destination = "/srv/onionoo/data"
-        read_only   = false
+        ONIONOO_HOST = "http://127.0.0.1:8080"
+        INTERVAL_MINUTES = "60"
+        METRICS_FILE_PATH = "/srv/onionoo/data/out/network/metrics"
       }
 
       config {
@@ -146,6 +140,12 @@ job "onionoo-stage" {
         volumes = [
           "local/logs/:/srv/onionoo/data/logs"
         ]
+      }
+
+      volume_mount {
+        volume      = "onionoo-data"
+        destination = "/srv/onionoo/data"
+        read_only   = false
       }
 
       service {
