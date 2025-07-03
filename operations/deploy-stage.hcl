@@ -82,7 +82,7 @@ job "onionoo-stage" {
         image   = "ghcr.io/anyone-protocol/onionoo:DEPLOY_TAG"
         image_pull_timeout = "15m"
         volumes = [
-          "local/logs/:/srv/onionoo/data/logs"
+          "${NOMAD_ALLOC_DIR}/logs/:/srv/onionoo/data/logs"
         ]
       }
 
@@ -117,7 +117,7 @@ job "onionoo-stage" {
         image_pull_timeout = "15m"
         ports   = ["http-port"]
         volumes = [
-          "local/logs/:/srv/onionoo/data/logs"
+          "${NOMAD_ALLOC_DIR}/logs/:/srv/onionoo/data/logs"
         ]
       }
 
@@ -141,7 +141,7 @@ job "onionoo-stage" {
         image   = "ghcr.io/anyone-protocol/onionoo-cron:DEPLOY_TAG"
         image_pull_timeout = "15m"
         volumes = [
-          "local/logs/:/srv/onionoo/data/logs"
+          "${NOMAD_ALLOC_DIR}/logs/:/srv/onionoo/data/logs"
         ]
       }
 
