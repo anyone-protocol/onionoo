@@ -28,8 +28,8 @@ public class ApiGeoLocationService {
 
   private final String apiBaseUrl;
   private final ObjectMapper objectMapper;
-  private Map<String, GeolocationData> fingerprintLocationMap;
-  private long lastUpdateTime = 0;
+  private volatile Map<String, GeolocationData> fingerprintLocationMap;
+  private volatile long lastUpdateTime = 0;
   private static final long CACHE_DURATION_MS = 60 * 60 * 1000; // 1 hour
   private static final long STALE_WARNING_THRESHOLD_MS = 70 * 60 * 1000; // 70 minutes
   private static final long CRITICAL_THRESHOLD_MS = 120 * 60 * 1000; // 2 hours
