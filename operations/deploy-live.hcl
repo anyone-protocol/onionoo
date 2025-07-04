@@ -54,20 +54,20 @@ job "onionoo-live" {
       driver = "docker"
 
       template {
-        data = <<EOH
-            BASE_DIR="/srv/onionoo"
-            LOGBASE="data/logs"
-            TYPE="jar"
+        data = <<-EOH
+        BASE_DIR="/srv/onionoo"
+        LOGBASE="data/logs"
+        TYPE="jar"
 	      {{- range service "collector-live" }}
-  	        COLLECTOR_HOST="{{ .Address }}:{{ .Port }}"
-	      {{ end -}}
-            COLLECTOR_PROTOCOL="http://"
-            UPDATER_PERIOD="5"
-            UPDATER_OFFSET="0"
-            {{- range service "api-service-live" }}
-            API_SERVICE_URL="http://{{ .Address }}:{{ .Port }}"
-            {{ end -}}
-            EOH
+        COLLECTOR_HOST="{{ .Address }}:{{ .Port }}"
+	      {{- end }}
+        COLLECTOR_PROTOCOL="http://"
+        UPDATER_PERIOD="5"
+        UPDATER_OFFSET="0"
+        {{- range service "api-service-live" }}
+        API_SERVICE_URL="http://{{ .Address }}:{{ .Port }}"
+        {{- end }}
+        EOH
         destination = "local/config.env"
         env         = true
       }
