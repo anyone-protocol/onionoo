@@ -56,7 +56,7 @@ job "onionoo-live" {
       template {
         data = <<-EOH
         BASE_DIR="/srv/onionoo"
-        LOGBASE="data/logs"
+        LOGBASE="{{ env `NOMAD_ALLOC_DIR` }}/logs"
         TYPE="jar"
 	      {{- range service "collector-live" }}
         COLLECTOR_HOST="{{ .Address }}:{{ .Port }}"
@@ -102,7 +102,7 @@ job "onionoo-live" {
 
       env {
         BASE_DIR = "/srv/onionoo"
-        LOGBASE  = "data/logs"
+        LOGBASE  = "${NOMAD_ALLOC_DIR}/logs"
         TYPE     = "war"
       }
 
