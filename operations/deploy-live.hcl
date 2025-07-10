@@ -34,7 +34,15 @@ job "onionoo-live" {
     service {
       name = "onionoo-war-live"
       port = "http-port"
-      tags = ["logging"]
+      [
+        "logging",
+        "traefik-ops.enable=true",
+        "traefik-ops.http.routers.onionoo-live.rule=Host(`onionoo.ops.anyone.tech`)",
+        "traefik-ops.http.routers.onionoo-live.entrypoints=https",
+        "traefik-ops.http.routers.onionoo-live.tls=true",
+        "traefik-ops.http.routers.onionoo-live.tls.certresolver=anyoneresolver",
+        "traefik-ops.http.routers.onionoo-live.middlewares=oauth2-errors@consulcatalog,oauth2-proxy@consulcatalog",
+      ]
       check {
         name     = "Onionoo web server check"
         type     = "http"
