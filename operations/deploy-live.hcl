@@ -34,7 +34,7 @@ job "onionoo-live" {
     service {
       name = "onionoo-war-live"
       port = "http-port"
-      [
+      tags = [
         "logging",
         "traefik-ops.enable=true",
         "traefik-ops.http.routers.onionoo-live.rule=Host(`onionoo.ops.anyone.tech`)",
