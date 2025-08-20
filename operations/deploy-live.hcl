@@ -61,6 +61,26 @@ job "onionoo-live" {
     task "onionoo-jar-live-task" {
       driver = "docker"
 
+      config {
+        image   = "ghcr.io/anyone-protocol/onionoo:DEPLOY_TAG"
+        image_pull_timeout = "15m"
+        volumes = [
+          "local/logs/:/srv/onionoo/data/logs"
+        ]
+      }
+
+      volume_mount {
+        volume      = "onionoo-data"
+        destination = "/srv/onionoo/data"
+        read_only   = false
+      }
+
+      env {
+        API_SERVICE_URL="https://api.ec.anyone.tech"
+      }
+
+      consul {}
+
       template {
         data = <<-EOH
         BASE_DIR="/srv/onionoo"
@@ -72,26 +92,9 @@ job "onionoo-live" {
         COLLECTOR_PROTOCOL="http://"
         UPDATER_PERIOD="5"
         UPDATER_OFFSET="0"
-        {{- range service "api-service-live" }}
-        API_SERVICE_URL="http://{{ .Address }}:{{ .Port }}"
-        {{- end }}
         EOH
         destination = "local/config.env"
         env         = true
-      }
-
-      volume_mount {
-        volume      = "onionoo-data"
-        destination = "/srv/onionoo/data"
-        read_only   = false
-      }
-
-      config {
-        image   = "ghcr.io/anyone-protocol/onionoo:DEPLOY_TAG"
-        image_pull_timeout = "15m"
-        volumes = [
-          "local/logs/:/srv/onionoo/data/logs"
-        ]
       }
 
       resources {
