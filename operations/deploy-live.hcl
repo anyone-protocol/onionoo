@@ -166,7 +166,7 @@ job "onionoo-live" {
 
       resources {
         cpu    = 256
-        memory = 256
+        memory = 1024
       }
     }
   }
