@@ -289,6 +289,7 @@ docker build -f docker/Dockerfile -t onionoo .
 
 This will:
 - Build the Onionoo JAR and WAR files from source
+- Build against the metrics-base commit recorded in `src/build`, not the latest upstream commit
 - Download required dependencies
 - Set up the proper directory structure
 - Create a ready-to-run container image
