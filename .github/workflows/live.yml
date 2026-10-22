@@ -3,13 +3,19 @@ name: LIVE - Tag and Deploy
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Build and push
         uses: ./.github/actions/build-and-push
         with:
