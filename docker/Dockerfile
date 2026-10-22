@@ -7,9 +7,7 @@ WORKDIR /src
 
 COPY . .
 
-RUN git submodule init && \
-    git submodule update && \
-    ant fetch-metrics-lib && \
+RUN ant fetch-metrics-lib && \
     ant -lib /usr/share/java resolve && \
     ant tar && \
     mkdir /out && \
